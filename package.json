@@ -1,6 +1,6 @@
 {
   "name": "mirador-textoverlay-plugin",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "mirador-textoverlay-plugin React component",
   "main": "lib/index.js",
   "module": "es/index.js",
@@ -13,26 +13,65 @@
   "scripts": {
     "build": "nwb build-react-component",
     "clean": "nwb clean-module && nwb clean-demo",
+    "lint": "eslint ./src ./__tests__",
     "prepublishOnly": "npm run build",
     "start": "nwb serve-react-demo",
-    "test": "nwb test-react",
-    "test:coverage": "nwb test-react --coverage",
-    "test:watch": "nwb test-react --server"
+    "test": "npm run lint && jest",
+    "test:coverage": "jest --coverage",
+    "test:watch": "jest --watch"
   },
   "dependencies": {},
   "peerDependencies": {
-    "react": "16.x"
+    "@material-ui/core": "^4.9.13",
+    "@material-ui/icons": "^4.9.1",
+    "isomorphic-unfetch": "^3.0.0",
+    "lodash": "^4.17.11",
+    "mirador": "^3.0.0-rc.3",
+    "prop-types": "^15.7.2",
+    "react": "16.x",
+    "react-dom": "16.x",
+    "redux-saga": "^1.1.3",
+    "reselect": "^4.0.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.9.6",
+    "@babel/preset-env": "^7.9.6",
+    "@babel/preset-react": "^7.9.4",
+    "@material-ui/core": "^4.9.13",
+    "@material-ui/icons": "^4.9.1",
+    "@material-ui/lab": "^4.0.0-alpha.52",
+    "babel-eslint": "^10.1.0",
+    "canvas": "^2.6.1",
+    "enzyme": "^3.11.0",
+    "enzyme-adapter-react-16": "^1.15.2",
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb": "^18.1.0",
+    "eslint-config-react-app": "^5.2.1",
+    "eslint-plugin-flowtype": "^4.7.0",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-jest": "^23.9.0",
+    "eslint-plugin-jsx-a11y": "^6.2.3",
+    "eslint-plugin-react": "^7.19.0",
+    "eslint-plugin-react-hooks": "^4.0.0",
+    "jest": "^26.0.1",
+    "jest-canvas-mock": "^2.2.0",
+    "mirador": "^3.0.0-rc.3",
     "nwb": "0.25.x",
+    "prop-types": "^15.7.2",
     "react": "^16.13.1",
-    "react-dom": "^16.13.1"
+    "react-dom": "^16.13.1",
+    "uuid": "^8.0.0"
   },
-  "author": "",
-  "homepage": "",
-  "license": "MIT",
-  "repository": "",
+  "author": "Johannes Baiter <johannes.baiter@bsb-muenchen.de>",
+  "homepage": "https://dbmdz.github.io/mirador-textoverlay-plugin",
+  "license": "Apache-2.0",
+  "repository": "https://github.com/dbmdz/mirador-text-overlay-plugin",
   "keywords": [
-    "react-component"
+    "react-component",
+    "mirador-plugin",
+    "mirador",
+    "ocr",
+    "transcription",
+    "iiif"
   ]
 }

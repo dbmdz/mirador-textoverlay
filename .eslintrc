@@ -1,0 +1,31 @@
+{
+  "env": {
+    "jest/globals": true
+  },
+  "extends": ["airbnb","react-app"],
+  "globals": {
+    "page": true,
+    "document": true
+  },
+  "parser": "babel-eslint",
+  "plugins": ["jest"],
+  "rules": {
+    "import/prefer-default-export": "off",
+    "no-console": "off",
+    "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
+    "require-jsdoc": ["error", {
+      "require": {
+        "FunctionDeclaration": true,
+        "MethodDefinition": true,
+        "ClassDeclaration": true,
+        "ArrowFunctionExpression": true,
+        "FunctionExpression": true
+      }
+    }],
+    "react/prefer-stateless-function": "off",
+    "sort-keys": ["error", "asc", {
+      "caseSensitive": false,
+      "natural": false
+    }]
+  }
+}

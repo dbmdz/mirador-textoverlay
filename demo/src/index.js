@@ -1,15 +1,29 @@
-import React, {Component} from 'react'
-import {render} from 'react-dom'
+import Mirador from 'mirador/dist/es/src/index';
+import textOverlayPlugin from '../../src';
 
-import Example from '../../src'
+const config = {
+  catalog: [
+    { manifestId: 'https://iiif.europeana.eu/presentation/9200396/BibliographicResource_3000118436165/manifest', provider: 'Europeana' },
+    { manifestId: 'https://wellcomelibrary.org/iiif/b19956435/manifest', provider: 'Wellcome Library' },
+    { manifestId: 'https://damsssl.llgc.org.uk/iiif/2.0/4566425/manifest.json', provider: 'LLGC' },
+    { manifestId: 'https://data.ucd.ie/api/img/manifests/ucdlib:33064', provider: 'Irish Architectural Archive' },
+    { manifestId: 'https://wellcomelibrary.org/iiif/b18035723/manifest', provider: 'Wellcome Library' },
+    { manifestId: 'https://scta.info/iiif/graciliscommentary/lon/manifest', provider: 'SCTA' },
+    { manifestId: 'https://purl.stanford.edu/zx429wp8334/iiif/manifest', provider: 'SUL' },
+    { manifestId: 'http://localhost:9000/api/iiif/bsb11091208/manifest', provider: 'BSB' }
+  ],
+  id: 'demo',
+  windows: [{
+    canvasIndex: 8,
+    manifestId: 'http://localhost:9000/api/iiif/bsb11091208/manifest',
+    textDisplay: {
+      enabled: true,
+      selectable: true,
+      visible: true,
+    },
+  }],
+};
 
-export default class Demo extends Component {
-  render() {
-    return <div>
-      <h1>mirador-textoverlay-plugin Demo</h1>
-      <Example/>
-    </div>
-  }
-}
-
-render(<Demo/>, document.querySelector('#demo'))
+Mirador.viewer(config, [
+  ...textOverlayPlugin,
+]);

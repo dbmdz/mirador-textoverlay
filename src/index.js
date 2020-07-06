@@ -1,9 +1,35 @@
-import React, {Component} from 'react'
+import { setWindowTextDisplayOptions } from './state/actions';
+import { textsReducer, windowTextDisplayOptionsReducer } from './state/reducers';
+import textSaga from './state/sagas';
+import { getWindowTextDisplayOptions, getTextsForVisibleCanvases } from './state/selectors';
+import MiradorTextOverlay from './components/MiradorTextOverlay';
+import WindowTextSettings from './components/WindowTextSettings';
 
-export default class extends Component {
-  render() {
-    return <div>
-      <h2>Welcome to React components</h2>
-    </div>
-  }
-}
+export default [
+  {
+    component: MiradorTextOverlay,
+    mapStateToProps: (state, { windowId }) => ({
+      pageTexts: getTextsForVisibleCanvases(state, { windowId }),
+      windowId,
+      ...getWindowTextDisplayOptions(state, { windowId }),
+    }),
+    mode: 'add',
+    reducers: {
+      texts: textsReducer,
+      windowTextDisplayOptions: windowTextDisplayOptionsReducer,
+    },
+    saga: textSaga,
+    target: 'OpenSeadragonViewer',
+  },
+  {
+    component: WindowTextSettings,
+    mapDispatchToProps: { setWindowTextDisplayOptions },
+    mapStateToProps: (state, { windowId }) => ({
+      textAvailable: getTextsForVisibleCanvases(state, { windowId }).length > 0,
+      windowId,
+      windowTextDisplayOptions: getWindowTextDisplayOptions(state, { windowId }),
+    }),
+    mode: 'add',
+    target: 'WindowTopBarPluginMenu',
+  },
+];

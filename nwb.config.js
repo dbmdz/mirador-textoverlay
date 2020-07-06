@@ -1,12 +1,22 @@
+const path = require('path');
+
 module.exports = {
-  type: 'react-component',
   npm: {
     esModules: true,
     umd: {
-      global: 'MiradorTextDisplay',
       externals: {
-        react: 'React'
-      }
-    }
-  }
-}
+        react: 'React',
+      },
+      global: 'MiradorTextDisplay',
+    },
+  },
+  type: 'react-component',
+  webpack: {
+    aliases: {
+      '@material-ui/core': path.resolve('./', 'node_modules', '@material-ui/core'),
+      '@material-ui/styles': path.resolve('./', 'node_modules', '@material-ui/styles'),
+      react: path.resolve('./', 'node_modules', 'react'),
+      'react-dom': path.resolve('./', 'node_modules', 'react-dom'),
+    },
+  },
+};
