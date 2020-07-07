@@ -1,4 +1,3 @@
-import flatten from 'lodash/flatten';
 import uniq from 'lodash/uniq';
 import {
   all, call, put, select, takeEvery,
@@ -10,9 +9,9 @@ import { receiveAnnotation, updateConfig } from 'mirador/dist/es/src/state/actio
 import { getCanvases } from 'mirador/dist/es/src/state/selectors';
 
 import {
-  PluginActionTypes, requestText, receiveText, receiveTextFailure,
+  PluginActionTypes, requestText, receiveText, receiveTextFailure, discoveredText,
 } from './actions';
-import { getTexts } from './selectors';
+import { getTexts, getWindowTextDisplayOptions, getTextsForVisibleCanvases } from './selectors';
 import translations from '../locales';
 import { parseIiifAnnotations, parseOcr } from '../lib/ocrFormats';
 
@@ -39,6 +38,10 @@ const isHocr = (resource) => resource && (
 
 /** Saga for discovering external OCR on visible canvases and requesting it if not yet loaded */
 function* discoverExternalOcr({ visibleCanvases: visibleCanvasIds, windowId }) {
+  const { enabled, selectable, visible } = yield select(getWindowTextDisplayOptions, { windowId });
+  if (!enabled) {
+    return;
+  }
   const canvases = yield select(getCanvases, { windowId });
   const visibleCanvases = (canvases || []).filter((c) => visibleCanvasIds.includes(c.id));
   const texts = yield select(getTexts);
@@ -49,9 +52,11 @@ function* discoverExternalOcr({ visibleCanvases: visibleCanvasIds, windowId }) {
     // eslint-disable-next-line no-underscore-dangle
     const { seeAlso } = canvas.__jsonld;
     if (isAlto(seeAlso) || isHocr(seeAlso)) {
-      const ocrId = seeAlso['@id'];
-      if (!texts[ocrId]) {
-        yield put(requestText(canvas.id, ocrId));
+      const ocrSource = seeAlso['@id'];
+      if ((selectable || visible) && !texts[ocrSource]) {
+        yield put(requestText(canvas.id, ocrSource));
+      } else {
+        yield put(discoveredText(canvas.id, ocrSource));
       }
     }
   }
@@ -112,6 +117,20 @@ function* processTextsFromAnnotations({ targetId, annotationId, annotationJson }
   }
 }
 
+/** Saga for requesting texts when display or selection is newly enabled */
+function* onConfigChange({ textDisplayOptions, windowId }) {
+  const { enabled, selectable, visible } = textDisplayOptions;
+  if (!enabled || (!selectable && !visible)) {
+    return;
+  }
+  const texts = yield select(getTextsForVisibleCanvases, { windowId });
+  for (const { canvasId, source, text } of texts) {
+    if (!text) {
+      yield put(requestText(canvasId, source));
+    }
+  }
+}
+
 /** Inject translation keys for this plugin into thte config */
 function* injectTranslations() {
   yield put(updateConfig({
@@ -126,6 +145,7 @@ export default function* textSaga() {
     takeEvery(ActionTypes.RECEIVE_ANNOTATION, fetchExternalAnnotationResources),
     takeEvery(ActionTypes.RECEIVE_ANNOTATION, processTextsFromAnnotations),
     takeEvery(ActionTypes.SET_CANVAS, discoverExternalOcr),
+    takeEvery(PluginActionTypes.SET_WINDOW_TEXTDISPLAY_OPTIONS, onConfigChange),
     takeEvery(PluginActionTypes.REQUEST_TEXT, fetchAndProcessOcr),
   ]);
 }

@@ -31,60 +31,83 @@ class MiradorTextOverlay extends Component {
   }
 
   /** Register OpenSeadragon callback when viewer changes */
-  componentDidUpdate({ viewer: oldViewer }) {
+  componentDidUpdate(prevProps) {
     const { enabled, viewer } = this.props;
-    if (enabled && viewer && viewer !== oldViewer) {
+    // OSD instance becomes available, register callback
+    if (enabled && viewer && viewer !== prevProps.viewer) {
       this.registerOsdCallback();
     }
+    // Newly enabled, force initial setting of state from OSD
+    if (this.shouldRender() && !this.shouldRender(prevProps)) {
+      this.onUpdateViewport();
+    }
+  }
+
+  /** OpenSeadragon viewport update callback */
+  onUpdateViewport() {
+    // Do nothing if the overlay is not currently rendered
+    if (!this.shouldRender) {
+      return;
+    }
+    const { containerHeight, containerWidth } = this.state;
+
+    // Update container and SVG width/height
+    const { viewer, canvasWorld } = this.props;
+    const newState = {};
+    if (containerWidth !== viewer.container.clientWidth) {
+      newState.containerWidth = viewer.container.clientWidth;
+    }
+    if (containerHeight !== viewer.container.clientHeight) {
+      newState.containerHeight = viewer.container.clientHeight;
+    }
+
+    // Update SVG page transforms and x-offsets
+    newState.pageTransforms = [];
+    newState.xOffsets = [];
+    const vpBounds = viewer.viewport.getBounds(true);
+    const viewportZoom = viewer.viewport.getZoom(true);
+    for (let itemNo = 0; itemNo < viewer.world.getItemCount(); itemNo += 1) {
+      const img = viewer.world.getItemAt(itemNo);
+      const canvasDims = canvasWorld.canvasDimensions[itemNo];
+      // Mirador canvas world scale factor
+      const canvasWorldScale = (img.source.dimensions.x / canvasDims.width);
+      // Absolute difference between unscaled width and width in canvas world
+      const canvasWorldOffset = img.source.dimensions.x - canvasDims.width;
+      newState.pageTransforms.push({
+        scaleFactor: img.viewportToImageZoom(viewportZoom),
+        translateX: -1 * vpBounds.x * canvasWorldScale + canvasWorldOffset,
+        translateY: -1 * vpBounds.y * canvasWorldScale,
+      });
+      // TODO: Use this.props.canvasWorrld.canvasDimensions instead
+      if (itemNo === 0) {
+        newState.xOffsets = [0, img.source.dimensions.x];
+      }
+    }
+    this.setState(newState);
+  }
+
+  /** If the overlay should be rendered at all */
+  shouldRender(props) {
+    const {
+      enabled, visible, selectable, pageTexts,
+    } = props ?? this.props;
+    return (enabled && (visible || selectable) && pageTexts.length > 0);
   }
 
   /** Update container dimensions and page scale/offset every time the OSD viewport changes. */
   registerOsdCallback() {
-    const { containerHeight, containerWidth } = this.state;
     const { viewer } = this.props;
-
-    viewer.addHandler('update-viewport', () => {
-      // Update container and SVG width/height
-      const newState = {};
-      if (containerWidth !== viewer.container.clientWidth) {
-        newState.containerWidth = viewer.container.clientWidth;
-      }
-      if (containerHeight !== viewer.container.clientHeight) {
-        newState.containerHeight = viewer.container.clientHeight;
-      }
-
-      // Update SVG page transforms and x-offsets
-      // FIXME: The calculations are way off when canvas #0 is smaller than canvas #1
-      // and canvas #1 gets scaled down because of this. Not a problem if it's the other
-      // way round (i.e. #0 gets downscaled) or there's no scaling involved, how do we fix this?
-      newState.pageTransforms = [];
-      newState.xOffsets = [];
-      const vpBounds = viewer.viewport.getBounds(true);
-      const viewportZoom = viewer.viewport.getZoom(true);
-      for (let itemNo = 0; itemNo < viewer.world.getItemCount(); itemNo += 1) {
-        const img = viewer.world.getItemAt(itemNo);
-        newState.pageTransforms.push({
-          scaleFactor: img.viewportToImageZoom(viewportZoom),
-          translateX: -1 * vpBounds.x,
-          translateY: -1 * vpBounds.y,
-        });
-        // TODO: Use this.props.canvasWorrld.canvasDimensions instead
-        if (itemNo === 0) {
-          newState.xOffsets = [0, img.source.dimensions.x];
-        }
-      }
-      this.setState(newState);
-    });
+    viewer.addHandler('update-viewport', this.onUpdateViewport.bind(this));
   }
 
   /** Render the text overlay SVG */
   render() {
-    const {
-      enabled, pageTexts, selectable, opacity, visible, viewer,
-    } = this.props;
-    if (!enabled || !viewer) {
+    if (!this.shouldRender()) {
       return null;
     }
+    const {
+      pageTexts, selectable, opacity, visible, viewer,
+    } = this.props;
     const {
       containerWidth: width, containerHeight: height, pageTransforms, xOffsets,
     } = this.state;
@@ -127,6 +150,7 @@ class MiradorTextOverlay extends Component {
 }
 
 MiradorTextOverlay.propTypes = {
+  canvasWorld: PropTypes.object, // eslint-disable-line react/forbid-prop-types
   enabled: PropTypes.bool,
   opacity: PropTypes.number,
   pageTexts: PropTypes.array, // eslint-disable-line react/forbid-prop-types
@@ -136,6 +160,7 @@ MiradorTextOverlay.propTypes = {
 };
 
 MiradorTextOverlay.defaultProps = {
+  canvasWorld: undefined,
   enabled: true,
   opacity: 0.75,
   pageTexts: undefined,

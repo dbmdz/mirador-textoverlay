@@ -1,4 +1,5 @@
 export const PluginActionTypes = {
+  DISCOVERED_TEXT: 'mirador-textoverlay/DISCOVERED_TEXT',
   RECEIVE_TEXT: 'mirador-textoverlay/RECEIVE_TEXT',
   RECEIVE_TEXT_FAILURE: 'mirador-textoverlay/RECEIVE_TEXT_FAILURE',
   REQUEST_TEXT: 'mirador-textoverlay/REQUEST_TEXT',
@@ -20,6 +21,20 @@ export function setWindowTextDisplayOptions(windowId, textDisplayOptions) {
     textDisplayOptions,
     type: PluginActionTypes.SET_WINDOW_TEXTDISPLAY_OPTIONS,
     windowId,
+  };
+}
+
+/**
+ * discoveredText: action creator
+ *
+ * @param {String} targetId
+ * @param {String} textUri
+ */
+export function discoveredText(targetId, textUri) {
+  return {
+    targetId,
+    textUri,
+    type: PluginActionTypes.DISCOVERED_TEXT,
   };
 }
 

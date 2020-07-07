@@ -17,11 +17,21 @@ export const windowTextDisplayOptionsReducer = (state = {}, action) => {
 /** Reducer for global text overlay state */
 export const textsReducer = (state = {}, action) => {
   switch (action.type) {
+    case PluginActionTypes.DISCOVERED_TEXT:
+      return {
+        ...state,
+        [action.targetId]: {
+          ...state[action.targetId],
+          canvasId: action.targetId,
+          source: action.textUri,
+        },
+      };
     case PluginActionTypes.REQUEST_TEXT:
       return {
         ...state,
         [action.targetId]: {
           ...state[action.targetId],
+          canvasId: action.targetId,
           isFetching: true,
           source: action.textUri,
         },
@@ -41,6 +51,7 @@ export const textsReducer = (state = {}, action) => {
         ...state,
         [action.targetId]: {
           ...state[action.targetId],
+          canvasId: action.targetId,
           isFetching: false,
           source: action.textUri,
           sourceType: action.sourceType,
@@ -52,6 +63,7 @@ export const textsReducer = (state = {}, action) => {
         ...state,
         [action.targetId]: {
           ...state[action.targetId],
+          canvasId: action.targetId,
           error: action.error,
           isFetching: false,
           source: action.textUri,

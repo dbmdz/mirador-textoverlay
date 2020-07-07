@@ -24,6 +24,7 @@ function parseHocrAttribs(titleAttrib) {
   }, {});
 }
 
+
 /** Parse an hOCR node */
 function parseHocrNode(node, endOfLine = false) {
   const [ulx, uly, lrx, lry] = parseHocrAttribs(node.title).bbox;
@@ -52,6 +53,7 @@ function parseHocrNode(node, endOfLine = false) {
     y: uly,
   };
 }
+
 
 /** Parse an hOCR document */
 export function parseHocr(hocrText) {
@@ -86,6 +88,7 @@ export function parseHocr(hocrText) {
   };
 }
 
+
 /** Create CSS directives from an ALTO TextStyle node */
 function altoStyleNodeToCSS(styleNode) {
   const styles = [];
@@ -103,6 +106,7 @@ function altoStyleNodeToCSS(styleNode) {
   }
   return styles.join(';');
 }
+
 
 /**
  * Parse an ALTO document.
@@ -243,6 +247,7 @@ export function parseAlto(altoText, imgSize) {
   };
 }
 
+
 /**
  * Parse an OCR document (currently hOCR or ALTO)
  *
@@ -256,60 +261,6 @@ export function parseOcr(ocrText, referenceSize) {
   return parseHocr(ocrText, referenceSize);
 }
 
-/**
- * If lines could not be determined from the annotations themselves, apply a
- * heuristic to group the text boxes into lines.
- */
-function groupIntoLines(wordBoxes) {
-  // FIXME: Don't commit this without comprehensive unit testing!!!
-  // FIXME: Untested first draft, needs more work
-  // Dumb heuristic: A line continues until the x-offset is *smaller* than the previous
-  const lines = [];
-  let currentLine = {
-    height: 0,
-    width: 0,
-    words: [],
-    x: 0,
-    y: 0,
-  };
-  let prevX = Number.MAX_SAFE_INTEGER;
-  wordBoxes.forEach((box) => {
-    if (box.text.indexOf(' ') > 0) {
-      // Box already is a line, no need to group
-      lines.push(box);
-    }
-    if (box.x < prevX) {
-      if (currentLine.words.length > 0) {
-        lines.push(currentLine);
-      }
-      currentLine = {
-        height: 0,
-        width: 0,
-        words: [],
-        x: box.x,
-        y: box.y,
-      };
-    }
-    currentLine.words.push(box);
-    if (box.y > currentLine.y) {
-      currentLine.y = box.y;
-    }
-    if (box.y + box.height > currentLine.y + currentLine.height) {
-      currentLine.height = (box.y + box.height) - currentLine.y;
-    }
-    if (currentLine.text) {
-      currentLine.text += ` ${box.text}`;
-    } else {
-      currentLine.text = box.text;
-    }
-    currentLine.width = (box.x + box.width) - currentLine.x;
-    prevX = box.x;
-  });
-  if (currentLine.length > 0) {
-    lines.push(currentLine);
-  }
-  return lines;
-}
 
 /** Parse OCR data from IIIF annotations.
  *

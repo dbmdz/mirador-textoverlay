@@ -64,11 +64,6 @@ export const getTextsForVisibleCanvases = createSelector(
     if (!texts || !canvases) return null;
     return canvases.map((c) => c.id)
       .map((targetId) => texts[targetId])
-      .filter((canvasText) => canvasText
-          && !canvasText.isFetching)
-      .map((canvasText) => ({
-        ...canvasText.text,
-        source: canvasText.source,
-      }));
+      .filter((canvasText) => canvasText !== undefined);
   },
 );

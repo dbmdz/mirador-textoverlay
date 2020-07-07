@@ -9,7 +9,12 @@ export default [
   {
     component: MiradorTextOverlay,
     mapStateToProps: (state, { windowId }) => ({
-      pageTexts: getTextsForVisibleCanvases(state, { windowId }),
+      pageTexts: getTextsForVisibleCanvases(state, { windowId })
+        .filter((canvasText) => !canvasText.isFetching)
+        .map((canvasText) => ({
+          ...canvasText.text,
+          source: canvasText.source,
+        })),
       windowId,
       ...getWindowTextDisplayOptions(state, { windowId }),
     }),
