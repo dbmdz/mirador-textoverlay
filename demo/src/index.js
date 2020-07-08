@@ -10,12 +10,11 @@ const config = {
     { manifestId: 'https://wellcomelibrary.org/iiif/b18035723/manifest', provider: 'Wellcome Library' },
     { manifestId: 'https://scta.info/iiif/graciliscommentary/lon/manifest', provider: 'SCTA' },
     { manifestId: 'https://purl.stanford.edu/zx429wp8334/iiif/manifest', provider: 'SUL' },
-    { manifestId: 'http://localhost:9000/api/iiif/bsb11091208/manifest', provider: 'BSB' }
   ],
   id: 'demo',
   windows: [{
     canvasIndex: 8,
-    manifestId: 'http://localhost:9000/api/iiif/bsb11091208/manifest',
+    manifestId: 'https://wellcomelibrary.org/iiif/b18035723/manifest',
     textDisplay: {
       enabled: true,
       selectable: true,

@@ -1,7 +1,7 @@
 {
-  "name": "mirador-textoverlay-plugin",
-  "version": "0.1.0",
-  "description": "mirador-textoverlay-plugin React component",
+  "name": "mirador-textoverlay",
+  "version": "0.1.0-beta2",
+  "description": "Mirador 3 plugin to render a hidden (but selectable) or visible text overlay",
   "main": "lib/index.js",
   "module": "es/index.js",
   "files": [
@@ -63,13 +63,14 @@
     "uuid": "^8.0.0"
   },
   "author": "Johannes Baiter <johannes.baiter@bsb-muenchen.de>",
-  "homepage": "https://dbmdz.github.io/mirador-textoverlay-plugin",
+  "homepage": "https://dbmdz.github.io/mirador-textoverlay",
   "license": "Apache-2.0",
-  "repository": "https://github.com/dbmdz/mirador-text-overlay-plugin",
+  "repository": "https://github.com/dbmdz/mirador-text-overlay",
   "keywords": [
     "react-component",
     "mirador-plugin",
     "mirador",
+    "mirador3",
     "ocr",
     "transcription",
     "iiif"
