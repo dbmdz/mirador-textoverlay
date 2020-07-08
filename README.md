@@ -1,10 +1,14 @@
-# mirador-textoverlay-plugin
+# mirador-textoverlay
 
 [![Travis][build-badge]][build]
 [![npm package][npm-badge]][npm]
 [![Coveralls][coveralls-badge]][coveralls]
 
-Describe mirador-textoverlay-plugin here.
+![Screenshot][screenshot]
+
+A Mirador 3 plugin to display a text overlay based on OCR or transcriptions.
+
+**Requires Mirador 3.0-rc.4!**.
 
 [build-badge]: https://img.shields.io/travis/user/repo/master.png?style=flat-square
 [build]: https://travis-ci.org/user/repo
@@ -14,3 +18,5 @@ Describe mirador-textoverlay-plugin here.
 
 [coveralls-badge]: https://img.shields.io/coveralls/user/repo/master.png?style=flat-square
 [coveralls]: https://coveralls.io/github/user/repo
+
+[screenshot]: doc/screenshot.png

@@ -17,8 +17,8 @@ const WindowTextSettings = ({
   t,
   textAvailable,
   windowId,
-  windowTextDisplayOptions: currentOpts,
-  setWindowTextDisplayOptions: setOpts,
+  windowTextOverlayOptions: currentOpts,
+  setWindowTextOverlayOptions: setOpts,
 }) => {
   /** Toggle a boolean option */
   const handleToggle = (optionName) => setOpts(
@@ -36,21 +36,20 @@ const WindowTextSettings = ({
     },
   );
 
-  // const { t } = useTranslation();
   const {
-    selectable, visible, opacity,
+    enabled, selectable, visible, opacity,
   } = currentOpts;
 
   return (
     <>
-      <ListSubheader role="presentation" disableSticky tabIndex="-1">{t('textDisplay')}</ListSubheader>
+      <ListSubheader role="presentation" disableSticky tabIndex="-1">{t('textOverlay')}</ListSubheader>
       <MenuItem>
         <FormControlLabel
-          disabled={!textAvailable}
+          disabled={!enabled || !textAvailable}
           control={(
             <>
               <TextSelectIcon />
-              <Switch disabled={!textAvailable} size="small" checked={selectable} onChange={() => handleToggle('selectable')} />
+              <Switch disabled={!enabled || !textAvailable} size="small" checked={selectable} onChange={() => handleToggle('selectable')} />
             </>
             )}
           label={t('textSelect')}
@@ -58,11 +57,11 @@ const WindowTextSettings = ({
       </MenuItem>
       <MenuItem>
         <FormControlLabel
-          disabled={!textAvailable}
+          disabled={!enabled || !textAvailable}
           control={(
             <>
               <TextVisibleIcon />
-              <Switch disabled={!textAvailable} size="small" checked={visible} onChange={() => handleToggle('visible')} />
+              <Switch disabled={!enabled || !textAvailable} size="small" checked={visible} onChange={() => handleToggle('visible')} />
             </>
           )}
           label={t('textVisible')}
@@ -75,7 +74,7 @@ const WindowTextSettings = ({
           <TextOpacityIcon titleAccess={t('textOpacity')} />
         </Typography>
         <Slider
-          disabled={!textAvailable}
+          disabled={!enabled || !textAvailable}
           value={opacity * 100}
           onChange={handleOpacityChange}
           min={0}
@@ -90,12 +89,12 @@ const WindowTextSettings = ({
 };
 
 WindowTextSettings.propTypes = {
-  setWindowTextDisplayOptions: PropTypes.func.isRequired,
+  setWindowTextOverlayOptions: PropTypes.func.isRequired,
   t: PropTypes.func,
   textAvailable: PropTypes.bool,
   windowId: PropTypes.string.isRequired,
   // eslint-disable-next-line react/forbid-prop-types
-  windowTextDisplayOptions: PropTypes.object.isRequired,
+  windowTextOverlayOptions: PropTypes.object.isRequired,
 };
 WindowTextSettings.defaultProps = {
   t: (key) => key,

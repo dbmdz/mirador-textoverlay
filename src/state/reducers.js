@@ -1,13 +1,13 @@
 import { PluginActionTypes } from './actions';
 
 /** Reducer for text display options for each window */
-export const windowTextDisplayOptionsReducer = (state = {}, action) => {
-  if (action.type === PluginActionTypes.SET_WINDOW_TEXTDISPLAY_OPTIONS) {
+export const windowTextOverlayOptionsReducer = (state = {}, action) => {
+  if (action.type === PluginActionTypes.SET_WINDOW_TEXTOVERLAY_OPTIONS) {
     return {
       ...state,
       [action.windowId]: {
         ...state[action.windowId],
-        ...action.textDisplayOptions,
+        ...action.textOverlayOptions,
       },
     };
   }
@@ -39,7 +39,7 @@ export const textsReducer = (state = {}, action) => {
     case PluginActionTypes.RECEIVE_TEXT:
       {
         const currentText = state[action.targetId];
-        // Dont overwrite the current text if we already have an OCR-sourced
+        // Don't overwrite the current text if we already have an OCR-sourced
         // text that was completely fetched without an error
         const skipText = currentText !== undefined
           && !currentText.error

@@ -1,13 +1,13 @@
 export default {
   de: {
-    textDisplay: 'Text-Anzeige',
     textOpacity: 'Transparenz',
+    textOverlay: 'Text-Anzeige',
     textSelect: 'Auswählbar',
     textVisible: 'Sichtbar',
   },
   en: {
-    textDisplay: 'Text Display',
     textOpacity: 'Opacity',
+    textOverlay: 'Text Overlay',
     textSelect: 'Selectable',
     textVisible: 'Visible',
   },

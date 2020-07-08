@@ -7,7 +7,7 @@ module.exports = {
       externals: {
         react: 'React',
       },
-      global: 'MiradorTextDisplay',
+      global: 'MiradorTextOverlay',
     },
   },
   type: 'react-component',

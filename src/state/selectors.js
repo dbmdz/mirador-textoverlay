@@ -9,25 +9,25 @@ const defaultConfig = {
   // Enable the text selection and display feature
   enabled: true,
   // Default opacity of text overlay
-  opacity: 0.5,
+  opacity: 0.75,
   // Make text selectable by default
   selectable: false,
-  // Display text overlay by default
+  // Overlay text overlay by default
   visible: false,
 };
 
 /** Selector to get default text display configuration */
-export const getTextDisplayConfig = createSelector(
+export const getTextOverlayConfig = createSelector(
   [getConfig],
-  ({ window }) => window && (window.textDisplay ?? defaultConfig),
+  ({ window }) => window && ({ ...defaultConfig, ...(window.textOverlay ?? {}) }),
 );
 
 /** Selector to get window text display options for all windows */
-export const getTextDisplayOptions = (state) => miradorSlice(state).windowTextDisplayOptions;
+export const getTextOverlayOptions = (state) => miradorSlice(state).windowTextOverlayOptions;
 
 /** Selector to get text display options for a given window */
-export const getWindowTextDisplayOptions = createSelector(
-  [getWindow, getTextDisplayConfig, getTextDisplayOptions],
+export const getWindowTextOverlayOptions = createSelector(
+  [getWindow, getTextOverlayConfig, getTextOverlayOptions],
   (window, defaultOptions, allWindowOptions) => ({
     ...defaultOptions,
     ...(allWindowOptions[window.id] ?? {}),

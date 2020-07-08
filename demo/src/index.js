@@ -12,14 +12,16 @@ const config = {
     { manifestId: 'https://purl.stanford.edu/zx429wp8334/iiif/manifest', provider: 'SUL' },
   ],
   id: 'demo',
-  windows: [{
-    canvasIndex: 8,
-    manifestId: 'https://wellcomelibrary.org/iiif/b18035723/manifest',
-    textDisplay: {
+  window: {
+    textOverlay: {
       enabled: true,
       selectable: true,
       visible: true,
     },
+  },
+  windows: [{
+    canvasIndex: 8,
+    manifestId: 'https://wellcomelibrary.org/iiif/b18035723/manifest',
   }],
 };
 

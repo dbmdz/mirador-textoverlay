@@ -3,23 +3,23 @@ export const PluginActionTypes = {
   RECEIVE_TEXT: 'mirador-textoverlay/RECEIVE_TEXT',
   RECEIVE_TEXT_FAILURE: 'mirador-textoverlay/RECEIVE_TEXT_FAILURE',
   REQUEST_TEXT: 'mirador-textoverlay/REQUEST_TEXT',
-  SET_WINDOW_TEXTDISPLAY_OPTIONS: 'mirador-textoverlay/SET_WINDOW_TEXTDISPLAY_OPTIONS',
+  SET_WINDOW_TEXTOVERLAY_OPTIONS: 'mirador-textoverlay/SET_WINDOW_TEXTOVERLAY_OPTIONS',
 };
 
 /**
- * setWindowTextDisplayOptions - action creator
+ * setWindowTextOverlayOptions - action creator
  *
  * @param {String} windowId
- * @param {Object} textDisplayOptions
- * @param {Boolean} textDisplayOptions.enabled
- * @param {Boolean} textDisplayOptions.selectable
- * @param {Boolean} textDisplayOptions.visible
- * @param {number} textDisplayOptions.opacity
+ * @param {Object} textOverlayOptions
+ * @param {Boolean} textOverlayOptions.enabled
+ * @param {Boolean} textOverlayOptions.selectable
+ * @param {Boolean} textOverlayOptions.visible
+ * @param {number} textOverlayOptions.opacity
  */
-export function setWindowTextDisplayOptions(windowId, textDisplayOptions) {
+export function setWindowTextOverlayOptions(windowId, textOverlayOptions) {
   return {
-    textDisplayOptions,
-    type: PluginActionTypes.SET_WINDOW_TEXTDISPLAY_OPTIONS,
+    textOverlayOptions,
+    type: PluginActionTypes.SET_WINDOW_TEXTOVERLAY_OPTIONS,
     windowId,
   };
 }

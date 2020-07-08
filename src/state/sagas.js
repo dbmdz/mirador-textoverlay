@@ -10,8 +10,11 @@ import { getCanvases } from 'mirador/dist/es/src/state/selectors';
 
 import {
   PluginActionTypes, requestText, receiveText, receiveTextFailure, discoveredText,
+  setWindowTextOverlayOptions,
 } from './actions';
-import { getTexts, getWindowTextDisplayOptions, getTextsForVisibleCanvases } from './selectors';
+import {
+  getTexts, getWindowTextOverlayOptions, getTextsForVisibleCanvases, getTextOverlayConfig,
+} from './selectors';
 import translations from '../locales';
 import { parseIiifAnnotations, parseOcr } from '../lib/ocrFormats';
 
@@ -38,7 +41,7 @@ const isHocr = (resource) => resource && (
 
 /** Saga for discovering external OCR on visible canvases and requesting it if not yet loaded */
 function* discoverExternalOcr({ visibleCanvases: visibleCanvasIds, windowId }) {
-  const { enabled, selectable, visible } = yield select(getWindowTextDisplayOptions, { windowId });
+  const { enabled, selectable, visible } = yield select(getWindowTextOverlayOptions, { windowId });
   if (!enabled) {
     return;
   }
@@ -118,8 +121,8 @@ function* processTextsFromAnnotations({ targetId, annotationId, annotationJson }
 }
 
 /** Saga for requesting texts when display or selection is newly enabled */
-function* onConfigChange({ textDisplayOptions, windowId }) {
-  const { enabled, selectable, visible } = textDisplayOptions;
+function* onConfigChange({ textOverlayOptions, windowId }) {
+  const { enabled, selectable, visible } = textOverlayOptions;
   if (!enabled || (!selectable && !visible)) {
     return;
   }
@@ -138,14 +141,22 @@ function* injectTranslations() {
   }));
 }
 
+/** Set the initial text display options from the config for new windows */
+function* setInitialOptions({ window }) {
+  const initialOptions = yield select(getTextOverlayConfig);
+  const windowOptions = window.textOverlay ?? {};
+  yield put(setWindowTextOverlayOptions(window.id, { ...initialOptions, ...windowOptions }));
+}
+
 /** Root saga for the plugin */
 export default function* textSaga() {
   yield all([
+    takeEvery(ActionTypes.ADD_WINDOW, setInitialOptions),
     takeEvery(ActionTypes.IMPORT_CONFIG, injectTranslations),
     takeEvery(ActionTypes.RECEIVE_ANNOTATION, fetchExternalAnnotationResources),
     takeEvery(ActionTypes.RECEIVE_ANNOTATION, processTextsFromAnnotations),
     takeEvery(ActionTypes.SET_CANVAS, discoverExternalOcr),
-    takeEvery(PluginActionTypes.SET_WINDOW_TEXTDISPLAY_OPTIONS, onConfigChange),
+    takeEvery(PluginActionTypes.SET_WINDOW_TEXTOVERLAY_OPTIONS, onConfigChange),
     takeEvery(PluginActionTypes.REQUEST_TEXT, fetchAndProcessOcr),
   ]);
 }
