@@ -6,7 +6,7 @@ import fetch from 'isomorphic-unfetch';
 
 import ActionTypes from 'mirador/dist/es/src/state/actions/action-types';
 import { receiveAnnotation, updateConfig } from 'mirador/dist/es/src/state/actions';
-import { getCanvases } from 'mirador/dist/es/src/state/selectors';
+import { getCanvases, getCanvas } from 'mirador/dist/es/src/state/selectors';
 
 import {
   PluginActionTypes, requestText, receiveText, receiveTextFailure, discoveredText,
@@ -53,11 +53,13 @@ function* discoverExternalOcr({ visibleCanvases: visibleCanvasIds, windowId }) {
   // seem to do anything :-/
   for (const canvas of visibleCanvases) {
     // eslint-disable-next-line no-underscore-dangle
-    const { seeAlso } = canvas.__jsonld;
+    const { seeAlso, width, height } = canvas.__jsonld;
     if (isAlto(seeAlso) || isHocr(seeAlso)) {
       const ocrSource = seeAlso['@id'];
       if ((selectable || visible) && !texts[ocrSource]) {
-        yield put(requestText(canvas.id, ocrSource));
+        yield put(requestText(
+          canvas.id, ocrSource, { height, width },
+        ));
       } else {
         yield put(discoveredText(canvas.id, ocrSource));
       }
@@ -129,7 +131,10 @@ function* onConfigChange({ textOverlayOptions, windowId }) {
   const texts = yield select(getTextsForVisibleCanvases, { windowId });
   for (const { canvasId, source, text } of texts) {
     if (!text) {
-      yield put(requestText(canvasId, source));
+      const canvas = yield select(getCanvas({ canvasId }));
+      // eslint-disable-next-line no-underscore-dangle
+      const { width, height } = canvas.__jsonld;
+      yield put(requestText(canvasId, source, { height, width }));
     }
   }
 }

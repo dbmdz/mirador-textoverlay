@@ -26,8 +26,8 @@ function parseHocrAttribs(titleAttrib) {
 
 
 /** Parse an hOCR node */
-function parseHocrNode(node, endOfLine = false) {
-  const [ulx, uly, lrx, lry] = parseHocrAttribs(node.title).bbox;
+function parseHocrNode(node, endOfLine = false, scaleFactor = 1) {
+  const [ulx, uly, lrx, lry] = parseHocrAttribs(node.title).bbox.map((dim) => dim * scaleFactor);
   let width = lrx - ulx;
   const height = lry - uly;
   let text = node.textContent;
@@ -56,10 +56,21 @@ function parseHocrNode(node, endOfLine = false) {
 
 
 /** Parse an hOCR document */
-export function parseHocr(hocrText) {
+export function parseHocr(hocrText, referenceSize) {
   const doc = parser.parseFromString(hocrText, 'text/html');
   const pageNode = doc.querySelector('div.ocr_page');
   const pageSize = parseHocrAttribs(pageNode.title).bbox;
+  let scaleFactor = 1;
+  if (pageSize[2] !== referenceSize.width || pageSize[3] !== referenceSize.height) {
+    const scaleFactorX = referenceSize.width / pageSize[2];
+    const scaleFactorY = referenceSize.height / pageSize[3];
+    const scaledWidth = Math.round(scaleFactorY * pageSize[2]);
+    const scaledHeight = Math.round(scaleFactorX * pageSize[3]);
+    if (scaledWidth !== referenceSize.width && scaledHeight !== referenceSize.height) {
+      console.warn(`Differing scale factors for x and y axis: x=${scaleFactorX}, y=${scaleFactorY}`);
+    }
+    scaleFactor = scaleFactorX;
+  }
   const lines = [];
   // FIXME: Seems to be an eslint bug: https://github.com/eslint/eslint/issues/12117
   // eslint-disable-next-line no-unused-vars
@@ -68,13 +79,13 @@ export function parseHocr(hocrText) {
   )) {
     const wordNodes = lineNode.querySelectorAll('span.ocrx_word');
     if (wordNodes.length === 0) {
-      lines.push(parseHocrNode(lineNode, true));
+      lines.push(parseHocrNode(lineNode, true, scaleFactor));
     } else {
-      const line = parseHocrNode(lineNode, true);
+      const line = parseHocrNode(lineNode, true, scaleFactor);
       const words = [];
       // eslint-disable-next-line no-unused-vars
       for (const [i, wordNode] of wordNodes.entries()) {
-        words.push(parseHocrNode(wordNode, i === wordNodes.length - 1));
+        words.push(parseHocrNode(wordNode, i === wordNodes.length - 1, scaleFactor));
       }
       line.words = words;
       line.text = words.map((w) => w.text).join('');
