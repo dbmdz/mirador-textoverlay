@@ -66,7 +66,7 @@ export function parseHocr(hocrText, referenceSize) {
     const scaleFactorY = referenceSize.height / pageSize[3];
     const scaledWidth = Math.round(scaleFactorY * pageSize[2]);
     const scaledHeight = Math.round(scaleFactorX * pageSize[3]);
-    if (scaledWidth !== referenceSize.width && scaledHeight !== referenceSize.height) {
+    if (scaledWidth !== referenceSize.width || scaledHeight !== referenceSize.height) {
       console.warn(`Differing scale factors for x and y axis: x=${scaleFactorX}, y=${scaleFactorY}`);
     }
     scaleFactor = scaleFactorX;

@@ -63,7 +63,7 @@ class MiradorTextOverlay extends Component {
 
     // Update SVG page transforms and x-offsets
     newState.pageTransforms = [];
-    newState.xOffsets = [];
+    newState.xOffsets = [0];
     const vpBounds = viewer.viewport.getBounds(true);
     const viewportZoom = viewer.viewport.getZoom(true);
     for (let itemNo = 0; itemNo < viewer.world.getItemCount(); itemNo += 1) {
@@ -71,17 +71,15 @@ class MiradorTextOverlay extends Component {
       const canvasDims = canvasWorld.canvasDimensions[itemNo];
       // Mirador canvas world scale factor
       const canvasWorldScale = (img.source.dimensions.x / canvasDims.width);
-      // Absolute difference between unscaled width and width in canvas world
-      const canvasWorldOffset = img.source.dimensions.x - canvasDims.width;
+      // Absolute difference between unscaled width and width in canvas world, only relevant
+      // for canvases other than the first one
+      const canvasWorldOffset = itemNo > 0 ? img.source.dimensions.x - canvasDims.width : 0;
       newState.pageTransforms.push({
         scaleFactor: img.viewportToImageZoom(viewportZoom),
         translateX: -1 * vpBounds.x * canvasWorldScale + canvasWorldOffset,
         translateY: -1 * vpBounds.y * canvasWorldScale,
       });
-      // TODO: Use this.props.canvasWorrld.canvasDimensions instead
-      if (itemNo === 0) {
-        newState.xOffsets = [0, img.source.dimensions.x];
-      }
+      newState.xOffsets.push(canvasDims.width);
     }
     this.setState(newState);
   }
@@ -102,12 +100,12 @@ class MiradorTextOverlay extends Component {
 
   /** Render the text overlay SVG */
   render() {
-    if (!this.shouldRender()) {
-      return null;
-    }
     const {
       pageTexts, selectable, opacity, visible, viewer,
     } = this.props;
+    if (!this.shouldRender() || !viewer || !pageTexts) {
+      return null;
+    }
     const {
       containerWidth: width, containerHeight: height, pageTransforms, xOffsets,
     } = this.state;
@@ -127,7 +125,7 @@ class MiradorTextOverlay extends Component {
         <svg xmlns="http://www.w3.org/2000/svg" style={svgStyles}>
           {pageTexts.map(({ lines, source }, idx) => (
             pageTransforms[idx]
-            && (
+            && lines && lines.length > 0 && (
             <PageTextDisplay
               key={source}
               lines={lines}
