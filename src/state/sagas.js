@@ -56,7 +56,12 @@ function* discoverExternalOcr({ visibleCanvases: visibleCanvasIds, windowId }) {
     const { seeAlso, width, height } = canvas.__jsonld;
     if (isAlto(seeAlso) || isHocr(seeAlso)) {
       const ocrSource = seeAlso['@id'];
-      if ((selectable || visible) && !texts[ocrSource]) {
+      const alreadyHasText = texts[canvas.id]?.source === ocrSource;
+      if (alreadyHasText) {
+        // eslint-disable-next-line no-continue
+        continue;
+      }
+      if ((selectable || visible)) {
         yield put(requestText(
           canvas.id, ocrSource, { height, width },
         ));
