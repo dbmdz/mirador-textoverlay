@@ -7,6 +7,7 @@ const config = {
     { manifestId: 'https://wellcomelibrary.org/iiif/b19956435/manifest', provider: 'Wellcome Library (ALTO)' },
     { manifestId: 'https://wellcomelibrary.org/iiif/b18035723/manifest', provider: 'Wellcome Library (ALTO)' },
     { manifestId: 'https://scta.info/iiif/graciliscommentary/lon/manifest', provider: 'SCTA (Annotations)' },
+    { manifestId: 'https://purl.stanford.edu/fg165hz3589/iiif/manifest', provider: 'Stanford University Libraries (ALTO)' },
   ],
   id: 'demo',
   window: {
