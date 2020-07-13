@@ -7,16 +7,21 @@
 
 [![Screenshot][screenshot]][demo]
 **[Demo on https://mirador-textoverlay.netlify.com][demo]** (try selecting some text)
+
 ## Requirements for supported IIIF manifests
 
 - Line-level annotations with either one of:
   - a `motivation` that is `supplementing` (IIIF v3)
   - a resource that has a `@type` that is `cnt:contentAsText`  (IIIF v2)
   - a `dcType` that is equal to `Line` (Europeana)
-- A per-canvas `seeAlso` entry pointing to the ALTO or hOCR OCR markup for the page with either:
+- A per-canvas `seeAlso` entry pointing to the ALTO or hOCR OCR markup for
+  the page with either:
   - A `format` that is `application/xml+alto` or `text/vnd.hocr+html`
-  - A `profile` starting with `http://www.loc.gov/standards/alto/`, `http://kba.cloud/hocr-spec`, `http://kba.github.io/hocr-spec/` or `https://github.com/kba/hocr-spec/blob/master/hocr-spec.md`
-- If using OCR markup, the plugin can handle arbitrary scaling factors, i.e. as long as the OCR matches the canvas it should render fine
+  - A `profile` starting with `http://www.loc.gov/standards/alto/`,
+  `http://kba.cloud/hocr-spec`, `http://kba.github.io/hocr-spec/` or
+  `https://github.com/kba/hocr-spec/blob/master/hocr-spec.md`
+- If using OCR markup, the plugin can handle arbitrary scaling factors, i.e.
+as long as the OCR matches the canvas it should render fine
 
 For a list of example manifests that are supported, refer to the `catalog`
 entry in the [demo instance configuration][demo-cfg-catalog]. If you need
@@ -27,7 +32,9 @@ an issue :-)
 
 ## Installation
 Currently the plugin can only be used if you build your own Mirador JavaScript bundle.
-To include the plugin in your Mirador installation, you need to install it from npm with `npm install mirador-textoverlay`, import it into your project and pass it to Mirador when you instantiate the viewer:
+To include the plugin in your Mirador installation, you need to install it
+from npm with `npm install mirador-textoverlay`, import it into your project
+and pass it to Mirador when you instantiate the viewer:
 
 ```javascript
 import Mirador from 'mirador/dist/es/src/index';
@@ -40,9 +47,11 @@ Mirador.viewer(config, [...textOverlayPlugin]);
 ```
 
 ## Configuration
-You can configure the plugin globally for all windows and/or individually for every window.
+You can configure the plugin globally for all windows and/or individually for
+every window.
 
-For global configuration add the `textOverlay` entry to the top-level `window` configuration:
+For global configuration add the `textOverlay` entry to the top-level
+`window` configuration:
 
 ```javascript
 const miradorConfig = {
@@ -71,6 +80,14 @@ rendering itself is pretty straight-forward and can probably be adapted to
 most "deep zoom" viewers without a lot of additional effort.
 If you need the OCR parsing code as a separate package that you can base an
 implementation for your favorite viewer on, please open an issue :-)
+
+## Contributing
+Found a bug? The plugin is not working with your manifest? Want a new
+feature? Create an issue, or if you want to take at fixing it yourself, make
+a fork, create a pull request, we're always open to contributions :-)
+
+For larger changes/features, it's usually wise to open an issue before
+starting the work, so we can discuss if it's a fit.
 
 [npm-badge]: https://img.shields.io/npm/mirador-textoverlay.png?style=flat-square
 [npm]: https://www.npmjs.org/package/mirador-textoverlay
