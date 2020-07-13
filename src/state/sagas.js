@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 import uniq from 'lodash/uniq';
 import {
   all, call, put, select, takeEvery,
@@ -53,9 +54,11 @@ function* discoverExternalOcr({ visibleCanvases: visibleCanvasIds, windowId }) {
   // FIXME: This should be doable with the `all` saga combinator, but it doesn't
   // seem to do anything :-/
   for (const canvas of visibleCanvases) {
-    // eslint-disable-next-line no-underscore-dangle
-    const { seeAlso, width, height } = canvas.__jsonld;
-    if (isAlto(seeAlso) || isHocr(seeAlso)) {
+    const { width, height } = canvas.__jsonld;
+    const seeAlso = (
+      Array.isArray(canvas.__jsonld.seeAlso) ? canvas.__jsonld.seeAlso : [canvas.__jsonld.seeAlso])
+      .filter((res) => isAlto(res) || isHocr(res))[0];
+    if (seeAlso !== undefined) {
       const ocrSource = seeAlso['@id'];
       const alreadyHasText = texts[canvas.id]?.source === ocrSource;
       if (alreadyHasText) {
@@ -138,7 +141,6 @@ function* onConfigChange({ textOverlayOptions, windowId }) {
   for (const { canvasId, source, text } of texts) {
     if (!text) {
       const canvas = yield select(getCanvas({ canvasId }));
-      // eslint-disable-next-line no-underscore-dangle
       const { width, height } = canvas.__jsonld;
       yield put(requestText(canvasId, source, { height, width }));
     }
