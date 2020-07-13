@@ -41,7 +41,7 @@ class PageTextDisplay extends PureComponent {
         // onPointerDown={this.onPointerDown.bind(this)}
         ref={this.containerRef}
       >
-        {lines.map((line, lineIdx) => (
+        {lines.filter((l) => l.width > 0 && l.height > 0).map((line, lineIdx) => (
           <React.Fragment key={`${line.x}.${line.y}`}>
             <rect
               x={line.x + xOffset}
@@ -53,7 +53,7 @@ class PageTextDisplay extends PureComponent {
             {line.words
               ? (
                 <text style={lineStyle} key={lineIdx}>
-                  {line.words.map(({
+                  {line.words.filter((w) => w.width > 0 && w.height > 0).map(({
                     x, y, width, height, text,
                   }, wordIdx) => (
                     <tspan

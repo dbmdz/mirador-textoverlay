@@ -30,14 +30,15 @@ function hasExternalResource(anno) {
 /** Checks if a given resource points to an ALTO OCR document */
 const isAlto = (resource) => resource && (
   resource.format === 'application/xml+alto'
-    || resource.profile.startsWith('http://www.loc.gov/standards/alto/'));
+    || (resource.profile && resource.profile.startsWith('http://www.loc.gov/standards/alto/')));
 
 /** Checks if a given resource points to an hOCR document */
 const isHocr = (resource) => resource && (
   resource.format === 'text/vnd.hocr+html'
-    || resource.profile === 'https://github.com/kba/hocr-spec/blob/master/hocr-spec.md'
-    || resource.profile.startsWith('http://kba.cloud/hocr-spec/')
-    || resource.profile.startsWith('http://kba.github.io/hocr-spec/'));
+    || (resource.profile && (
+      resource.profile === 'https://github.com/kba/hocr-spec/blob/master/hocr-spec.md'
+      || resource.profile.startsWith('http://kba.cloud/hocr-spec/')
+      || resource.profile.startsWith('http://kba.github.io/hocr-spec/'))));
 
 /** Saga for discovering external OCR on visible canvases and requesting it if not yet loaded */
 function* discoverExternalOcr({ visibleCanvases: visibleCanvasIds, windowId }) {
