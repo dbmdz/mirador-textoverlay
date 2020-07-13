@@ -303,7 +303,7 @@ export function parseIiifAnnotations(annos, imgSize) {
     }
     let target = anno.target || anno.on;
     target = Array.isArray(target) ? target[0] : target;
-    const [x, y, width, height] = [...target.matchAll(fragmentPat)][0].slice(1, 5);
+    const [x, y, width, height] = target.match(fragmentPat).slice(1, 5);
     return {
       height: parseInt(height, 10),
       text,
