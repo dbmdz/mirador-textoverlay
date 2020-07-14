@@ -1,14 +1,20 @@
 export default {
   de: {
-    textOpacity: 'Transparenz',
-    textOverlay: 'Text-Anzeige',
-    textSelect: 'Auswählbar',
-    textVisible: 'Sichtbar',
+    collapseTextOverlayOptions: 'Optionen für die Textdarstellung einklappen',
+    disableTextOverlay: 'Textdarstellung deaktivieren',
+    enableTextOverlay: 'Textdarstellung aktivieren',
+    expandTextOverlayOptions: 'Optionen für die Textdarstellung ausklappen',
+    textOpacity: 'Text-Transparenz',
+    textSelect: 'Text Auswählbar',
+    textVisible: 'Text Sichtbar',
   },
   en: {
-    textOpacity: 'Opacity',
-    textOverlay: 'Text Overlay',
-    textSelect: 'Selectable',
-    textVisible: 'Visible',
+    collapseTextOverlayOptions: 'Contract text overlay options',
+    disableTextOverlay: 'Disable text overlay',
+    enableTextOverlay: 'Enable text overlay',
+    expandTextOverlayOptions: 'Expand text overlay options',
+    textOpacity: 'Text Opacity',
+    textSelect: 'Text Selectable',
+    textVisible: 'Text Visible',
   },
 };

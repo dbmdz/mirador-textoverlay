@@ -1,36 +1,25 @@
 import { createSelector } from 'reselect';
 
-import {
-  getCanvas, getConfig, getVisibleCanvases, getWindow,
-} from 'mirador/dist/es/src/state/selectors';
+import { getCanvas, getWindowConfig, getVisibleCanvases } from 'mirador/dist/es/src/state/selectors';
 import { miradorSlice } from 'mirador/dist/es/src/state/selectors/utils';
 
 const defaultConfig = {
   // Enable the text selection and display feature
   enabled: true,
   // Default opacity of text overlay
-  opacity: 0.75,
+  opacity: 1.0,
   // Make text selectable by default
   selectable: false,
   // Overlay text overlay by default
   visible: false,
 };
 
-/** Selector to get default text display configuration */
-export const getTextOverlayConfig = createSelector(
-  [getConfig],
-  ({ window }) => window && ({ ...defaultConfig, ...(window.textOverlay ?? {}) }),
-);
-
-/** Selector to get window text display options for all windows */
-export const getTextOverlayOptions = (state) => miradorSlice(state).windowTextOverlayOptions;
-
 /** Selector to get text display options for a given window */
 export const getWindowTextOverlayOptions = createSelector(
-  [getWindow, getTextOverlayConfig, getTextOverlayOptions],
-  (window, defaultOptions, allWindowOptions) => ({
-    ...defaultOptions,
-    ...(allWindowOptions[window.id] ?? {}),
+  [getWindowConfig],
+  ({ textOverlay }) => ({
+    ...defaultConfig,
+    ...(textOverlay ?? {}),
   }),
 );
 
