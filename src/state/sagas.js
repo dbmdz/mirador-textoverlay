@@ -7,7 +7,7 @@ import fetch from 'isomorphic-unfetch';
 
 import ActionTypes from 'mirador/dist/es/src/state/actions/action-types';
 import { receiveAnnotation, updateConfig } from 'mirador/dist/es/src/state/actions';
-import { getCanvases, getCanvas, getWindowConfig, getVisibleCanvases } from 'mirador/dist/es/src/state/selectors';
+import { getCanvases, getWindowConfig, getVisibleCanvases } from 'mirador/dist/es/src/state/selectors';
 
 import {
   PluginActionTypes, requestText, receiveText, receiveTextFailure, discoveredText,

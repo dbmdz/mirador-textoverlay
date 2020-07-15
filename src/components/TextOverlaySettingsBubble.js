@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { MiradorMenuButton } from 'mirador/dist/es/src/components/MiradorMenuButton';
-import { Slider } from '@material-ui/core';
+import Slider from '@material-ui/core/Slider';
 import TextIcon from '@material-ui/icons/TextFields';
 import CloseIcon from '@material-ui/icons/Close';
 import SubjectIcon from '@material-ui/icons/Subject';
@@ -15,7 +15,7 @@ const TextOverlaySettingsBubble = ({
   const {
     enabled, visible, selectable, opacity,
   } = windowTextOverlayOptions;
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(enabled && (visible || selectable));
   const [showOpacitySlider, setShowOpacitySlider] = useState(false);
 
   if (!enabled || !textsAvailable) {
@@ -27,6 +27,8 @@ const TextOverlaySettingsBubble = ({
       borderRadius: 25,
       position: 'absolute',
       right: 8,
+      // The mirador-image-tools plugin renders itself at the same position,
+      // so if it's active, position the menu lower
       top: imageToolsEnabled ? 66 : 8,
       zIndex: 999,
     }}
@@ -35,6 +37,7 @@ const TextOverlaySettingsBubble = ({
       && (
       <>
         <div style={{
+          // CSS voodoo to render a border with a margin on the top and bottom
           borderImageSlice: 1,
           borderImageSource: 'linear-gradient(to bottom, rgba(0, 0, 0, 0) 20%, rgba(0, 0, 0, 0.2) 20% 80%, rgba(0, 0, 0, 0) 80% )',
           borderRight: '1px solid rgba(0, 0, 0, 0.2)',
@@ -48,6 +51,7 @@ const TextOverlaySettingsBubble = ({
               ...windowTextOverlayOptions,
               selectable: !selectable,
             })}
+            aria-pressed={selectable}
             style={{ backgroundColor: selectable && 'rgba(0, 0, 0, 0.25)' }}
           >
             <TextSelectIcon />
@@ -65,12 +69,14 @@ const TextOverlaySettingsBubble = ({
                 setShowOpacitySlider(false);
               }
             }}
+            aria-pressed={visible}
             style={{ backgroundColor: visible && 'rgba(0, 0, 0, 0.25)' }}
           >
             <TextIcon />
           </MiradorMenuButton>
         </div>
         <div style={{
+          // CSS voodoo to render a border with a margin on the top and bottom
           borderImageSlice: 1,
           borderImageSource: 'linear-gradient(to bottom, rgba(0, 0, 0, 0) 20%, rgba(0, 0, 0, 0.2) 20% 80%, rgba(0, 0, 0, 0) 80% )',
           borderRight: '1px solid rgba(0, 0, 0, 0.2)',
@@ -92,6 +98,7 @@ const TextOverlaySettingsBubble = ({
           {visible && showOpacitySlider
           && (
           <div
+            data-test-id="text-opacity-slider"
             id="text-opacity-slider"
             aria-labelledby="text-opacity-slider-label"
             style={{
@@ -110,6 +117,7 @@ const TextOverlaySettingsBubble = ({
               min={0}
               max={100}
               value={opacity * 100}
+              getAriaValueText={(value) => t('opacityCurrentValue', { value })}
               onChange={(evt, val) => updateWindowTextOverlayOptions({
                 ...windowTextOverlayOptions,
                 opacity: val / 100.0,
