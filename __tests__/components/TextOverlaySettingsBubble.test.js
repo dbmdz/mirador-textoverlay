@@ -7,7 +7,7 @@ import {
 } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 
-import TextOverlaySettingsBubble from '../src/components/TextOverlaySettingsBubble';
+import TextOverlaySettingsBubble from '../../src/components/TextOverlaySettingsBubble';
 
 // Mocked MUI slider for easier testing, taken from
 // https://stackoverflow.com/a/61628815 (CC BY-SA 4.0)
