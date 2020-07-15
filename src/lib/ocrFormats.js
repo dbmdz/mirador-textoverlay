@@ -8,7 +8,7 @@ const namespaces = {
 
 /** Parse hOCR attributes from a node's title attribute */
 function parseHocrAttribs(titleAttrib) {
-  const vals = titleAttrib.split(';');
+  const vals = titleAttrib.split(';').map((x) => x.trim());
   return vals.reduce((acc, val) => {
     const key = val.split(' ')[0];
     // Special handling for bounding boxes, convert them to a number[4]
@@ -88,7 +88,7 @@ export function parseHocr(hocrText, referenceSize) {
         words.push(parseHocrNode(wordNode, i === wordNodes.length - 1, scaleFactor));
       }
       line.words = words;
-      line.text = words.map((w) => w.text).join('');
+      line.text = words.map((w) => w.text).join('').trim();
       lines.push(line);
     }
   }
@@ -102,6 +102,13 @@ export function parseHocr(hocrText, referenceSize) {
 
 /** Create CSS directives from an ALTO TextStyle node */
 function altoStyleNodeToCSS(styleNode) {
+  // NOTE: We don't map super/subscript, since it would change the font size
+  const fontStyleMap = {
+    bold: 'font-weight: bold',
+    italics: 'font-style: italic',
+    smallcaps: 'font-variant: small-caps',
+    underline: 'text-decoration: underline',
+  };
   const styles = [];
   if (styleNode.hasAttribute('FONTFAMILY')) {
     styles.push(`font-family: ${styleNode.getAttribute('FONTFAMILY')}`);
@@ -113,7 +120,10 @@ function altoStyleNodeToCSS(styleNode) {
     styles.push(`color: #${styleNode.getAttribute('FONTCOLOR')}`);
   }
   if (styleNode.hasAttribute('FONTSTYLE')) {
-    styles.push(`font-style: #${styleNode.getAttribute('FONTSTYLE')}`);
+    const altoStyle = styleNode.getAttribute('FONTSTYLE');
+    if (altoStyle in fontStyleMap) {
+      styles.push(fontStyleMap[altoStyle]);
+    }
   }
   return styles.join(';');
 }
@@ -126,7 +136,7 @@ function altoStyleNodeToCSS(styleNode) {
  * millimeters for units by default and we need pixels.
  */
 export function parseAlto(altoText, imgSize) {
-  const doc = parser.parseFromString(altoText, 'text/xml');
+  let doc = parser.parseFromString(altoText, 'text/xml');
   // We assume ALTO is set as the default namespace
   const altoNamespace = doc.firstElementChild.getAttribute('xmlns');
   if (
@@ -137,16 +147,21 @@ export function parseAlto(altoText, imgSize) {
     console.error('Unsupported ALTO namespace: ', altoNamespace);
     return null;
   }
+  // jdom's XPath implementation has issues with namespaces, so we just strip them here
+  doc = parser.parseFromString(
+    altoText.replace(/<([a-zA-Z0-9 ]+)(?:xml)ns=".*"(.*)>/g, '<$1$2>'),
+    'text/xml',
+  );
   /** Namespace resolver that forrces the ALTO namespace */
   const altoResolver = () => altoNamespace;
   const measurementUnit = doc.evaluate(
-    '/alto:alto/alto:Description/alto:MeasurementUnit',
+    '/alto/Description/MeasurementUnit',
     doc,
     altoResolver,
     XPathResult.STRING_TYPE,
   ).stringValue;
   const pageElem = doc.evaluate(
-    '/alto:alto/alto:Layout/alto:Page',
+    '/alto/Layout/Page',
     doc,
     altoResolver,
     XPathResult.FIRST_ORDERED_NODE_TYPE,
@@ -165,7 +180,7 @@ export function parseAlto(altoText, imgSize) {
 
   const styles = {};
   const styleIter = doc.evaluate(
-    '/alto:alto/alto:Styles/alto:TextStyle',
+    '/alto/Styles/TextStyle',
     doc,
     altoResolver,
     XPathResult.ORDERED_NODE_ITERATOR_TYPE,
@@ -177,14 +192,14 @@ export function parseAlto(altoText, imgSize) {
   }
 
   const hasSpaces = doc.evaluate(
-    'count(//alto:SP)',
+    'count(//SP)',
     doc,
     altoResolver,
     XPathResult.NUMBER_TYPE,
-  ) > 0;
+  ).numberValue > 0;
   const lines = [];
   const lineIter = doc.evaluate(
-    './/alto:TextLine',
+    './/TextLine',
     doc,
     altoResolver,
     XPathResult.ORDERED_NODE_ITERATOR_TYPE,
@@ -201,7 +216,7 @@ export function parseAlto(altoText, imgSize) {
       y: Number.parseInt(lineNode.getAttribute('VPOS'), 10) * scaleFactorY,
     };
     const wordIter = doc.evaluate(
-      './/alto:*',
+      './/*',
       lineNode,
       altoResolver,
       XPathResult.ORDERED_NODE_ITERATOR_TYPE,
