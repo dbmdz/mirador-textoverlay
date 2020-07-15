@@ -89,7 +89,7 @@ a fork, create a pull request, we're always open to contributions :-)
 For larger changes/features, it's usually wise to open an issue before
 starting the work, so we can discuss if it's a fit.
 
-[npm-badge]: https://img.shields.io/npm/mirador-textoverlay.png?style=flat-square
+[npm-badge]: https://img.shields.io/npm/v/mirador-textoverlay.png?style=flat-square
 [npm]: https://www.npmjs.org/package/mirador-textoverlay
 
 [mirador-badge]: https://img.shields.io/badge/Mirador-%E2%89%A53.0.0--rc.3-blueviolet 
