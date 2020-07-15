@@ -40,7 +40,7 @@ const isHocr = (resource) => resource && (
 
 /** Wrapper around fetch() that returns the content as text */
 export async function fetchOcrMarkup(url) {
-  const resp = await fetch(textUri);
+  const resp = await fetch(url);
   return resp.text();
 }
 
@@ -92,6 +92,12 @@ export function* fetchAndProcessOcr({ targetId, textUri, canvasSize }) {
   }
 }
 
+/** Fetch external annotation resource JSON */
+export async function fetchAnnotationResource(url) {
+  const resp = await fetch(url);
+  return resp.json();
+}
+
 /** Saga for fetching external annotation resources */
 export function* fetchExternalAnnotationResources({ targetId, annotationId, annotationJson }) {
   if (!annotationJson.resources.some(hasExternalResource)) {
@@ -99,7 +105,7 @@ export function* fetchExternalAnnotationResources({ targetId, annotationId, anno
   }
   const resourceUris = uniq(annotationJson.resources.map((anno) => anno.resource['@id'].split('#')[0]));
   const contents = yield all(
-    resourceUris.map((uri) => call(() => fetch(uri).then((resp) => resp.json()))),
+    resourceUris.map((uri) => call(fetchAnnotationResource, uri)),
   );
   const contentMap = Object.fromEntries(contents.map((c) => [c.id ?? c['@id'], c]));
   const completedAnnos = annotationJson.resources.map((anno) => {
@@ -114,7 +120,7 @@ export function* fetchExternalAnnotationResources({ targetId, annotationId, anno
     const startIdx = Number.parseInt(match[2], 10);
     const endIdx = Number.parseInt(match[3], 10);
     const partialContent = wholeResource.value.substring(startIdx, endIdx);
-    return { ...anno, resource: { ...wholeResource, value: partialContent } };
+    return { ...anno, resource: { ...anno.resource, value: partialContent } };
   });
   yield put(
     receiveAnnotation(targetId, annotationId, { ...annotationJson, resources: completedAnnos }),
@@ -132,7 +138,8 @@ export function* processTextsFromAnnotations({ targetId, annotationId, annotatio
   );
 
   if (contentAsTextAnnos.length > 0) {
-    yield put(receiveText(targetId, annotationId, 'annos', parseIiifAnnotations(contentAsTextAnnos)));
+    const parsed = yield call(parseIiifAnnotations, contentAsTextAnnos);
+    yield put(receiveText(targetId, annotationId, 'annos', parsed));
   }
 }
 
