@@ -39,7 +39,7 @@ const isHocr = (resource) => resource && (
       || resource.profile.startsWith('http://kba.github.io/hocr-spec/'))));
 
 /** Saga for discovering external OCR on visible canvases and requesting it if not yet loaded */
-function* discoverExternalOcr({ visibleCanvases: visibleCanvasIds, windowId }) {
+export function* discoverExternalOcr({ visibleCanvases: visibleCanvasIds, windowId }) {
   const { enabled, selectable, visible } = (
     yield select(getWindowConfig, { windowId })
   ).textOverlay ?? { enabled: false };
@@ -76,7 +76,7 @@ function* discoverExternalOcr({ visibleCanvases: visibleCanvasIds, windowId }) {
 }
 
 /** Saga for fetching OCR and parsing it */
-function* fetchAndProcessOcr({ targetId, textUri, canvasSize }) {
+export function* fetchAndProcessOcr({ targetId, textUri, canvasSize }) {
   try {
     const text = yield call(() => fetch(textUri).then((resp) => resp.text()));
     const parsedText = parseOcr(text, canvasSize);
@@ -87,7 +87,7 @@ function* fetchAndProcessOcr({ targetId, textUri, canvasSize }) {
 }
 
 /** Saga for fetching external annotation resources */
-function* fetchExternalAnnotationResources({ targetId, annotationId, annotationJson }) {
+export function* fetchExternalAnnotationResources({ targetId, annotationId, annotationJson }) {
   if (!annotationJson.resources.some(hasExternalResource)) {
     return;
   }
@@ -116,7 +116,7 @@ function* fetchExternalAnnotationResources({ targetId, annotationId, annotationJ
 }
 
 /** Saga for processing texts from IIIF annotations */
-function* processTextsFromAnnotations({ targetId, annotationId, annotationJson }) {
+export function* processTextsFromAnnotations({ targetId, annotationId, annotationJson }) {
   // Check if the annotation contains "content as text" resources that
   // we can extract text with coordinates from
   const contentAsTextAnnos = annotationJson.resources.filter(
@@ -131,7 +131,7 @@ function* processTextsFromAnnotations({ targetId, annotationId, annotationJson }
 }
 
 /** Saga for requesting texts when display or selection is newly enabled */
-function* onConfigChange({ payload, id: windowId }) {
+export function* onConfigChange({ payload, id: windowId }) {
   const { enabled, selectable, visible } = payload.textOverlay ?? {};
   if (!enabled || (!selectable && !visible)) {
     return;
@@ -150,7 +150,7 @@ function* onConfigChange({ payload, id: windowId }) {
 }
 
 /** Inject translation keys for this plugin into thte config */
-function* injectTranslations() {
+export function* injectTranslations() {
   yield put(updateConfig({
     translations,
   }));
