@@ -1,19 +1,5 @@
 import { PluginActionTypes } from './actions';
 
-/** Reducer for text display options for each window */
-export const windowTextOverlayOptionsReducer = (state = {}, action) => {
-  if (action.type === PluginActionTypes.SET_WINDOW_TEXTOVERLAY_OPTIONS) {
-    return {
-      ...state,
-      [action.windowId]: {
-        ...state[action.windowId],
-        ...action.textOverlayOptions,
-      },
-    };
-  }
-  return state;
-};
-
 /** Reducer for global text overlay state */
 export const textsReducer = (state = {}, action) => {
   switch (action.type) {

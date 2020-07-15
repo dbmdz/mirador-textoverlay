@@ -1,9 +1,11 @@
-import { setWindowTextOverlayOptions } from './state/actions';
-import { textsReducer, windowTextOverlayOptionsReducer } from './state/reducers';
+import { updateWindow } from 'mirador/dist/es/src/state/actions';
+import { getWindowConfig } from 'mirador/dist/es/src/state/selectors';
+
+import { textsReducer } from './state/reducers';
 import textSaga from './state/sagas';
-import { getWindowTextOverlayOptions, getTextsForVisibleCanvases } from './state/selectors';
+import { getTextsForVisibleCanvases, getWindowTextOverlayOptions } from './state/selectors';
 import MiradorTextOverlay from './components/MiradorTextOverlay';
-import WindowTextSettings from './components/WindowTextSettings';
+import TextOverlaySettingsBubble from './components/TextOverlaySettingsBubble';
 
 export default [
   {
@@ -21,20 +23,23 @@ export default [
     mode: 'add',
     reducers: {
       texts: textsReducer,
-      windowTextOverlayOptions: windowTextOverlayOptionsReducer,
     },
     saga: textSaga,
     target: 'OpenSeadragonViewer',
   },
   {
-    component: WindowTextSettings,
-    mapDispatchToProps: { setWindowTextOverlayOptions },
+    component: TextOverlaySettingsBubble,
+    mapDispatchToProps: (dispatch, { windowId }) => ({
+      updateWindowTextOverlayOptions: (options) => dispatch(
+        updateWindow(windowId, { textOverlay: options }),
+      ),
+    }),
     mapStateToProps: (state, { windowId }) => ({
-      textAvailable: getTextsForVisibleCanvases(state, { windowId }).length > 0,
-      windowId,
+      imageToolsEnabled: getWindowConfig(state, { windowId }).imageToolsEnabled ?? false,
+      textsAvailable: getTextsForVisibleCanvases(state, { windowId }).length > 0,
       windowTextOverlayOptions: getWindowTextOverlayOptions(state, { windowId }),
     }),
     mode: 'add',
-    target: 'WindowTopBarPluginMenu',
+    target: 'OpenSeadragonViewer',
   },
 ];

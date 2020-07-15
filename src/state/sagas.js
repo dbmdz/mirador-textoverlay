@@ -7,15 +7,12 @@ import fetch from 'isomorphic-unfetch';
 
 import ActionTypes from 'mirador/dist/es/src/state/actions/action-types';
 import { receiveAnnotation, updateConfig } from 'mirador/dist/es/src/state/actions';
-import { getCanvases, getCanvas } from 'mirador/dist/es/src/state/selectors';
+import { getCanvases, getWindowConfig, getVisibleCanvases } from 'mirador/dist/es/src/state/selectors';
 
 import {
   PluginActionTypes, requestText, receiveText, receiveTextFailure, discoveredText,
-  setWindowTextOverlayOptions,
 } from './actions';
-import {
-  getTexts, getWindowTextOverlayOptions, getTextsForVisibleCanvases, getTextOverlayConfig,
-} from './selectors';
+import { getTexts, getTextsForVisibleCanvases } from './selectors';
 import translations from '../locales';
 import { parseIiifAnnotations, parseOcr } from '../lib/ocrFormats';
 
@@ -43,7 +40,9 @@ const isHocr = (resource) => resource && (
 
 /** Saga for discovering external OCR on visible canvases and requesting it if not yet loaded */
 function* discoverExternalOcr({ visibleCanvases: visibleCanvasIds, windowId }) {
-  const { enabled, selectable, visible } = yield select(getWindowTextOverlayOptions, { windowId });
+  const { enabled, selectable, visible } = (
+    yield select(getWindowConfig, { windowId })
+  ).textOverlay ?? { enabled: false };
   if (!enabled) {
     return;
   }
@@ -132,18 +131,21 @@ function* processTextsFromAnnotations({ targetId, annotationId, annotationJson }
 }
 
 /** Saga for requesting texts when display or selection is newly enabled */
-function* onConfigChange({ textOverlayOptions, windowId }) {
-  const { enabled, selectable, visible } = textOverlayOptions;
+function* onConfigChange({ payload, id: windowId }) {
+  const { enabled, selectable, visible } = payload.textOverlay ?? {};
   if (!enabled || (!selectable && !visible)) {
     return;
   }
   const texts = yield select(getTextsForVisibleCanvases, { windowId });
-  for (const { canvasId, source, text } of texts) {
-    if (!text) {
-      const canvas = yield select(getCanvas({ canvasId }));
-      const { width, height } = canvas.__jsonld;
-      yield put(requestText(canvasId, source, { height, width }));
-    }
+  // Check if we need to discover external OCR
+  const needsDiscovery = (
+    texts.length === 0
+    || texts.filter(({ sourceType }) => sourceType === 'annos').length > 0
+  );
+  if (needsDiscovery) {
+    const visibleCanvases = yield select(getVisibleCanvases, { windowId });
+    const canvasIds = visibleCanvases.map((c) => c.id);
+    yield call(discoverExternalOcr, { visibleCanvases: canvasIds, windowId });
   }
 }
 
@@ -154,22 +156,14 @@ function* injectTranslations() {
   }));
 }
 
-/** Set the initial text display options from the config for new windows */
-function* setInitialOptions({ window }) {
-  const initialOptions = yield select(getTextOverlayConfig);
-  const windowOptions = window.textOverlay ?? {};
-  yield put(setWindowTextOverlayOptions(window.id, { ...initialOptions, ...windowOptions }));
-}
-
 /** Root saga for the plugin */
 export default function* textSaga() {
   yield all([
-    takeEvery(ActionTypes.ADD_WINDOW, setInitialOptions),
     takeEvery(ActionTypes.IMPORT_CONFIG, injectTranslations),
     takeEvery(ActionTypes.RECEIVE_ANNOTATION, fetchExternalAnnotationResources),
     takeEvery(ActionTypes.RECEIVE_ANNOTATION, processTextsFromAnnotations),
     takeEvery(ActionTypes.SET_CANVAS, discoverExternalOcr),
-    takeEvery(PluginActionTypes.SET_WINDOW_TEXTOVERLAY_OPTIONS, onConfigChange),
+    takeEvery(ActionTypes.UPDATE_WINDOW, onConfigChange),
     takeEvery(PluginActionTypes.REQUEST_TEXT, fetchAndProcessOcr),
   ]);
 }
