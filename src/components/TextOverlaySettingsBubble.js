@@ -22,16 +22,18 @@ const TextOverlaySettingsBubble = ({
     return null;
   }
   return (
-    <div style={{
-      backgroundColor: 'rgba(255, 255, 255, 0.8)',
-      borderRadius: 25,
-      position: 'absolute',
-      right: 8,
-      // The mirador-image-tools plugin renders itself at the same position,
-      // so if it's active, position the menu lower
-      top: imageToolsEnabled ? 66 : 8,
-      zIndex: 999,
-    }}
+    <div
+      className="MuiPaper-elevation4"
+      style={{
+        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+        borderRadius: 25,
+        position: 'absolute',
+        right: 8,
+        // The mirador-image-tools plugin renders itself at the same position,
+        // so if it's active, position the menu lower
+        top: imageToolsEnabled ? 66 : 8,
+        zIndex: 999,
+      }}
     >
       {open
       && (
