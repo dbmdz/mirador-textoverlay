@@ -1,12 +1,14 @@
 import { select, call } from 'redux-saga/effects';
 import { expectSaga } from 'redux-saga-test-plan';
+import { throwError } from 'redux-saga-test-plan/providers';
 import { getWindowConfig, getCanvases } from 'mirador/dist/es/src/state/selectors';
 
 import {
-  discoveredText, requestText,
+  discoveredText, requestText, receiveText, receiveTextFailure,
 } from '../../src/state/actions';
-import { discoverExternalOcr } from '../../src/state/sagas';
+import { discoverExternalOcr, fetchAndProcessOcr, fetchOcrMarkup } from '../../src/state/sagas';
 import { getTexts } from '../../src/state/selectors';
+import { parseOcr } from '../../src/lib/ocrFormats';
 
 const windowConfig = {
   textOverlay: {
@@ -57,19 +59,21 @@ describe('Discovering external OCR resources', () => {
       .put(discoveredText('canvasB', 'http://example.com/ocr/canvasB'))
       .run());
 
-  it('should request the texts if selectability is enabled',
-    () => expectSaga(
-      discoverExternalOcr,
-      { visibleCanvases: ['canvasA', 'canvasB'], windowId },
-    ).provide([
-      [select(getWindowConfig, { windowId }),
-        { textOverlay: { ...windowConfig.textOverlay, selectable: true } }],
-      [select(getCanvases, { windowId }), canvases],
-      [select(getTexts), {}],
-    ])
-      .put(requestText('canvasA', 'http://example.com/ocr/canvasA', canvasSize))
-      .put(requestText('canvasB', 'http://example.com/ocr/canvasB', canvasSize))
-      .run());
+  ['selectable', 'visible'].forEach((setting) => {
+    it(`should request the texts if '${setting}' is enabled`,
+      () => expectSaga(
+        discoverExternalOcr,
+        { visibleCanvases: ['canvasA', 'canvasB'], windowId },
+      ).provide([
+        [select(getWindowConfig, { windowId }),
+          { textOverlay: { ...windowConfig.textOverlay, [setting]: true } }],
+        [select(getCanvases, { windowId }), canvases],
+        [select(getTexts), {}],
+      ])
+        .put(requestText('canvasA', 'http://example.com/ocr/canvasA', canvasSize))
+        .put(requestText('canvasB', 'http://example.com/ocr/canvasB', canvasSize))
+        .run());
+  });
 
   it('should not do anything when the sources are already discovered',
     () => expectSaga(
@@ -97,4 +101,33 @@ describe('Discovering external OCR resources', () => {
         expect(effects.select).toHaveLength(1);
         expect(effects.put).toBeUndefined();
       }));
+});
+
+describe('Fetching and processing external OCR', () => {
+  const targetId = 'canvasA';
+  const textUri = 'http://example.com/ocr/canvasA';
+  const textStub = 'some dummy text';
+  const parsedStub = { lines: [] };
+  const err = new Error('could not fetch');
+
+  it('should update store after successfull fetch and parse',
+    () => expectSaga(
+      fetchAndProcessOcr,
+      { canvasSize, targetId, textUri },
+    ).provide([
+      [call(fetchOcrMarkup, textUri), textStub],
+      [call(parseOcr, textStub, canvasSize), parsedStub],
+    ])
+      .put(receiveText(targetId, textUri, 'ocr', parsedStub))
+      .run());
+
+  it('should update store after failed fetch and parse',
+    () => expectSaga(
+      fetchAndProcessOcr,
+      { canvasSize, targetId, textUri },
+    ).provide([
+      [call(fetchOcrMarkup, textUri), throwError(err)],
+    ])
+      .put(receiveTextFailure(targetId, textUri, err))
+      .run());
 });

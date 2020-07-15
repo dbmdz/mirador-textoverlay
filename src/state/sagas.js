@@ -38,6 +38,12 @@ const isHocr = (resource) => resource && (
       || resource.profile.startsWith('http://kba.cloud/hocr-spec/')
       || resource.profile.startsWith('http://kba.github.io/hocr-spec/'))));
 
+/** Wrapper around fetch() that returns the content as text */
+export async function fetchOcrMarkup(url) {
+  const resp = await fetch(textUri);
+  return resp.text();
+}
+
 /** Saga for discovering external OCR on visible canvases and requesting it if not yet loaded */
 export function* discoverExternalOcr({ visibleCanvases: visibleCanvasIds, windowId }) {
   const { enabled, selectable, visible } = (
@@ -78,8 +84,8 @@ export function* discoverExternalOcr({ visibleCanvases: visibleCanvasIds, window
 /** Saga for fetching OCR and parsing it */
 export function* fetchAndProcessOcr({ targetId, textUri, canvasSize }) {
   try {
-    const text = yield call(() => fetch(textUri).then((resp) => resp.text()));
-    const parsedText = parseOcr(text, canvasSize);
+    const text = yield call(fetchOcrMarkup, textUri);
+    const parsedText = yield call(parseOcr, text, canvasSize);
     yield put(receiveText(targetId, textUri, 'ocr', parsedText));
   } catch (error) {
     yield put(receiveTextFailure(targetId, textUri, error));
