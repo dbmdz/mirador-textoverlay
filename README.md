@@ -92,8 +92,8 @@ starting the work, so we can discuss if it's a fit.
 [npm-badge]: https://img.shields.io/npm/v/mirador-textoverlay.png?style=flat-square
 [npm]: https://www.npmjs.org/package/mirador-textoverlay
 
-[mirador-badge]: https://img.shields.io/badge/Mirador-%E2%89%A53.0.0--rc.3-blueviolet 
-[mirador]: https://github.com/ProjectMirador/mirador/releases/tag/v3.0.0-rc.3
+[mirador-badge]: https://img.shields.io/badge/Mirador-%E2%89%A53.0.0--rc.4-blueviolet 
+[mirador]: https://github.com/ProjectMirador/mirador/releases/tag/v3.0.0-rc.4
 
 [screenshot]: .docassets/screenshot.png
 [demo]: https://mirador-textoverlay.netlify.com
