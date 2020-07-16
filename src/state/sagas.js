@@ -38,8 +38,14 @@ const isHocr = (resource) => resource && (
       || resource.profile.startsWith('http://kba.cloud/hocr-spec/')
       || resource.profile.startsWith('http://kba.github.io/hocr-spec/'))));
 
+/** Wrapper around fetch() that returns the content as text */
+export async function fetchOcrMarkup(url) {
+  const resp = await fetch(url);
+  return resp.text();
+}
+
 /** Saga for discovering external OCR on visible canvases and requesting it if not yet loaded */
-function* discoverExternalOcr({ visibleCanvases: visibleCanvasIds, windowId }) {
+export function* discoverExternalOcr({ visibleCanvases: visibleCanvasIds, windowId }) {
   const { enabled, selectable, visible } = (
     yield select(getWindowConfig, { windowId })
   ).textOverlay ?? { enabled: false };
@@ -76,24 +82,30 @@ function* discoverExternalOcr({ visibleCanvases: visibleCanvasIds, windowId }) {
 }
 
 /** Saga for fetching OCR and parsing it */
-function* fetchAndProcessOcr({ targetId, textUri, canvasSize }) {
+export function* fetchAndProcessOcr({ targetId, textUri, canvasSize }) {
   try {
-    const text = yield call(() => fetch(textUri).then((resp) => resp.text()));
-    const parsedText = parseOcr(text, canvasSize);
+    const text = yield call(fetchOcrMarkup, textUri);
+    const parsedText = yield call(parseOcr, text, canvasSize);
     yield put(receiveText(targetId, textUri, 'ocr', parsedText));
   } catch (error) {
     yield put(receiveTextFailure(targetId, textUri, error));
   }
 }
 
+/** Fetch external annotation resource JSON */
+export async function fetchAnnotationResource(url) {
+  const resp = await fetch(url);
+  return resp.json();
+}
+
 /** Saga for fetching external annotation resources */
-function* fetchExternalAnnotationResources({ targetId, annotationId, annotationJson }) {
+export function* fetchExternalAnnotationResources({ targetId, annotationId, annotationJson }) {
   if (!annotationJson.resources.some(hasExternalResource)) {
     return;
   }
   const resourceUris = uniq(annotationJson.resources.map((anno) => anno.resource['@id'].split('#')[0]));
   const contents = yield all(
-    resourceUris.map((uri) => call(() => fetch(uri).then((resp) => resp.json()))),
+    resourceUris.map((uri) => call(fetchAnnotationResource, uri)),
   );
   const contentMap = Object.fromEntries(contents.map((c) => [c.id ?? c['@id'], c]));
   const completedAnnos = annotationJson.resources.map((anno) => {
@@ -108,7 +120,7 @@ function* fetchExternalAnnotationResources({ targetId, annotationId, annotationJ
     const startIdx = Number.parseInt(match[2], 10);
     const endIdx = Number.parseInt(match[3], 10);
     const partialContent = wholeResource.value.substring(startIdx, endIdx);
-    return { ...anno, resource: { ...wholeResource, value: partialContent } };
+    return { ...anno, resource: { ...anno.resource, value: partialContent } };
   });
   yield put(
     receiveAnnotation(targetId, annotationId, { ...annotationJson, resources: completedAnnos }),
@@ -116,7 +128,7 @@ function* fetchExternalAnnotationResources({ targetId, annotationId, annotationJ
 }
 
 /** Saga for processing texts from IIIF annotations */
-function* processTextsFromAnnotations({ targetId, annotationId, annotationJson }) {
+export function* processTextsFromAnnotations({ targetId, annotationId, annotationJson }) {
   // Check if the annotation contains "content as text" resources that
   // we can extract text with coordinates from
   const contentAsTextAnnos = annotationJson.resources.filter(
@@ -126,12 +138,13 @@ function* processTextsFromAnnotations({ targetId, annotationId, annotationJson }
   );
 
   if (contentAsTextAnnos.length > 0) {
-    yield put(receiveText(targetId, annotationId, 'annos', parseIiifAnnotations(contentAsTextAnnos)));
+    const parsed = yield call(parseIiifAnnotations, contentAsTextAnnos);
+    yield put(receiveText(targetId, annotationId, 'annos', parsed));
   }
 }
 
 /** Saga for requesting texts when display or selection is newly enabled */
-function* onConfigChange({ payload, id: windowId }) {
+export function* onConfigChange({ payload, id: windowId }) {
   const { enabled, selectable, visible } = payload.textOverlay ?? {};
   if (!enabled || (!selectable && !visible)) {
     return;
@@ -150,7 +163,7 @@ function* onConfigChange({ payload, id: windowId }) {
 }
 
 /** Inject translation keys for this plugin into thte config */
-function* injectTranslations() {
+export function* injectTranslations() {
   yield put(updateConfig({
     translations,
   }));

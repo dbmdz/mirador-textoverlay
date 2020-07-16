@@ -61,6 +61,7 @@
     "prop-types": "^15.7.2",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
+    "redux-saga-test-plan": "^4.0.0-rc.3",
     "uuid": "^8.0.0"
   },
   "author": "Johannes Baiter <johannes.baiter@bsb-muenchen.de>",
