@@ -1,6 +1,6 @@
 {
   "name": "mirador-textoverlay",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Mirador 3 plugin to render a hidden (but selectable) or visible text overlay",
   "main": "lib/index.js",
   "module": "es/index.js",
@@ -26,7 +26,7 @@
     "@material-ui/icons": "^4.9.1",
     "isomorphic-unfetch": "^3.0.0",
     "lodash": "^4.17.11",
-    "mirador": "^3.0.0-rc.3",
+    "mirador": "^3.0.0-rc.4",
     "prop-types": "^15.7.2",
     "react": "16.x",
     "react-dom": "16.x",
