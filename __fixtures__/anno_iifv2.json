@@ -1,0 +1,326 @@
+{
+  "@context": "http://iiif.io/api/presentation/2/context.json",
+  "@id": "https://wellcomelibrary.org/iiif/b18035723/contentAsText/8",
+  "@type": "sc:AnnotationList",
+  "resources": [
+    {
+      "@id": "https://wellcomelibrary.org/iiif/b18035723/annos/contentAsText/a8t0",
+      "@type": "oa:Annotation",
+      "motivation": "sc:painting",
+      "resource": {
+        "@type": "cnt:ContentAsText",
+        "format": "text/plain",
+        "chars": "such besonders geeignet. Von den beiden zutraulichen Nagern ist"
+      },
+      "on": "https://wellcomelibrary.org/iiif/b18035723/canvas/c8#xywh=115,207,2130,65"
+    },
+    {
+      "@id": "https://wellcomelibrary.org/iiif/b18035723/annos/contentAsText/a8t1",
+      "@type": "oa:Annotation",
+      "motivation": "sc:painting",
+      "resource": {
+        "@type": "cnt:ContentAsText",
+        "format": "text/plain",
+        "chars": "„Frau\" Meerschweinchen schneeweiß mit roten Augen, „er\" hingegen,"
+      },
+      "on": "https://wellcomelibrary.org/iiif/b18035723/canvas/c8#xywh=116,278,2129,64"
+    },
+    {
+      "@id": "https://wellcomelibrary.org/iiif/b18035723/annos/contentAsText/a8t2",
+      "@type": "oa:Annotation",
+      "motivation": "sc:painting",
+      "resource": {
+        "@type": "cnt:ContentAsText",
+        "format": "text/plain",
+        "chars": "Herr Meerschweinchen, ist ganz schwarz und dunkeläugig wie ein"
+      },
+      "on": "https://wellcomelibrary.org/iiif/b18035723/canvas/c8#xywh=116,351,2130,64"
+    },
+    {
+      "@id": "https://wellcomelibrary.org/iiif/b18035723/annos/contentAsText/a8t3",
+      "@type": "oa:Annotation",
+      "motivation": "sc:painting",
+      "resource": {
+        "@type": "cnt:ContentAsText",
+        "format": "text/plain",
+        "chars": "kleiner Satan. Freund Peter sollte einfach feststellen, wie die Nach¬"
+      },
+      "on": "https://wellcomelibrary.org/iiif/b18035723/canvas/c8#xywh=116,422,2129,58"
+    },
+    {
+      "@id": "https://wellcomelibrary.org/iiif/b18035723/annos/contentAsText/a8t4",
+      "@type": "oa:Annotation",
+      "motivation": "sc:painting",
+      "resource": {
+        "@type": "cnt:ContentAsText",
+        "format": "text/plain",
+        "chars": "kommen aussehen würden, und er war — stolz auf diesen Forschungs¬"
+      },
+      "on": "https://wellcomelibrary.org/iiif/b18035723/canvas/c8#xywh=116,493,2124,63"
+    },
+    {
+      "@id": "https://wellcomelibrary.org/iiif/b18035723/annos/contentAsText/a8t5",
+      "@type": "oa:Annotation",
+      "motivation": "sc:painting",
+      "resource": {
+        "@type": "cnt:ContentAsText",
+        "format": "text/plain",
+        "chars": "auftrag — mindestens ebenso gespannt wie ein Universitätsprofessor,"
+      },
+      "on": "https://wellcomelibrary.org/iiif/b18035723/canvas/c8#xywh=118,567,2129,65"
+    },
+    {
+      "@id": "https://wellcomelibrary.org/iiif/b18035723/annos/contentAsText/a8t6",
+      "@type": "oa:Annotation",
+      "motivation": "sc:painting",
+      "resource": {
+        "@type": "cnt:ContentAsText",
+        "format": "text/plain",
+        "chars": "der dem Ergebnis einer bedeutungsvollen Versuchsreihe entgegen¬"
+      },
+      "on": "https://wellcomelibrary.org/iiif/b18035723/canvas/c8#xywh=118,637,2129,67"
+    },
+    {
+      "@id": "https://wellcomelibrary.org/iiif/b18035723/annos/contentAsText/a8t7",
+      "@type": "oa:Annotation",
+      "motivation": "sc:painting",
+      "resource": {
+        "@type": "cnt:ContentAsText",
+        "format": "text/plain",
+        "chars": "sieht: Peter fragte sich, ob die Meerschweinchenjungen wohl alle"
+      },
+      "on": "https://wellcomelibrary.org/iiif/b18035723/canvas/c8#xywh=117,708,2130,67"
+    },
+    {
+      "@id": "https://wellcomelibrary.org/iiif/b18035723/annos/contentAsText/a8t8",
+      "@type": "oa:Annotation",
+      "motivation": "sc:painting",
+      "resource": {
+        "@type": "cnt:ContentAsText",
+        "format": "text/plain",
+        "chars": "schwarz würden oder alle weiß, ob es gar gescheckte oder graue"
+      },
+      "on": "https://wellcomelibrary.org/iiif/b18035723/canvas/c8#xywh=117,781,2131,64"
+    },
+    {
+      "@id": "https://wellcomelibrary.org/iiif/b18035723/annos/contentAsText/a8t9",
+      "@type": "oa:Annotation",
+      "motivation": "sc:painting",
+      "resource": {
+        "@type": "cnt:ContentAsText",
+        "format": "text/plain",
+        "chars": "Meerschweinchen geben würde oder vielleicht alles durcheinander."
+      },
+      "on": "https://wellcomelibrary.org/iiif/b18035723/canvas/c8#xywh=117,853,2130,66"
+    },
+    {
+      "@id": "https://wellcomelibrary.org/iiif/b18035723/annos/contentAsText/a8t10",
+      "@type": "oa:Annotation",
+      "motivation": "sc:painting",
+      "resource": {
+        "@type": "cnt:ContentAsText",
+        "format": "text/plain",
+        "chars": "Als dann der große Augenblick gekommen war, schien Peter etwas"
+      },
+      "on": "https://wellcomelibrary.org/iiif/b18035723/canvas/c8#xywh=118,925,2130,66"
+    },
+    {
+      "@id": "https://wellcomelibrary.org/iiif/b18035723/annos/contentAsText/a8t11",
+      "@type": "oa:Annotation",
+      "motivation": "sc:painting",
+      "resource": {
+        "@type": "cnt:ContentAsText",
+        "format": "text/plain",
+        "chars": "enttäuscht, daß alle vier Jungen genau so aussahen wie der Vater:"
+      },
+      "on": "https://wellcomelibrary.org/iiif/b18035723/canvas/c8#xywh=118,996,2128,67"
+    },
+    {
+      "@id": "https://wellcomelibrary.org/iiif/b18035723/annos/contentAsText/a8t12",
+      "@type": "oa:Annotation",
+      "motivation": "sc:painting",
+      "resource": {
+        "@type": "cnt:ContentAsText",
+        "format": "text/plain",
+        "chars": "Schwarz und dunkeläugig!"
+      },
+      "on": "https://wellcomelibrary.org/iiif/b18035723/canvas/c8#xywh=118,1073,811,63"
+    },
+    {
+      "@id": "https://wellcomelibrary.org/iiif/b18035723/annos/contentAsText/a8t13",
+      "@type": "oa:Annotation",
+      "motivation": "sc:painting",
+      "resource": {
+        "@type": "cnt:ContentAsText",
+        "format": "text/plain",
+        "chars": "Aber Peter ist trotz seiner Jugend schon einer von den echten"
+      },
+      "on": "https://wellcomelibrary.org/iiif/b18035723/canvas/c8#xywh=189,1147,2062,64"
+    },
+    {
+      "@id": "https://wellcomelibrary.org/iiif/b18035723/annos/contentAsText/a8t14",
+      "@type": "oa:Annotation",
+      "motivation": "sc:painting",
+      "resource": {
+        "@type": "cnt:ContentAsText",
+        "format": "text/plain",
+        "chars": "Naturforschern — er hat ihre erste Tugend, Geduld, und auch ihre"
+      },
+      "on": "https://wellcomelibrary.org/iiif/b18035723/canvas/c8#xywh=119,1221,2131,62"
+    },
+    {
+      "@id": "https://wellcomelibrary.org/iiif/b18035723/annos/contentAsText/a8t15",
+      "@type": "oa:Annotation",
+      "motivation": "sc:painting",
+      "resource": {
+        "@type": "cnt:ContentAsText",
+        "format": "text/plain",
+        "chars": "zweite: Ihm fällt etwas Neues ein! Und ein bißchen Glück hat er auch:"
+      },
+      "on": "https://wellcomelibrary.org/iiif/b18035723/canvas/c8#xywh=120,1292,2127,50"
+    },
+    {
+      "@id": "https://wellcomelibrary.org/iiif/b18035723/annos/contentAsText/a8t16",
+      "@type": "oa:Annotation",
+      "motivation": "sc:painting",
+      "resource": {
+        "@type": "cnt:ContentAsText",
+        "format": "text/plain",
+        "chars": "Zwei der Jungen sind Weibchen, zwei Männchen. Und so wartet er"
+      },
+      "on": "https://wellcomelibrary.org/iiif/b18035723/canvas/c8#xywh=119,1363,2132,64"
+    },
+    {
+      "@id": "https://wellcomelibrary.org/iiif/b18035723/annos/contentAsText/a8t17",
+      "@type": "oa:Annotation",
+      "motivation": "sc:painting",
+      "resource": {
+        "@type": "cnt:ContentAsText",
+        "format": "text/plain",
+        "chars": "ein halbes Jahr ge duldig, bis seine jungen Meerschweinchen erwach¬"
+      },
+      "on": "https://wellcomelibrary.org/iiif/b18035723/canvas/c8#xywh=120,1435,2131,64"
+    },
+    {
+      "@id": "https://wellcomelibrary.org/iiif/b18035723/annos/contentAsText/a8t18",
+      "@type": "oa:Annotation",
+      "motivation": "sc:painting",
+      "resource": {
+        "@type": "cnt:ContentAsText",
+        "format": "text/plain",
+        "chars": "sen sind; er hat sie während dieser Zeit als Pärchen voneinander"
+      },
+      "on": "https://wellcomelibrary.org/iiif/b18035723/canvas/c8#xywh=121,1506,2129,61"
+    },
+    {
+      "@id": "https://wellcomelibrary.org/iiif/b18035723/annos/contentAsText/a8t19",
+      "@type": "oa:Annotation",
+      "motivation": "sc:painting",
+      "resource": {
+        "@type": "cnt:ContentAsText",
+        "format": "text/plain",
+        "chars": "getrennt gehalten. Dann ist es soweit: Meerschweinchen-Enkel sind"
+      },
+      "on": "https://wellcomelibrary.org/iiif/b18035723/canvas/c8#xywh=120,1578,2130,65"
+    },
+    {
+      "@id": "https://wellcomelibrary.org/iiif/b18035723/annos/contentAsText/a8t20",
+      "@type": "oa:Annotation",
+      "motivation": "sc:painting",
+      "resource": {
+        "@type": "cnt:ContentAsText",
+        "format": "text/plain",
+        "chars": "^ ?"
+      },
+      "on": "https://wellcomelibrary.org/iiif/b18035723/canvas/c8#xywh=1021,1755,390,65"
+    },
+    {
+      "@id": "https://wellcomelibrary.org/iiif/b18035723/annos/contentAsText/a8t21",
+      "@type": "oa:Annotation",
+      "motivation": "sc:painting",
+      "resource": {
+        "@type": "cnt:ContentAsText",
+        "format": "text/plain",
+        "chars": "da! Aber wie merkwürdig! In beiden Würfen liegt neben drdi"
+      },
+      "on": "https://wellcomelibrary.org/iiif/b18035723/canvas/c8#xywh=127,2673,2131,64"
+    },
+    {
+      "@id": "https://wellcomelibrary.org/iiif/b18035723/annos/contentAsText/a8t22",
+      "@type": "oa:Annotation",
+      "motivation": "sc:painting",
+      "resource": {
+        "@type": "cnt:ContentAsText",
+        "format": "text/plain",
+        "chars": "schwarzen, die aussehen wie die schwarzen Eltern, ein schneeweißes"
+      },
+      "on": "https://wellcomelibrary.org/iiif/b18035723/canvas/c8#xywh=126,2744,2131,61"
+    },
+    {
+      "@id": "https://wellcomelibrary.org/iiif/b18035723/annos/contentAsText/a8t23",
+      "@type": "oa:Annotation",
+      "motivation": "sc:painting",
+      "resource": {
+        "@type": "cnt:ContentAsText",
+        "format": "text/plain",
+        "chars": "Junges, dessen Augen denn auch genau so korallenrot werden wie"
+      },
+      "on": "https://wellcomelibrary.org/iiif/b18035723/canvas/c8#xywh=126,2818,2131,64"
+    },
+    {
+      "@id": "https://wellcomelibrary.org/iiif/b18035723/annos/contentAsText/a8t24",
+      "@type": "oa:Annotation",
+      "motivation": "sc:painting",
+      "resource": {
+        "@type": "cnt:ContentAsText",
+        "format": "text/plain",
+        "chars": "die seiner „Großmutter\"!"
+      },
+      "on": "https://wellcomelibrary.org/iiif/b18035723/canvas/c8#xywh=126,2891,786,56"
+    },
+    {
+      "@id": "https://wellcomelibrary.org/iiif/b18035723/annos/contentAsText/a8t25",
+      "@type": "oa:Annotation",
+      "motivation": "sc:painting",
+      "resource": {
+        "@type": "cnt:ContentAsText",
+        "format": "text/plain",
+        "chars": "Peter macht sich seine eigenen Gedanken über seine Meerschwein¬"
+      },
+      "on": "https://wellcomelibrary.org/iiif/b18035723/canvas/c8#xywh=195,2967,2064,64"
+    },
+    {
+      "@id": "https://wellcomelibrary.org/iiif/b18035723/annos/contentAsText/a8t26",
+      "@type": "oa:Annotation",
+      "motivation": "sc:painting",
+      "resource": {
+        "@type": "cnt:ContentAsText",
+        "format": "text/plain",
+        "chars": "chenzüchtungen. Wenn, so sagt er sich, in der dritten, der Enkelgene¬"
+      },
+      "on": "https://wellcomelibrary.org/iiif/b18035723/canvas/c8#xywh=128,3041,2129,63"
+    },
+    {
+      "@id": "https://wellcomelibrary.org/iiif/b18035723/annos/contentAsText/a8t27",
+      "@type": "oa:Annotation",
+      "motivation": "sc:painting",
+      "resource": {
+        "@type": "cnt:ContentAsText",
+        "format": "text/plain",
+        "chars": "ration, wieder weiße Tiere entstehen konnten, so kann in der zweiten."
+      },
+      "on": "https://wellcomelibrary.org/iiif/b18035723/canvas/c8#xywh=125,3113,2136,61"
+    },
+    {
+      "@id": "https://wellcomelibrary.org/iiif/b18035723/annos/contentAsText/a8t28",
+      "@type": "oa:Annotation",
+      "motivation": "sc:painting",
+      "resource": {
+        "@type": "cnt:ContentAsText",
+        "format": "text/plain",
+        "chars": "6"
+      },
+      "on": "https://wellcomelibrary.org/iiif/b18035723/canvas/c8#xywh=1179,3263,29,46"
+    }
+  ]
+}
