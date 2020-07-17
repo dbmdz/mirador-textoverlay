@@ -3,7 +3,9 @@ import {
   describe, it, jest, expect,
 } from '@jest/globals';
 
-import { parseOcr, parseAlto, parseHocr, parseIiifAnnotations } from '../../src/lib/ocrFormats';
+import {
+  parseOcr, parseAlto, parseHocr, parseIiifAnnotations,
+} from '../../src/lib/ocrFormats';
 
 import contentAsTextAnnos from '../../__fixtures__/anno_iifv2.json';
 
