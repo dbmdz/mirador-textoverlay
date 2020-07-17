@@ -122,16 +122,15 @@ class MiradorTextOverlay extends Component {
     viewer.addHandler('update-viewport', this.onUpdateViewport.bind(this));
     viewer.addHandler('animation-finish', () => {
       const { hideDuringAnimation } = this.state;
+      const newState = { animating: false };
       if (!hideDuringAnimation) {
         this.perfMon.stop();
         if (this.perfMon.isPerformanceDegraded) {
-          this.setState({
-            hideDuringAnimation: true,
-            showPerformanceNotification: true,
-          });
+          newState.hideDuringAnimation = true;
+          newState.showPerformanceNotification = true;
         }
       }
-      this.setState({ animating: false });
+      this.setState(newState);
       this.onUpdateViewport();
     });
   }
@@ -175,6 +174,7 @@ class MiradorTextOverlay extends Component {
             onClose={closeNotification}
             message={t('performanceDegradationDetected')}
             action={(
+              // The 'dismiss' label comes from M3 itself
               <IconButton size="small" aria-label={t('dismiss')} color="inherit" onClick={closeNotification}>
                 <CloseIcon fontSize="small" />
               </IconButton>
