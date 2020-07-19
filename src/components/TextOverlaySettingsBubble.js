@@ -6,11 +6,13 @@ import TextIcon from '@material-ui/icons/TextFields';
 import CloseIcon from '@material-ui/icons/Close';
 import SubjectIcon from '@material-ui/icons/Subject';
 import OpacityIcon from '@material-ui/icons/Opacity';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import TextSelectIcon from './TextSelectIcon';
 
 /** Control text overlay settings  */
 const TextOverlaySettingsBubble = ({
-  windowTextOverlayOptions, imageToolsEnabled, textsAvailable, updateWindowTextOverlayOptions, t,
+  windowTextOverlayOptions, imageToolsEnabled, textsAvailable,
+  textsFetching, updateWindowTextOverlayOptions, t,
 }) => {
   const {
     enabled, visible, selectable, opacity,
@@ -35,7 +37,7 @@ const TextOverlaySettingsBubble = ({
         zIndex: 999,
       }}
     >
-      {open
+      {(open && !textsFetching)
       && (
       <>
         <div style={{
@@ -130,28 +132,29 @@ const TextOverlaySettingsBubble = ({
         </div>
       </>
       )}
+      {textsFetching
+        && <CircularProgress size={50} style={{ position: 'absolute' }} />}
       <MiradorMenuButton
         aria-label={open ? t('collapseTextOverlayOptions') : t('expandTextOverlayOptions')}
+        disabled={textsFetching}
         onClick={() => setOpen(!open)}
       >
-        { open ? <CloseIcon /> : <SubjectIcon />}
+        { (open && !textsFetching)
+          ? <CloseIcon />
+          : <SubjectIcon />}
       </MiradorMenuButton>
     </div>
   );
 };
 
 TextOverlaySettingsBubble.propTypes = {
-  imageToolsEnabled: PropTypes.bool,
-  t: PropTypes.func,
+  imageToolsEnabled: PropTypes.bool.isRequired,
+  t: PropTypes.func.isRequired,
   textsAvailable: PropTypes.bool.isRequired,
+  textsFetching: PropTypes.bool.isRequired,
   updateWindowTextOverlayOptions: PropTypes.func.isRequired,
   // eslint-disable-next-line react/forbid-prop-types
   windowTextOverlayOptions: PropTypes.object.isRequired,
-};
-
-TextOverlaySettingsBubble.defaultProps = {
-  imageToolsEnabled: false,
-  t: (key) => key,
 };
 
 export default TextOverlaySettingsBubble;

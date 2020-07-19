@@ -23,9 +23,6 @@
       }
     }],
     "react/prefer-stateless-function": "off",
-    "sort-keys": ["error", "asc", {
-      "caseSensitive": false,
-      "natural": false
-    }]
+    "sort-keys": "off",
   }
 }

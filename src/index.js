@@ -37,6 +37,7 @@ export default [
     mapStateToProps: (state, { windowId }) => ({
       imageToolsEnabled: getWindowConfig(state, { windowId }).imageToolsEnabled ?? false,
       textsAvailable: getTextsForVisibleCanvases(state, { windowId }).length > 0,
+      textsFetching: getTextsForVisibleCanvases(state, { windowId }).some((t) => t.isFetching),
       windowTextOverlayOptions: getWindowTextOverlayOptions(state, { windowId }),
     }),
     mode: 'add',
