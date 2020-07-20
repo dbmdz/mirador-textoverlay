@@ -42,6 +42,7 @@ function renderBubble(props = {}) {
     imageToolsEnabled={false}
     t={(key) => key}
     textsAvailable
+    textsFetching={false}
     updateWindowTextOverlayOptions={updateOptionsMock}
     {...props}
     windowTextOverlayOptions={options}
@@ -188,5 +189,15 @@ describe('TextOverlaySettingsBubble', () => {
     renderBubble({ imageToolsEnabled: true });
     expect(screen.getByLabelText('expandTextOverlayOptions').parentElement)
       .toHaveStyle('top: 66px');
+  });
+
+  it('should be closed, disabled and surrounded by a progress bar when texts are fetching', () => {
+    renderBubble({ textsFetching: true, visible: true });
+    expect(screen.getByRole('progressbar')).toBeVisible();
+    expect(screen.getByLabelText('expandTextOverlayOptions')).toBeVisible();
+    expect(screen.getByLabelText('expandTextOverlayOptions')).toBeDisabled();
+    expect(screen.queryByLabelText('textSelect')).toBeNull();
+    expect(screen.queryByLabelText('textVisible')).toBeNull();
+    expect(screen.queryByLabelText('textOpacity')).toBeNull();
   });
 });
