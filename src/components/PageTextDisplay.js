@@ -23,7 +23,7 @@ class PageTextDisplay extends React.Component {
   /** Register pointerdown handler on SVG container */
   componentDidMount() {
     // FIXME: We should be able to use React for this, but it somehow doesn't work
-    this.svgContainerRef.current.onpointerdown = this.onPointerDown;
+    this.svgContainerRef.current.addEventListener('pointerdown', this.onPointerDown);
   }
 
   /** Only update the component when some of the props changed.
