@@ -160,12 +160,20 @@ export function parseAlto(altoText, imgSize) {
     altoResolver,
     XPathResult.STRING_TYPE,
   ).stringValue;
-  const pageElem = doc.evaluate(
+  let pageElem = doc.evaluate(
     '/alto/Layout/Page',
     doc,
     altoResolver,
     XPathResult.FIRST_ORDERED_NODE_TYPE,
   ).singleNodeValue;
+  if (!pageElem.hasAttribute('WIDTH')) {
+    pageElem = doc.evaluate(
+      '/alto/Layout/Page/PrintSpace',
+      doc,
+      altoResolver,
+      XPathResult.FIRST_ORDERED_NODE_TYPE,
+    ).singleNodeValue;
+  }
   let pageWidth = Number.parseInt(pageElem.getAttribute('WIDTH'), 10);
   let pageHeight = Number.parseInt(pageElem.getAttribute('HEIGHT'), 10);
   let scaleFactorX = 1.0;
@@ -273,6 +281,13 @@ export function parseAlto(altoText, imgSize) {
   };
 }
 
+/** Helper to calculate a rough fallback image size from the line coordinates */
+function getFallbackImageSize(lines) {
+  return {
+    width: Math.max.apply(null, lines.map(({ x, width }) => x + width)),
+    height: Math.max.apply(null, lines.map(({ y, height }) => y + height)),
+  };
+}
 
 /**
  * Parse an OCR document (currently hOCR or ALTO)
@@ -281,10 +296,16 @@ export function parseAlto(altoText, imgSize) {
  * @param {object} referenceSize Reference size to scale coordinates to
  */
 export function parseOcr(ocrText, referenceSize) {
+  let parse;
   if (ocrText.indexOf('<alto') >= 0) {
-    return parseAlto(ocrText, referenceSize);
+    parse = parseAlto(ocrText, referenceSize);
+  } else {
+    parse = parseHocr(ocrText, referenceSize);
   }
-  return parseHocr(ocrText, referenceSize);
+  if (!parse.width || !parse.height) {
+    parse = { ...parse, ...getFallbackImageSize(parse.lines) };
+  }
+  return parse;
 }
 
 
@@ -327,9 +348,9 @@ export function parseIiifAnnotations(annos, imgSize) {
       y: parseInt(y, 10),
     };
   });
+
   return {
-    height: imgSize?.height,
+    ...(imgSize ?? getFallbackImageSize(boxes)),
     lines: boxes,
-    width: imgSize?.width,
   };
 }
