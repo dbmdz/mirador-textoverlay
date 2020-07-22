@@ -1,12 +1,7 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
-import Snackbar from '@material-ui/core/Snackbar';
-import IconButton from '@material-ui/core/IconButton';
-import CloseIcon from '@material-ui/icons/Close';
-
 import PageTextDisplay from './PageTextDisplay';
-import PerformanceMonitor from '../lib/perf';
 
 /** Overlay that renders OCR or transcription text in a SVG.
  *
@@ -15,40 +10,49 @@ import PerformanceMonitor from '../lib/perf';
  * at the correct position.
  */
 class MiradorTextOverlay extends Component {
-  /** Set up initial state */
+  /** Register refs that allow us to directly access the actual render components */
   constructor(props) {
     super(props);
 
-    this.perfMon = new PerformanceMonitor(350);
-
-    this.state = {
-      animating: false,
-      containerHeight: undefined,
-      containerWidth: undefined,
-      hideDuringAnimation: false,
-      pageTransforms: [],
-      showPerformanceNotification: false,
-    };
+    this.renderRefs = [
+      React.createRef(),
+      React.createRef(),
+    ];
   }
 
   /** Register OpenSeadragon callback on initial mount */
   componentDidMount() {
     const { enabled, viewer } = this.props;
     if (enabled && viewer) {
-      this.registerOsdCallbacks();
+      this.registerOsdCallback();
     }
   }
 
-  /** Register OpenSeadragon callback when viewer changes */
+  /** Register OpenSeadragon callback when viewport changes */
   componentDidUpdate(prevProps) {
-    const { enabled, viewer } = this.props;
+    const {
+      enabled, viewer, opacity, pageTexts,
+    } = this.props;
+
     // OSD instance becomes available, register callback
     if (enabled && viewer && viewer !== prevProps.viewer) {
-      this.registerOsdCallbacks();
+      this.registerOsdCallback();
     }
     // Newly enabled, force initial setting of state from OSD
-    if (this.shouldRender() && !this.shouldRender(prevProps)) {
+    const newlyEnabled = (
+      (this.shouldRender() && !this.shouldRender(prevProps))
+      || (pageTexts.filter(({ lines }) => lines.length > 0).length
+          !== prevProps.pageTexts.filter(({ lines }) => lines.length > 0).length));
+
+    if (newlyEnabled) {
       this.onUpdateViewport();
+    }
+
+    // Manually update SVG opacity for performance reasons
+    if (opacity !== prevProps.opacity) {
+      this.renderRefs
+        .filter((ref) => ref.current != null)
+        .forEach((ref) => ref.current.updateOpacity(opacity));
     }
   }
 
@@ -59,46 +63,30 @@ class MiradorTextOverlay extends Component {
       return;
     }
 
-    // Update container and SVG width/height
-    const {
-      animating, containerHeight, containerWidth, hideDuringAnimation,
-    } = this.state;
-    const { viewer, canvasWorld, visible } = this.props;
-    if (animating && (!visible || hideDuringAnimation)) {
-      // If the text is not visible, we can delay the expensive updating
-      // until we've finished animating, since the user cannot interact
-      // with the text during animation anyway.
-      return;
-    }
-    const newState = {};
-    if (containerWidth !== viewer.container.clientWidth) {
-      newState.containerWidth = viewer.container.clientWidth;
-    }
-    if (containerHeight !== viewer.container.clientHeight) {
-      newState.containerHeight = viewer.container.clientHeight;
-    }
+    const { viewer, canvasWorld } = this.props;
 
-    // Update SVG page transforms and x-offsets
-    newState.pageTransforms = [];
-    newState.xOffsets = [0];
+    // Determine new scale factor and position for each page
     const vpBounds = viewer.viewport.getBounds(true);
     const viewportZoom = viewer.viewport.getZoom(true);
     for (let itemNo = 0; itemNo < viewer.world.getItemCount(); itemNo += 1) {
+      // Skip update if we don't have a reference to the PageTextDisplay instance
+      if (!this.renderRefs[itemNo].current) {
+        // eslint-disable-next-line no-continue
+        continue;
+      }
       const img = viewer.world.getItemAt(itemNo);
       const canvasDims = canvasWorld.canvasDimensions[itemNo];
-      // Mirador canvas world scale factor
+      const canvasWorldOffset = itemNo > 0
+        ? (img.source.dimensions.x - canvasDims.width)
+          + canvasWorld.canvasDimensions[itemNo - 1].width
+        : 0;
       const canvasWorldScale = (img.source.dimensions.x / canvasDims.width);
-      // Absolute difference between unscaled width and width in canvas world, only relevant
-      // for canvases other than the first one
-      const canvasWorldOffset = itemNo > 0 ? img.source.dimensions.x - canvasDims.width : 0;
-      newState.pageTransforms.push({
-        scaleFactor: img.viewportToImageZoom(viewportZoom),
-        translateX: -1 * vpBounds.x * canvasWorldScale + canvasWorldOffset,
-        translateY: -1 * vpBounds.y * canvasWorldScale,
-      });
-      newState.xOffsets.push(canvasDims.width);
+      this.renderRefs[itemNo].current.updateTransforms(
+        img.viewportToImageZoom(viewportZoom),
+        vpBounds.x * canvasWorldScale - canvasWorldOffset,
+        vpBounds.y * canvasWorldScale,
+      );
     }
-    this.setState(newState);
   }
 
   /** If the overlay should be rendered at all */
@@ -110,97 +98,39 @@ class MiradorTextOverlay extends Component {
   }
 
   /** Update container dimensions and page scale/offset every time the OSD viewport changes. */
-  registerOsdCallbacks() {
+  registerOsdCallback() {
     const { viewer } = this.props;
-    viewer.addHandler('animation-start', () => {
-      const { hideDuringAnimation } = this.state;
-      if (!hideDuringAnimation) {
-        this.perfMon.start();
-      }
-      this.setState({ animating: true });
-    });
     viewer.addHandler('update-viewport', this.onUpdateViewport.bind(this));
-    viewer.addHandler('animation-finish', () => {
-      const { hideDuringAnimation } = this.state;
-      const newState = { animating: false };
-      if (!hideDuringAnimation) {
-        this.perfMon.stop();
-        if (this.perfMon.isPerformanceDegraded) {
-          newState.hideDuringAnimation = true;
-          newState.showPerformanceNotification = true;
-        }
-      }
-      this.setState(newState);
-      this.onUpdateViewport();
-    });
   }
 
   /** Render the text overlay SVG */
   render() {
     const {
-      pageTexts, selectable, opacity, t, visible, viewer,
+      pageTexts, selectable, visible, viewer, opacity,
     } = this.props;
     if (!this.shouldRender() || !viewer || !pageTexts) {
       return null;
     }
-    const {
-      containerWidth: width, containerHeight: height, pageTransforms, xOffsets,
-      animating, showPerformanceNotification, hideDuringAnimation,
-    } = this.state;
-    const containerStyles = {
-      height,
-      left: 0,
-      position: 'relative',
-      top: 0,
-      width,
-    };
-    const svgStyles = {
-      // Hide the SVG and don't remove it, since we don't want to destroy
-      // a user's selection
-      display: (animating && (!visible || hideDuringAnimation)) ? 'none' : undefined,
-      height,
-      width,
-    };
-    // eslint-disable-next-line require-jsdoc
-    const closeNotification = () => this.setState({ showPerformanceNotification: false });
     return ReactDOM.createPortal(
-      <div style={containerStyles}>
-        {showPerformanceNotification
-          && (
-          <Snackbar
-            anchorOrigin={{ horizontal: 'center', vertical: 'top' }}
-            autoHideDuration={30000}
-            open
-            onClose={closeNotification}
-            message={t('performanceDegradationDetected')}
-            action={(
-              // The 'dismiss' label comes from M3 itself
-              <IconButton size="small" aria-label={t('dismiss')} color="inherit" onClick={closeNotification}>
-                <CloseIcon fontSize="small" />
-              </IconButton>
-            )}
-          />
-          )}
-        <svg xmlns="http://www.w3.org/2000/svg" style={svgStyles}>
-          {pageTexts.map(({ lines, source }, idx) => (
-            pageTransforms[idx]
-            && lines && lines.length > 0 && (
+      <>
+        {pageTexts
+          .filter(({ lines }) => lines && lines.length > 0)
+          .map(({
+            lines, source, width: pageWidth, height: pageHeight,
+          }, idx) => (
             <PageTextDisplay
+              ref={this.renderRefs[idx]}
               key={source}
               lines={lines}
-              selectable={selectable}
               source={source}
-              displayText={visible}
+              selectable={selectable}
+              visible={visible}
               opacity={opacity}
-              scaleFactor={pageTransforms[idx].scaleFactor}
-              translateX={pageTransforms[idx].translateX}
-              translateY={pageTransforms[idx].translateY}
-              xOffset={xOffsets?.[idx] ?? 0}
+              width={pageWidth}
+              height={pageHeight}
             />
-            )
           ))}
-        </svg>
-      </div>,
+      </>,
       viewer.canvas,
     );
   }
@@ -212,7 +142,6 @@ MiradorTextOverlay.propTypes = {
   opacity: PropTypes.number,
   pageTexts: PropTypes.array, // eslint-disable-line react/forbid-prop-types
   selectable: PropTypes.bool,
-  t: PropTypes.func,
   viewer: PropTypes.object, // eslint-disable-line react/forbid-prop-types
   visible: PropTypes.bool,
 };
@@ -223,7 +152,6 @@ MiradorTextOverlay.defaultProps = {
   opacity: 0.75,
   pageTexts: undefined,
   selectable: true,
-  t: (key) => key,
   viewer: undefined,
   visible: false,
 };

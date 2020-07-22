@@ -24,5 +24,6 @@
     }],
     "react/prefer-stateless-function": "off",
     "sort-keys": "off",
+    "no-continue": "off",
   }
 }

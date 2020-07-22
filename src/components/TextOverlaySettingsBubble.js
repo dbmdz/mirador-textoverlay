@@ -133,7 +133,7 @@ const TextOverlaySettingsBubble = ({
       </>
       )}
       {textsFetching
-        && <CircularProgress size={50} style={{ position: 'absolute' }} />}
+        && <CircularProgress disableShrink size={50} style={{ position: 'absolute' }} />}
       <MiradorMenuButton
         aria-label={open ? t('collapseTextOverlayOptions') : t('expandTextOverlayOptions')}
         disabled={textsFetching}
