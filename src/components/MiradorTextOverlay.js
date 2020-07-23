@@ -120,25 +120,26 @@ class MiradorTextOverlay extends Component {
     return ReactDOM.createPortal(
       <>
         {pageTexts
-          .filter(({ lines }) => (
-            lines
-            && lines.length > 0
-            && lines.filter(({ text }) => text).length > 0))
           .map(({
             lines, source, width: pageWidth, height: pageHeight,
-          }, idx) => (
-            <PageTextDisplay
-              ref={this.renderRefs[idx]}
-              key={source}
-              lines={lines}
-              source={source}
-              selectable={selectable}
-              visible={visible}
-              opacity={opacity}
-              width={pageWidth}
-              height={pageHeight}
-            />
-          ))}
+          }, idx) => {
+            if (!this.shouldRenderPage({ lines })) {
+              return null;
+            }
+            return (
+              <PageTextDisplay
+                ref={this.renderRefs[idx]}
+                key={source}
+                lines={lines}
+                source={source}
+                selectable={selectable}
+                visible={visible}
+                opacity={opacity}
+                width={pageWidth}
+                height={pageHeight}
+              />
+            );
+          })}
       </>,
       viewer.canvas,
     );
