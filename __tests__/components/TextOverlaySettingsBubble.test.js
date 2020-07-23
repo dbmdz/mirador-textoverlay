@@ -6,8 +6,21 @@ import {
   fireEvent, render, screen, queryByRole,
 } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
+import useTheme from '@material-ui/core/styles/useTheme';
 
 import TextOverlaySettingsBubble from '../../src/components/TextOverlaySettingsBubble';
+
+jest.mock('@material-ui/core/styles/useTheme');
+useTheme.mockImplementation(() => (
+  {
+    palette: {
+      getContrastText: () => '#000',
+      shades: {
+        main: '#fff',
+      },
+    },
+  }
+));
 
 // Mocked MUI slider for easier testing, taken from
 // https://stackoverflow.com/a/61628815 (CC BY-SA 4.0)

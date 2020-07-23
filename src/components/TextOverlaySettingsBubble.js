@@ -7,7 +7,29 @@ import CloseIcon from '@material-ui/icons/Close';
 import SubjectIcon from '@material-ui/icons/Subject';
 import OpacityIcon from '@material-ui/icons/Opacity';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import useTheme from '@material-ui/core/styles/useTheme';
+
 import TextSelectIcon from './TextSelectIcon';
+
+/**
+ * Based on https://gist.github.com/danieliser/b4b24c9f772066bcf0a6
+ */
+const changeAlpha = (color, opacity) => {
+  if (color[0] === '#') {
+    let hex = color.replace('#', '');
+    if (hex.length === 3) {
+      hex += hex;
+    }
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+    return `rgba(${r},${g},${b},${opacity})`;
+  } if (color.startsWith('rgba')) {
+    return color.replace(/[^,]+(?=\))/, opacity);
+  }
+  console.error(`Unsupported color: ${color}`);
+  return color;
+};
 
 /** Control text overlay settings  */
 const TextOverlaySettingsBubble = ({
@@ -19,6 +41,16 @@ const TextOverlaySettingsBubble = ({
   } = windowTextOverlayOptions;
   const [open, setOpen] = useState(enabled && (visible || selectable));
   const [showOpacitySlider, setShowOpacitySlider] = useState(false);
+  const { palette } = useTheme();
+  const bubbleBg = palette.shades.main;
+  // CSS voodoo to render a border with a margin on the top and bottom
+  const bubbleFg = palette.getContrastText(bubbleBg);
+  const borderImageSource = 'linear-gradient('
+    + `to bottom, ${changeAlpha(bubbleFg, 0)}) 20%,`
+    + `${changeAlpha(bubbleFg, 0.2)} 20% 80%,`
+    + `${changeAlpha(bubbleFg, 0)} 80%`;
+  const borderRight = `1px solid ${changeAlpha(bubbleFg, 0.2)}`;
+  const toggledBubbleBg = changeAlpha(bubbleFg, 0.25);
 
   if (!enabled || !textsAvailable) {
     return null;
@@ -27,7 +59,7 @@ const TextOverlaySettingsBubble = ({
     <div
       className="MuiPaper-elevation4"
       style={{
-        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+        backgroundColor: changeAlpha(bubbleBg, 0.8),
         borderRadius: 25,
         position: 'absolute',
         right: 8,
@@ -41,10 +73,9 @@ const TextOverlaySettingsBubble = ({
       && (
       <>
         <div style={{
-          // CSS voodoo to render a border with a margin on the top and bottom
           borderImageSlice: 1,
-          borderImageSource: 'linear-gradient(to bottom, rgba(0, 0, 0, 0) 20%, rgba(0, 0, 0, 0.2) 20% 80%, rgba(0, 0, 0, 0) 80% )',
-          borderRight: '1px solid rgba(0, 0, 0, 0.2)',
+          borderImageSource,
+          borderRight,
           display: 'inline-block',
           paddingRight: 8,
         }}
@@ -56,7 +87,7 @@ const TextOverlaySettingsBubble = ({
               selectable: !selectable,
             })}
             aria-pressed={selectable}
-            style={{ backgroundColor: selectable && 'rgba(0, 0, 0, 0.25)' }}
+            style={{ backgroundColor: selectable && toggledBubbleBg }}
           >
             <TextSelectIcon />
           </MiradorMenuButton>
@@ -74,7 +105,7 @@ const TextOverlaySettingsBubble = ({
               }
             }}
             aria-pressed={visible}
-            style={{ backgroundColor: visible && 'rgba(0, 0, 0, 0.25)' }}
+            style={{ backgroundColor: visible && toggledBubbleBg }}
           >
             <TextIcon />
           </MiradorMenuButton>
@@ -82,8 +113,8 @@ const TextOverlaySettingsBubble = ({
         <div style={{
           // CSS voodoo to render a border with a margin on the top and bottom
           borderImageSlice: 1,
-          borderImageSource: 'linear-gradient(to bottom, rgba(0, 0, 0, 0) 20%, rgba(0, 0, 0, 0.2) 20% 80%, rgba(0, 0, 0, 0) 80% )',
-          borderRight: '1px solid rgba(0, 0, 0, 0.2)',
+          borderImageSource,
+          borderRight,
           display: 'inline-block',
           paddingRight: 8,
         }}
@@ -95,7 +126,9 @@ const TextOverlaySettingsBubble = ({
             aria-controls="text-opacity-slider"
             aria-expanded={showOpacitySlider}
             onClick={() => setShowOpacitySlider(!showOpacitySlider)}
-            style={{ backgroundColor: showOpacitySlider && 'rgba(0, 0, 0, 0.1)' }}
+            style={{
+              backgroundColor: showOpacitySlider && changeAlpha(bubbleFg, 0.1),
+            }}
           >
             <OpacityIcon />
           </MiradorMenuButton>
@@ -106,7 +139,7 @@ const TextOverlaySettingsBubble = ({
             id="text-opacity-slider"
             aria-labelledby="text-opacity-slider-label"
             style={{
-              backgroundColor: 'rgba(255, 255, 255, 0.8)',
+              backgroundColor: changeAlpha(bubbleBg, 0.8),
               borderRadius: 25,
               height: '150px',
               marginTop: 2,
