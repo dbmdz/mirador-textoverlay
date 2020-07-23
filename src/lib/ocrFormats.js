@@ -136,7 +136,7 @@ function altoStyleNodeToCSS(styleNode) {
  * millimeters for units by default and we need pixels.
  */
 export function parseAlto(altoText, imgSize) {
-  let doc = parser.parseFromString(altoText, 'text/xml');
+  const doc = parser.parseFromString(altoText, 'text/xml');
   // We assume ALTO is set as the default namespace
   const altoNamespace = doc.firstElementChild.getAttribute('xmlns');
   if (
@@ -147,33 +147,13 @@ export function parseAlto(altoText, imgSize) {
     console.error('Unsupported ALTO namespace: ', altoNamespace);
     return null;
   }
-  // jdom's XPath implementation has issues with namespaces, so we just strip them here
-  doc = parser.parseFromString(
-    altoText.replace(/<([a-zA-Z0-9 ]+)(?:xml)ns=".*"(.*)>/g, '<$1$2>'),
-    'text/xml',
-  );
   /** Namespace resolver that forrces the ALTO namespace */
-  const altoResolver = () => altoNamespace;
-  const measurementUnit = doc.evaluate(
-    '/alto/Description/MeasurementUnit',
-    doc,
-    altoResolver,
-    XPathResult.STRING_TYPE,
-  ).stringValue;
-  let pageElem = doc.evaluate(
-    '/alto/Layout/Page',
-    doc,
-    altoResolver,
-    XPathResult.FIRST_ORDERED_NODE_TYPE,
-  ).singleNodeValue;
-  if (!pageElem.hasAttribute('WIDTH')) {
-    pageElem = doc.evaluate(
-      '/alto/Layout/Page/PrintSpace',
-      doc,
-      altoResolver,
-      XPathResult.FIRST_ORDERED_NODE_TYPE,
-    ).singleNodeValue;
-  }
+  const measurementUnit = doc.querySelector(
+    'alto > Description > MeasurementUnit',
+  )?.textContent;
+  const pageElem = doc.querySelector(
+    'alto > Layout > Page, alto > Layout > Page > PrintSpace',
+  );
   let pageWidth = Number.parseInt(pageElem.getAttribute('WIDTH'), 10);
   let pageHeight = Number.parseInt(pageElem.getAttribute('HEIGHT'), 10);
   let scaleFactorX = 1.0;
@@ -187,34 +167,16 @@ export function parseAlto(altoText, imgSize) {
   }
 
   const styles = {};
-  const styleIter = doc.evaluate(
-    '/alto/Styles/TextStyle',
-    doc,
-    altoResolver,
-    XPathResult.ORDERED_NODE_ITERATOR_TYPE,
-  );
-  let styleNode = styleIter.iterateNext();
-  while (styleNode) {
+  const styleElems = doc.querySelectorAll('alto > Styles > TextStyle');
+  for (const styleNode of styleElems) {
     styles[styleNode.getAttribute('ID')] = altoStyleNodeToCSS(styleNode);
-    styleNode = styleIter.iterateNext();
   }
 
-  const hasSpaces = doc.evaluate(
-    'count(//SP)',
-    doc,
-    altoResolver,
-    XPathResult.NUMBER_TYPE,
-  ).numberValue > 0;
+  const hasSpaces = doc.querySelector('SP') !== null;
   const lines = [];
-  const lineIter = doc.evaluate(
-    './/TextLine',
-    doc,
-    altoResolver,
-    XPathResult.ORDERED_NODE_ITERATOR_TYPE,
-  );
-  let lineNode = lineIter.iterateNext();
+  const lineElems = doc.querySelectorAll('TextLine');
   let lineEndsHyphenated = false;
-  while (lineNode) {
+  for (const lineNode of lineElems) {
     const line = {
       height: Number.parseInt(lineNode.getAttribute('HEIGHT'), 10) * scaleFactorY,
       text: '',
@@ -223,14 +185,8 @@ export function parseAlto(altoText, imgSize) {
       x: Number.parseInt(lineNode.getAttribute('HPOS'), 10) * scaleFactorX,
       y: Number.parseInt(lineNode.getAttribute('VPOS'), 10) * scaleFactorY,
     };
-    const wordIter = doc.evaluate(
-      './/*',
-      lineNode,
-      altoResolver,
-      XPathResult.ORDERED_NODE_ITERATOR_TYPE,
-    );
-    let wordNode = wordIter.iterateNext();
-    while (wordNode) {
+    const wordElems = lineNode.querySelectorAll('String, SP, HYP');
+    for (const wordNode of wordElems) {
       const styleRefs = wordNode.getAttribute('STYLEREFS');
       let style = null;
       if (styleRefs !== null) {
@@ -253,7 +209,6 @@ export function parseAlto(altoText, imgSize) {
       const height = Number.parseInt(wordNode.getAttribute('HEIGHT'), 10) * scaleFactorY;
       const x = Number.parseInt(wordNode.getAttribute('HPOS'), 10) * scaleFactorX;
       const y = Number.parseInt(wordNode.getAttribute('VPOS'), 10) * scaleFactorY;
-      wordNode = wordIter.iterateNext();
 
       // Not at end of line and doc doesn't encode spaces, add whitespace after word
       if (!hasSpaces && text !== ' ' && wordNode) {
@@ -272,7 +227,6 @@ export function parseAlto(altoText, imgSize) {
     }
     lineEndsHyphenated = false;
     lines.push(line);
-    lineNode = lineIter.iterateNext();
   }
   return {
     height: pageHeight,
