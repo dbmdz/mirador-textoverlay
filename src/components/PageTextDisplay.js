@@ -109,6 +109,7 @@ class PageTextDisplay extends React.Component {
     const renderOpacity = (!visible && selectable) ? 0 : opacity;
     const boxStyle = { fill: `rgba(255, 255, 255, ${renderOpacity})` };
     const textStyle = { fill: `rgba(0, 0, 0, ${renderOpacity})` };
+    const renderLines = lines.filter((l) => l.width > 0 && l.height > 0);
     return (
       <div
         ref={this.containerRef}
@@ -116,48 +117,50 @@ class PageTextDisplay extends React.Component {
       >
         <svg style={svgStyle}>
           <g ref={this.svgContainerRef}>
-            {lines.filter((l) => l.width > 0 && l.height > 0).map((line, lineIdx) => (
-              <React.Fragment key={`${line.x}.${line.y}`}>
-                <rect
-                  x={line.x}
-                  y={line.y}
-                  width={line.width}
-                  height={line.height}
-                  style={boxStyle}
-                />
-                {line.words
-                  ? (
-                    <text style={textStyle}>
-                      {line.words.filter((w) => w.width > 0 && w.height > 0).map(({
-                        x, y, width, height, text,
-                      }, wordIdx) => (
-                        <tspan
-                          key={`${lineIdx}-${wordIdx}`}
-                          x={x}
-                          y={line.y + line.height * 0.75}
-                          textLength={width}
-                          fontSize={`${line.height}px`}
-                          lengthAdjust="spacingAndGlyphs"
-                        >
-                          {text}
-                        </tspan>
-                      ))}
-                    </text>
-                  )
-                  : (
-                    <text
-                      x={line.x}
-                      y={line.y + line.height * 0.75}
-                      textLength={line.width}
-                      fontSize={`${line.height}px`}
-                      lengthAdjust="spacingAndGlyphs"
-                      style={textStyle}
-                    >
-                      {line.text}
-                    </text>
-                  )}
-              </React.Fragment>
+            {renderLines.map((line) => (
+              <rect
+                key={`rect-${line.x}.${line.y}`}
+                x={line.x}
+                y={line.y}
+                width={line.width}
+                height={line.height}
+                style={boxStyle}
+              />
             ))}
+
+            {renderLines.map((line, lineIdx) => (
+              line.words
+                ? (
+                  <text style={textStyle}>
+                    {line.words.filter((w) => w.width > 0 && w.height > 0).map(({
+                      x, width, text,
+                    }, wordIdx) => (
+                      <tspan
+                        key={`${lineIdx}-${wordIdx}`}
+                        x={x}
+                        y={line.y + line.height * 0.75}
+                        textLength={width}
+                        fontSize={`${line.height}px`}
+                        lengthAdjust="spacingAndGlyphs"
+                      >
+                        {text}
+                      </tspan>
+                    ))}
+                    )
+                  </text>
+                )
+                : (
+                  <text
+                    x={line.x}
+                    y={line.y + line.height * 0.75}
+                    textLength={line.width}
+                    fontSize={`${line.height}px`}
+                    lengthAdjust="spacingAndGlyphs"
+                    style={textStyle}
+                  >
+                    {line.text}
+                  </text>
+                )))}
           </g>
         </svg>
       </div>
