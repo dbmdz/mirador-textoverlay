@@ -132,9 +132,9 @@ class PageTextDisplay extends React.Component {
                         <tspan
                           key={`${lineIdx}-${wordIdx}`}
                           x={x}
-                          y={y + height * 0.75}
+                          y={line.y + line.height * 0.75}
                           textLength={width}
-                          fontSize={`${height}px`}
+                          fontSize={`${line.height}px`}
                           lengthAdjust="spacingAndGlyphs"
                         >
                           {text}
