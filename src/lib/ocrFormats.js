@@ -1,3 +1,5 @@
+import max from 'lodash/max';
+
 /** Functions to parse OCR boxes from various formats and render them as SVG. */
 const parser = new DOMParser();
 const namespaces = {
@@ -238,8 +240,8 @@ export function parseAlto(altoText, imgSize) {
 /** Helper to calculate a rough fallback image size from the line coordinates */
 function getFallbackImageSize(lines) {
   return {
-    width: Math.max.apply(null, lines.map(({ x, width }) => x + width)),
-    height: Math.max.apply(null, lines.map(({ y, height }) => y + height)),
+    width: max(lines.map(({ x, width }) => x + width)),
+    height: max(lines.map(({ y, height }) => y + height)),
   };
 }
 
