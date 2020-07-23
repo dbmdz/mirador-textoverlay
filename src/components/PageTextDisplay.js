@@ -23,7 +23,7 @@ class PageTextDisplay extends React.Component {
   /** Register pointerdown handler on SVG container */
   componentDidMount() {
     // FIXME: We should be able to use React for this, but it somehow doesn't work
-    this.svgContainerRef.current.onpointerdown = this.onPointerDown;
+    this.svgContainerRef.current.addEventListener('pointerdown', this.onPointerDown);
   }
 
   /** Only update the component when some of the props changed.
@@ -65,6 +65,7 @@ class PageTextDisplay extends React.Component {
       `translate(${translateX}px, ${translateY}px)`,
       `scale(${scaleFactor})`,
     ];
+    this.containerRef.current.style.display = null;
     this.containerRef.current.style.transform = containerTransforms.join(' ');
   }
 
@@ -98,6 +99,7 @@ class PageTextDisplay extends React.Component {
       // (without using translate3d) and achieve 60fps on a regular laptop even with huge objects.
       willChange: 'transform',
       position: 'absolute',
+      display: 'none', // will be cleared by first update
     };
     const svgStyle = {
       width: pageWidth,

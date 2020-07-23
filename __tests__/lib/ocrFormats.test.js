@@ -122,4 +122,10 @@ describe('parsing text from IIIF annotations', () => {
       y: 351,
     });
   });
+
+  it('should be able to infer a page size if none is passed', () => {
+    const parsed = parseIiifAnnotations(contentAsTextAnnos.resources);
+    expect(parsed.width).toEqual(2261);
+    expect(parsed.height).toEqual(3309);
+  });
 });

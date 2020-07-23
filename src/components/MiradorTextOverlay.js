@@ -41,8 +41,8 @@ class MiradorTextOverlay extends Component {
     // Newly enabled, force initial setting of state from OSD
     const newlyEnabled = (
       (this.shouldRender() && !this.shouldRender(prevProps))
-      || (pageTexts.filter(({ lines }) => lines.length > 0).length
-          !== prevProps.pageTexts.filter(({ lines }) => lines.length > 0).length));
+      || (pageTexts.filter(this.shouldRenderPage).length
+          !== prevProps.pageTexts.filter(this.shouldRenderPage).length));
 
     if (newlyEnabled) {
       this.onUpdateViewport();
@@ -89,6 +89,12 @@ class MiradorTextOverlay extends Component {
     }
   }
 
+  /** If the page should be rendered */
+  shouldRenderPage = ({ lines }) => (
+    lines
+    && lines.length > 0
+    && lines.some(({ text, words }) => text || (words && words.length > 0)))
+
   /** If the overlay should be rendered at all */
   shouldRender(props) {
     const {
@@ -114,22 +120,26 @@ class MiradorTextOverlay extends Component {
     return ReactDOM.createPortal(
       <>
         {pageTexts
-          .filter(({ lines }) => lines && lines.length > 0)
           .map(({
             lines, source, width: pageWidth, height: pageHeight,
-          }, idx) => (
-            <PageTextDisplay
-              ref={this.renderRefs[idx]}
-              key={source}
-              lines={lines}
-              source={source}
-              selectable={selectable}
-              visible={visible}
-              opacity={opacity}
-              width={pageWidth}
-              height={pageHeight}
-            />
-          ))}
+          }, idx) => {
+            if (!this.shouldRenderPage({ lines })) {
+              return null;
+            }
+            return (
+              <PageTextDisplay
+                ref={this.renderRefs[idx]}
+                key={source}
+                lines={lines}
+                source={source}
+                selectable={selectable}
+                visible={visible}
+                opacity={opacity}
+                width={pageWidth}
+                height={pageHeight}
+              />
+            );
+          })}
       </>,
       viewer.canvas,
     );
