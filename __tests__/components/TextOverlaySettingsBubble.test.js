@@ -10,6 +10,7 @@ import useTheme from '@material-ui/core/styles/useTheme';
 
 import TextOverlaySettingsBubble from '../../src/components/TextOverlaySettingsBubble';
 
+// Very simple mock theme so that our previous hardcoded asserts work
 jest.mock('@material-ui/core/styles/useTheme');
 useTheme.mockImplementation(() => (
   {
