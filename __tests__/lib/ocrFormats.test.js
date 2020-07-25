@@ -38,23 +38,23 @@ describe('parsing ALTO', () => {
       x: closeTo(82.28),
       y: closeTo(1236.09),
     });
-    expect(parsed.lines[54].words).toHaveLength(9);
-    expect(parsed.lines[64].words[6]).toMatchObject({
+    expect(parsed.lines[54].words).toHaveLength(5);
+    expect(parsed.lines[64].words[3]).toMatchObject({
       height: closeTo(10.23),
-      text: 'mission',
-      width: closeTo(42.91),
+      text: 'mission ',
+      width: closeTo(49.04),
       x: closeTo(189.36),
       y: closeTo(1237.27),
     });
   });
 
   it('should not add newlines at the end of hyphenated lines', () => {
-    expect(parsed.lines[94].words[10].text).toMatch('exa');
-    expect(parsed.lines[96].words[16].text).toMatch('Débats\n');
+    expect(parsed.lines[94].words[5].text).toMatch('exa');
+    expect(parsed.lines[96].words[8].text).toMatch('Débats\n');
   });
 
   it('should convert style nodes to proper CSS', () => {
-    expect(parsed.lines[96].words[16].style)
+    expect(parsed.lines[96].words[8].style)
       .toBe('font-family: Times New Roman;font-style: italic');
   });
 });

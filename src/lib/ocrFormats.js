@@ -187,7 +187,7 @@ export function parseAlto(altoText, imgSize) {
       x: Number.parseInt(lineNode.getAttribute('HPOS'), 10) * scaleFactorX,
       y: Number.parseInt(lineNode.getAttribute('VPOS'), 10) * scaleFactorY,
     };
-    const wordElems = lineNode.querySelectorAll('String, SP, HYP');
+    const wordElems = lineNode.querySelectorAll('String, HYP');
     for (const wordNode of wordElems) {
       const styleRefs = wordNode.getAttribute('STYLEREFS');
       let style = null;
@@ -201,8 +201,6 @@ export function parseAlto(altoText, imgSize) {
       let text;
       if (wordNode.tagName === 'String') {
         text = wordNode.getAttribute('CONTENT');
-      } else if (wordNode.tagName === 'SP') {
-        text = ' ';
       } else if (wordNode.tagName === 'HYP') {
         lineEndsHyphenated = true;
       }
@@ -212,8 +210,14 @@ export function parseAlto(altoText, imgSize) {
       const x = Number.parseInt(wordNode.getAttribute('HPOS'), 10) * scaleFactorX;
       const y = Number.parseInt(wordNode.getAttribute('VPOS'), 10) * scaleFactorY;
 
-      // Not at end of line and doc doesn't encode spaces, add whitespace after word
-      if (!hasSpaces && text !== ' ' && wordNode) {
+      const sibling = wordNode.nextElementSibling;
+      const addSpace = (
+        // Doc doesn't encode spaces, add whitespace after word
+        (!hasSpaces && text !== ' ' && wordNode)
+        // Check if next sibling is a space element
+        || (sibling && sibling.tagName === 'SP')
+      );
+      if (addSpace) {
         width += width / text.length;
         text += ' ';
       }
@@ -225,6 +229,7 @@ export function parseAlto(altoText, imgSize) {
       line.text += text;
     }
     if (!lineEndsHyphenated) {
+      // Strip last space from line, replace with newline
       line.words.slice(-1)[0].text += '\n';
     }
     lineEndsHyphenated = false;

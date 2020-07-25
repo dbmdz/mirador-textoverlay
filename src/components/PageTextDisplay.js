@@ -146,7 +146,6 @@ class PageTextDisplay extends React.Component {
                         {text}
                       </tspan>
                     ))}
-                    )
                   </text>
                 )
                 : (

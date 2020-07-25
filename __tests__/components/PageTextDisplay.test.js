@@ -16,8 +16,8 @@ function svgTextMatcher(text) {
   return (content, element) => {
     if (element.tagName === 'text') {
       const elementText = Array.from(element.querySelectorAll('tspan'))
-        .map((el) => el.textContent).join(' ');
-      return elementText === text;
+        .map((el) => el.textContent.trim()).join(' ');
+      return elementText.startsWith(text);
     }
     return false;
   };
@@ -134,5 +134,17 @@ describe('PageTextDisplay', () => {
     renderPage({ selectable: true }, rerender);
     fireEvent.pointerDown(firstLine);
     expect(topCallback).not.toHaveBeenCalled();
+  });
+
+  it('should include whitespace and linebreaks when selecting text from overlay', () => {
+    renderPage();
+    const range = new Range();
+    const startNode = screen.getByText('firstWord');
+    range.setStart(startNode, 0);
+    const endNode = screen.getByText('secondWord');
+    range.setEnd(endNode.nextElementSibling, 0);
+    document.getSelection().addRange(range);
+    expect(document.getSelection().toString())
+      .toEqual('firstWord on a line\nanother secondWord ');
   });
 });

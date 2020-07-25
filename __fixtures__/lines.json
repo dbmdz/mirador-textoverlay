@@ -8,15 +8,15 @@
       "words": [
         { "text": "a", "x": 50, "y": 100, "width": 50, "height": 120 },
         {
-          "text": "firstWord",
+          "text": "firstWord ",
           "x": 120,
           "y": 100,
           "width": 220,
           "height": 120
         },
-        { "text": "on", "x": 360, "y": 100, "width": 100, "height": 120 },
-        { "text": "a", "x": 480, "y": 100, "width": 50, "height": 120 },
-        { "text": "line", "x": 550, "y": 100, "width": 260, "height": 120 }
+        { "text": "on ", "x": 360, "y": 100, "width": 100, "height": 120 },
+        { "text": "a ", "x": 480, "y": 100, "width": 50, "height": 120 },
+        { "text": "line\n", "x": 550, "y": 100, "width": 260, "height": 120 }
       ]
     },
     {
@@ -25,17 +25,17 @@
       "width": 1800,
       "height": 120,
       "words": [
-        { "text": "another", "x": 50, "y": 240, "width": 300, "height": 120 },
+        { "text": "another ", "x": 50, "y": 240, "width": 300, "height": 120 },
         {
-          "text": "secondWord",
+          "text": "secondWord ",
           "x": 420,
           "y": 240,
           "width": 220,
           "height": 120
         },
-        { "text": "on", "x": 660, "y": 240, "width": 100, "height": 120 },
-        { "text": "another", "x": 780, "y": 240, "width": 300, "height": 120 },
-        { "text": "line", "x": 1150, "y": 240, "width": 260, "height": 120 }
+        { "text": "on ", "x": 660, "y": 240, "width": 100, "height": 120 },
+        { "text": "another ", "x": 780, "y": 240, "width": 300, "height": 120 },
+        { "text": "line\n", "x": 1150, "y": 240, "width": 260, "height": 120 }
       ]
     }
   ],
