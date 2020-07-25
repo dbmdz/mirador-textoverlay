@@ -39,7 +39,7 @@ function parseHocrNode(node, endOfLine = false, scaleFactor = 1) {
     text += extraText;
     // Increase the width of the node to compensate for the extra characters
     if (!endOfLine) {
-      width += charWidth * extraText.length;
+      width += charWidth * extraText.trim().length;
     }
   }
   let style = node.getAttribute('style');
@@ -74,8 +74,6 @@ export function parseHocr(hocrText, referenceSize) {
     scaleFactor = scaleFactorX;
   }
   const lines = [];
-  // FIXME: Seems to be an eslint bug: https://github.com/eslint/eslint/issues/12117
-  // eslint-disable-next-line no-unused-vars
   for (const lineNode of pageNode.querySelectorAll(
     'span.ocr_line, span.ocrx_line',
   )) {
@@ -205,7 +203,7 @@ export function parseAlto(altoText, imgSize) {
         lineEndsHyphenated = true;
       }
       // NOTE: Hyphenation elements are ignored
-      let width = Number.parseInt(wordNode.getAttribute('WIDTH'), 10) * scaleFactorX;
+      const width = Number.parseInt(wordNode.getAttribute('WIDTH'), 10) * scaleFactorX;
       const height = Number.parseInt(wordNode.getAttribute('HEIGHT'), 10) * scaleFactorY;
       const x = Number.parseInt(wordNode.getAttribute('HPOS'), 10) * scaleFactorX;
       const y = Number.parseInt(wordNode.getAttribute('VPOS'), 10) * scaleFactorY;
@@ -218,7 +216,6 @@ export function parseAlto(altoText, imgSize) {
         || (sibling && sibling.tagName === 'SP')
       );
       if (addSpace) {
-        width += width / text.length;
         text += ' ';
       }
       if (text) {
