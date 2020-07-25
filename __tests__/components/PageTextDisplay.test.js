@@ -11,18 +11,6 @@ import PageTextDisplay from '../../src/components/PageTextDisplay';
 import lineFixtures from '../../__fixtures__/lines.json';
 
 
-/** Helper function to match against an elements inner text */
-function svgTextMatcher(text) {
-  return (content, element) => {
-    if (element.tagName === 'text') {
-      const elementText = Array.from(element.querySelectorAll('tspan'))
-        .map((el) => el.textContent).join(' ');
-      return elementText === text;
-    }
-    return false;
-  };
-}
-
 /** Render a page overlay to the testing screen */
 function renderPage(props = {}, renderFn = render) {
   const pageRef = React.createRef();
@@ -45,15 +33,12 @@ function renderPage(props = {}, renderFn = render) {
 describe('PageTextDisplay', () => {
   it('should render lines with individual words accurately', () => {
     renderPage();
-    const firstLine = screen.getByText(svgTextMatcher('a firstWord on a line'));
-    expect(firstLine).not.toBeNull();
-    expect(firstLine.previousElementSibling).toHaveAttribute('style', 'fill: rgba(255, 255, 255, 0.75);');
-    expect(firstLine).toHaveAttribute('style', 'fill: rgba(0, 0, 0, 0.75);');
     const word = screen.getByText('firstWord');
     expect(word).not.toBeNull();
     expect(word).toHaveAttribute('y', '190');
     expect(word).toHaveAttribute('font-size', '120px');
-    expect(screen.getByText(svgTextMatcher('another secondWord on another line'))).not.toBeNull();
+    expect(word).toHaveAttribute('style', 'fill: rgba(0, 0, 0, 0.75);');
+    expect(screen.getByText('secondWord')).not.toBeNull();
   });
 
   it('should render lines without individual words accurately', () => {
@@ -69,24 +54,24 @@ describe('PageTextDisplay', () => {
 
   it('should render invisible lines correctly', () => {
     renderPage({ visible: false });
-    expect(screen.getByText(svgTextMatcher('a firstWord on a line')))
+    expect(screen.getByText('firstWord'))
       .toHaveAttribute('style', 'fill: rgba(0, 0, 0, 0);');
-    expect(screen.getByText(svgTextMatcher('another secondWord on another line')))
+    expect(screen.getByText('secondWord'))
       .toHaveAttribute('style', 'fill: rgba(0, 0, 0, 0);');
   });
 
   it('should not re-render by itself when the opacity changes', () => {
     const { rerender } = renderPage();
-    expect(screen.getByText(svgTextMatcher('a firstWord on a line')))
+    expect(screen.getByText('firstWord'))
       .toHaveAttribute('style', 'fill: rgba(0, 0, 0, 0.75);');
     renderPage({ opacity: 0.25 }, rerender);
-    expect(screen.getByText(svgTextMatcher('a firstWord on a line')))
+    expect(screen.getByText('firstWord'))
       .toHaveAttribute('style', 'fill: rgba(0, 0, 0, 0.75);');
   });
 
   it('should re-render when the source changes', () => {
     const { rerender } = renderPage();
-    expect(screen.getByText(svgTextMatcher('a firstWord on a line'))).not.toBeNull();
+    expect(screen.getByText('firstWord')).not.toBeNull();
     renderPage({ source: 'http://example.com/pages/2', lines: lineFixtures.withoutWords, opacity: 0.25 }, rerender);
     expect(screen.getByText('a word on a line'))
       .toHaveAttribute('style', 'fill: rgba(0, 0, 0, 0.25);');
@@ -104,8 +89,8 @@ describe('PageTextDisplay', () => {
   });
 
   it('should correctly set opacity to all rect and text elements', () => {
-    const { ref } = renderPage();
-    const firstLine = screen.getByText(svgTextMatcher('a firstWord on a line'));
+    const { ref } = renderPage({ lines: lineFixtures.withoutWords });
+    const firstLine = screen.getByText('a word on a line');
     expect(firstLine.previousElementSibling).toHaveAttribute('style', 'fill: rgba(255, 255, 255, 0.75);');
     expect(firstLine).toHaveAttribute('style', 'fill: rgba(0, 0, 0, 0.75);');
     ref.current.updateOpacity(0.25);
@@ -114,11 +99,11 @@ describe('PageTextDisplay', () => {
   });
 
   it('should render text invisible if visibility is disabled', () => {
-    const { rerender } = renderPage();
-    const firstLine = screen.getByText(svgTextMatcher('a firstWord on a line'));
+    const { rerender } = renderPage({ lines: lineFixtures.withoutWords });
+    const firstLine = screen.getByText('a word on a line');
     expect(firstLine.previousElementSibling).toHaveAttribute('style', 'fill: rgba(255, 255, 255, 0.75);');
     expect(firstLine).toHaveAttribute('style', 'fill: rgba(0, 0, 0, 0.75);');
-    renderPage({ visible: false }, rerender);
+    renderPage({ visible: false, lines: lineFixtures.withoutWords }, rerender);
     expect(firstLine.previousElementSibling).toHaveAttribute('style', 'fill: rgba(255, 255, 255, 0);');
     expect(firstLine).toHaveAttribute('style', 'fill: rgba(0, 0, 0, 0);');
   });
@@ -127,7 +112,7 @@ describe('PageTextDisplay', () => {
     const topCallback = jest.fn();
     const { rerender, container } = renderPage({ selectable: false });
     container.addEventListener('pointerdown', topCallback);
-    const firstLine = screen.getByText(svgTextMatcher('a firstWord on a line'));
+    const firstLine = screen.getByText('firstWord');
     fireEvent.pointerDown(firstLine);
     expect(topCallback).toHaveBeenCalled();
     topCallback.mockClear();

@@ -131,28 +131,27 @@ class PageTextDisplay extends React.Component {
             {renderLines.map((line, lineIdx) => (
               line.words
                 ? (
-                  <text style={textStyle}>
-                    {line.words.filter((w) => w.width > 0 && w.height > 0).map(({
-                      x, width, text,
-                    }, wordIdx) => (
-                      <tspan
-                        key={`${lineIdx}-${wordIdx}`}
-                        x={x}
-                        y={line.y + line.height * 0.75}
-                        textLength={width}
-                        fontSize={`${line.height}px`}
-                        lengthAdjust="spacingAndGlyphs"
-                      >
-                        {text}
-                      </tspan>
-                    ))}
-                    )
-                  </text>
+                  line.words.filter((w) => w.width > 0 && w.height > 0).map(({
+                    x, y, width, text,
+                  }, wordIdx) => (
+                    <text
+                      key={`text-${x}-${y}`}
+                      x={x}
+                      y={line.y + line.height * 0.75}
+                      textLength={width}
+                      fontSize={`${line.height}px`}
+                      lengthAdjust="spacingAndGlyphs"
+                      style={textStyle}
+                    >
+                      {text}
+                    </text>
+                  ))
                 )
                 : (
                   <text
                     x={line.x}
                     y={line.y + line.height * 0.75}
+                    key={`text-${line.x}-${line.y}`}
                     textLength={line.width}
                     fontSize={`${line.height}px`}
                     lengthAdjust="spacingAndGlyphs"
