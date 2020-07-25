@@ -42,7 +42,7 @@ describe('parsing ALTO', () => {
     expect(parsed.lines[64].words[3]).toMatchObject({
       height: closeTo(10.23),
       text: 'mission ',
-      width: closeTo(49.04),
+      width: closeTo(42.91),
       x: closeTo(189.36),
       y: closeTo(1237.27),
     });
@@ -81,7 +81,7 @@ describe('parsing hOCR', () => {
     expect(parsed.lines[29].words[7]).toMatchObject({
       height: 56,
       text: '„aber ',
-      width: 142.8,
+      width: 119,
       x: 922,
       y: 2097,
     });
