@@ -16,8 +16,10 @@ function svgTextMatcher(text) {
   return (content, element) => {
     if (element.tagName === 'text') {
       const elementText = Array.from(element.querySelectorAll('tspan'))
-        .map((el) => el.textContent).join(' ');
-      return elementText === text;
+        .map((el) => el.textContent)
+        .map((el) => (el.slice(-1) === ' ' ? el : `${el} `))
+        .join('');
+      return elementText.trimEnd() === text;
     }
     return false;
   };
@@ -140,10 +142,21 @@ describe('PageTextDisplay', () => {
   });
 
   it('should render words as <text> elements when running under Gecko', () => {
+    const prevAgent = global.navigator.userAgent;
     global.navigator.userAgent = 'Mozilla/5.0 (X11; Linux x86_64; rv:10.0) Gecko/20100101 Firefox/10.0';
     renderPage();
+    global.navigator.userAgent = prevAgent;
     const word = screen.getByText('firstWord');
     expect(word).not.toBeNull();
     expect(word.tagName).toEqual('text');
+  });
+
+  it('should render words with smaller width in Gecko to account for rendering differences', () => {
+    const prevAgent = global.navigator.userAgent;
+    global.navigator.userAgent = 'Mozilla/5.0 (X11; Linux x86_64; rv:10.0) Gecko/20100101 Firefox/10.0';
+    renderPage();
+    global.navigator.userAgent = prevAgent;
+    const word = screen.getByText('firstWord');
+    expect(word).toHaveAttribute('textLength', '198');
   });
 });
