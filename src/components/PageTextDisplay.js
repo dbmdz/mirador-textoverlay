@@ -4,6 +4,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import { changeAlpha } from '../lib/color';
+
 /** Check if we're running in Gecko */
 function runningInGecko() {
   return navigator.userAgent.indexOf('Gecko/') >= 0;
@@ -37,11 +39,15 @@ class PageTextDisplay extends React.Component {
    * but this way we can more precisely control when we re-render.
    */
   shouldComponentUpdate(nextProps) {
-    const { source, selectable, visible } = this.props;
+    const {
+      source, selectable, visible, textColor, bgColor,
+    } = this.props;
     return (
       nextProps.source !== source
       || nextProps.selectable !== selectable
       || nextProps.visible !== visible
+      || nextProps.textColor !== textColor
+      || nextProps.bgColor !== bgColor
     );
   }
 
@@ -84,18 +90,19 @@ class PageTextDisplay extends React.Component {
     // We need to apply the opacity to the individual rects and texts instead of
     // one of the containers, since otherwise the user's selection highlight would
     // become transparent as well or disappear entirely.
+    const { bgColor, textColor } = this.props;
     for (const rect of this.svgContainerRef.current.querySelectorAll('rect')) {
-      rect.style.fill = `rgba(255, 255, 255, ${opacity})`;
+      rect.style.fill = changeAlpha(bgColor, opacity);
     }
     for (const text of this.svgContainerRef.current.querySelectorAll('text')) {
-      text.style.fill = `rgba(0, 0, 0, ${opacity})`;
+      text.style.fill = changeAlpha(textColor, opacity);
     }
   }
 
   /** Render the page overlay */
   render() {
     const {
-      selectable, visible, lines, width: pageWidth, height: pageHeight, opacity,
+      selectable, visible, lines, width: pageWidth, height: pageHeight, opacity, textColor, bgColor,
     } = this.props;
 
     const containerStyle = {
@@ -111,8 +118,8 @@ class PageTextDisplay extends React.Component {
       cursor: selectable ? undefined : 'default',
     };
     const renderOpacity = (!visible && selectable) ? 0 : opacity;
-    const boxStyle = { fill: `rgba(255, 255, 255, ${renderOpacity})` };
-    const textStyle = { fill: `rgba(0, 0, 0, ${renderOpacity})` };
+    const boxStyle = { fill: changeAlpha(bgColor, renderOpacity) };
+    const textStyle = { fill: changeAlpha(textColor, renderOpacity) };
     const renderLines = lines.filter((l) => l.width > 0 && l.height > 0);
 
     /* Firefox/Gecko does not currently support the lengthAdjust parameter on
@@ -205,6 +212,8 @@ PageTextDisplay.propTypes = {
   selectable: PropTypes.bool.isRequired,
   visible: PropTypes.bool.isRequired,
   opacity: PropTypes.number.isRequired,
+  textColor: PropTypes.string.isRequired,
+  bgColor: PropTypes.string.isRequired,
   width: PropTypes.number.isRequired,
   height: PropTypes.number.isRequired,
   // eslint-disable-next-line react/forbid-prop-types

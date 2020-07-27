@@ -12,6 +12,10 @@ const defaultConfig = {
   selectable: false,
   // Overlay text overlay by default
   visible: false,
+  // Color of rendered text,
+  textColor: '#000000',
+  // Color of line background
+  bgColor: '#ffffff',
 };
 
 /** Selector to get text display options for a given window */

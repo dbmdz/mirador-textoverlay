@@ -7,6 +7,9 @@ export default {
     textOpacity: 'Text-Transparenz',
     textSelect: 'Text Auswählbar',
     textVisible: 'Text Sichtbar',
+    colorPicker: 'Farbauswahl',
+    textColor: 'Farbe für Text',
+    backgroundColor: 'Farbe für Zeilenhintergrund',
   },
   en: {
     collapseTextOverlayOptions: 'Contract text overlay options',
@@ -16,5 +19,8 @@ export default {
     textOpacity: 'Text Opacity',
     textSelect: 'Text Selectable',
     textVisible: 'Text Visible',
+    colorPicker: 'Color Picker',
+    textColor: 'Text Color',
+    backgroundColor: 'Line Backgrouund Color',
   },
 };

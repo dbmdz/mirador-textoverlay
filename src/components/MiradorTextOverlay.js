@@ -112,7 +112,7 @@ class MiradorTextOverlay extends Component {
   /** Render the text overlay SVG */
   render() {
     const {
-      pageTexts, selectable, visible, viewer, opacity,
+      pageTexts, selectable, visible, viewer, opacity, textColor, bgColor,
     } = this.props;
     if (!this.shouldRender() || !viewer || !pageTexts) {
       return null;
@@ -137,6 +137,8 @@ class MiradorTextOverlay extends Component {
                 opacity={opacity}
                 width={pageWidth}
                 height={pageHeight}
+                textColor={textColor}
+                bgColor={bgColor}
               />
             );
           })}
@@ -154,6 +156,8 @@ MiradorTextOverlay.propTypes = {
   selectable: PropTypes.bool,
   viewer: PropTypes.object, // eslint-disable-line react/forbid-prop-types
   visible: PropTypes.bool,
+  textColor: PropTypes.string,
+  bgColor: PropTypes.string,
 };
 
 MiradorTextOverlay.defaultProps = {
@@ -164,6 +168,8 @@ MiradorTextOverlay.defaultProps = {
   selectable: true,
   viewer: undefined,
   visible: false,
+  textColor: '#000000',
+  bgColor: '#ffffff',
 };
 
 export default MiradorTextOverlay;

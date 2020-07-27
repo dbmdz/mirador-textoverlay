@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/label-has-associated-control */
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { MiradorMenuButton } from 'mirador/dist/es/src/components/MiradorMenuButton';
@@ -6,31 +7,12 @@ import TextIcon from '@material-ui/icons/TextFields';
 import CloseIcon from '@material-ui/icons/Close';
 import SubjectIcon from '@material-ui/icons/Subject';
 import OpacityIcon from '@material-ui/icons/Opacity';
+import PaletteIcon from '@material-ui/icons/Palette';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import useTheme from '@material-ui/core/styles/useTheme';
 
+import { changeAlpha } from '../lib/color';
 import TextSelectIcon from './TextSelectIcon';
-
-/**
- * Based on https://gist.github.com/danieliser/b4b24c9f772066bcf0a6
- */
-const changeAlpha = (color, opacity) => {
-  if (color[0] === '#') {
-    let hex = color.replace('#', '');
-    if (hex.length === 3) {
-      hex += hex;
-    }
-    const r = parseInt(hex.substring(0, 2), 16);
-    const g = parseInt(hex.substring(2, 4), 16);
-    const b = parseInt(hex.substring(4, 6), 16);
-    return `rgba(${r},${g},${b},${opacity})`;
-  }
-  if (color.startsWith('rgba')) {
-    return color.replace(/[^,]+(?=\))/, opacity);
-  }
-  console.error(`Unsupported color: ${color}`);
-  return color;
-};
 
 /** Control text overlay settings  */
 const TextOverlaySettingsBubble = ({
@@ -38,10 +20,12 @@ const TextOverlaySettingsBubble = ({
   textsFetching, updateWindowTextOverlayOptions, t,
 }) => {
   const {
-    enabled, visible, selectable, opacity,
+    enabled, visible, selectable, opacity, textColor, bgColor,
   } = windowTextOverlayOptions;
   const [open, setOpen] = useState(enabled && (visible || selectable));
   const [showOpacitySlider, setShowOpacitySlider] = useState(false);
+  const [showColorPicker, setShowColorPicker] = useState(false);
+
   const { palette } = useTheme();
   const bubbleBg = palette.shades.main;
   // CSS voodoo to render a border with a margin on the top and bottom
@@ -104,6 +88,9 @@ const TextOverlaySettingsBubble = ({
               if (showOpacitySlider && visible) {
                 setShowOpacitySlider(false);
               }
+              if (showColorPicker && visible) {
+                setShowColorPicker(false);
+              }
             }}
             aria-pressed={visible}
             style={{ backgroundColor: visible && toggledBubbleBg }}
@@ -112,12 +99,7 @@ const TextOverlaySettingsBubble = ({
           </MiradorMenuButton>
         </div>
         <div style={{
-          // CSS voodoo to render a border with a margin on the top and bottom
-          borderImageSlice: 1,
-          borderImageSource,
-          borderRight,
           display: 'inline-block',
-          paddingRight: 8,
         }}
         >
           <MiradorMenuButton
@@ -139,12 +121,12 @@ const TextOverlaySettingsBubble = ({
             data-test-id="text-opacity-slider"
             id="text-opacity-slider"
             aria-labelledby="text-opacity-slider-label"
+            className="MuiPaper-elevation4"
             style={{
               backgroundColor: changeAlpha(bubbleBg, 0.8),
-              borderRadius: 25,
+              borderRadius: '0px 0px 25px 25px',
               height: '150px',
-              marginTop: 2,
-              padding: 8,
+              padding: '16px 8px 8px 8px',
               position: 'absolute',
               top: 48,
               zIndex: 100,
@@ -161,6 +143,112 @@ const TextOverlaySettingsBubble = ({
                 opacity: val / 100.0,
               })}
             />
+          </div>
+          )}
+        </div>
+        <div
+          style={{
+            display: 'inline-block',
+            paddingRight: 8,
+            // CSS voodoo to render a border with a margin on the top and bottom
+            borderImageSlice: 1,
+            borderImageSource,
+            borderRight,
+          }}
+        >
+          <MiradorMenuButton
+            id="color-picker-label"
+            disabled={!visible}
+            aria-label={t('colorPicker')}
+            aria-controls="color-picker"
+            aria-expanded={showColorPicker}
+            onClick={() => setShowColorPicker(!showColorPicker)}
+            style={{
+              backgroundColor: showColorPicker && changeAlpha(bubbleFg, 0.1),
+            }}
+          >
+            <PaletteIcon />
+          </MiradorMenuButton>
+          {visible && showColorPicker
+          && (
+          <div
+            className="MuiPaper-elevation4"
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              position: 'absolute',
+              top: 48,
+              zIndex: 100,
+              borderRadius: '0 0 25px 25px',
+              backgroundColor: changeAlpha(bubbleBg, 0.8),
+            }}
+          >
+            <label
+              style={{
+                width: 48,
+                height: 48,
+                padding: 8,
+                boxSizing: 'border-box',
+              }}
+            >
+              <div
+                title={t('textColor')}
+                className="MuiPaper-elevation2"
+                style={{
+                  display: 'inline-block',
+                  width: 32,
+                  height: 32,
+                  borderRadius: 16,
+                  backgroundColor: textColor,
+                }}
+              />
+              <input
+                type="color"
+                value={textColor}
+                style={{ display: 'none' }}
+                onChange={(evt) => updateWindowTextOverlayOptions({
+                  ...windowTextOverlayOptions,
+                  textColor: evt.target.value,
+                })}
+                onInput={(evt) => updateWindowTextOverlayOptions({
+                  ...windowTextOverlayOptions,
+                  textColor: evt.target.value,
+                })}
+              />
+            </label>
+            <label
+              style={{
+                width: 48,
+                height: 48,
+                padding: 8,
+                boxSizing: 'border-box',
+              }}
+            >
+              <div
+                title={t('backgroundColor')}
+                className="MuiPaper-elevation2"
+                style={{
+                  display: 'inline-block',
+                  width: 32,
+                  height: 32,
+                  borderRadius: 16,
+                  backgroundColor: bgColor,
+                }}
+              />
+              <input
+                type="color"
+                value={bgColor}
+                style={{ display: 'none' }}
+                onChange={(evt) => updateWindowTextOverlayOptions({
+                  ...windowTextOverlayOptions,
+                  bgColor: evt.target.value,
+                })}
+                onInput={(evt) => updateWindowTextOverlayOptions({
+                  ...windowTextOverlayOptions,
+                  bgColor: evt.target.value,
+                })}
+              />
+            </label>
           </div>
           )}
         </div>
