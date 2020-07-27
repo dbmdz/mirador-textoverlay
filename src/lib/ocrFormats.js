@@ -40,8 +40,12 @@ function parseHocrNode(node, endOfLine = false, scaleFactor = 1) {
     // Increase the width of the node to compensate for the extra characters
     if (!endOfLine) {
       width += charWidth * extraText.length;
+    } else if (text.slice(-1) !== '\u00AD') {
+      // Add newline if the line does not end on a hyphenation
+      text = `${text.trim()}\n`;
     }
   }
+
   let style = node.getAttribute('style');
   if (style) {
     style = style.replace(/font-size:.+;/, '');
@@ -49,7 +53,7 @@ function parseHocrNode(node, endOfLine = false, scaleFactor = 1) {
   return {
     height,
     style,
-    text: text.replace('\u00AD', '-'), // Soft hyphens should be visible
+    text,
     width,
     x: ulx,
     y: uly,
