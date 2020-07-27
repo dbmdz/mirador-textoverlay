@@ -55,8 +55,8 @@ describe('PageTextDisplay', () => {
     expect(word).not.toBeNull();
     expect(word.tagName).toEqual('tspan');
     expect(word).toHaveAttribute('y', '190');
+    expect(word).toHaveAttribute('textLength', '220');
     expect(word).toHaveAttribute('font-size', '90px');
-    expect(word).toHaveAttribute('style', 'fill: rgba(0, 0, 0, 0.75);');
     expect(screen.getByText('secondWord')).not.toBeNull();
   });
 
