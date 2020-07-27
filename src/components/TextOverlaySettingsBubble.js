@@ -24,7 +24,8 @@ const changeAlpha = (color, opacity) => {
     const g = parseInt(hex.substring(2, 4), 16);
     const b = parseInt(hex.substring(4, 6), 16);
     return `rgba(${r},${g},${b},${opacity})`;
-  } if (color.startsWith('rgba')) {
+  }
+  if (color.startsWith('rgba')) {
     return color.replace(/[^,]+(?=\))/, opacity);
   }
   console.error(`Unsupported color: ${color}`);
