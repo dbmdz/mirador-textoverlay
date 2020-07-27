@@ -224,8 +224,17 @@ export function parseAlto(altoText, imgSize) {
       }
       line.text += text;
     }
+    if (line.words.length === 0) {
+      continue;
+    }
     if (!lineEndsHyphenated) {
-      line.words.slice(-1)[0].text += '\n';
+      const lastWord = line.words.slice(-1)[0];
+      if (lastWord.text.slice(-1)[0] === ' ') {
+        // Undo width expansion/space expansion
+        lastWord.text = lastWord.text.slice(0, -1);
+        lastWord.width -= (lastWord.width / lastWord.text.length);
+      }
+      lastWord.text += '\n';
     }
     lineEndsHyphenated = false;
     lines.push(line);

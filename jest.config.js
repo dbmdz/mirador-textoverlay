@@ -12,5 +12,6 @@ module.exports = {
   transformIgnorePatterns: [
     '<rootDir>/node_modules/(?!(mirador|manifesto.js))',
   ],
-
+  testPathIgnorePatterns: ['/.*__tests__/setupJest.js/'],
+  setupFiles: ['<rootDir>/jest.setup.js'],
 };

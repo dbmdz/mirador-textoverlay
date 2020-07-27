@@ -51,9 +51,11 @@ describe('PageTextDisplay', () => {
     expect(firstLine).toHaveAttribute('style', 'fill: rgba(0, 0, 0, 0.75);');
     const word = screen.getByText('firstWord');
     expect(word).not.toBeNull();
+    expect(word.tagName).toEqual('tspan');
     expect(word).toHaveAttribute('y', '190');
-    expect(word).toHaveAttribute('font-size', '120px');
-    expect(screen.getByText(svgTextMatcher('another secondWord on another line'))).not.toBeNull();
+    expect(word).toHaveAttribute('font-size', '90px');
+    expect(word).toHaveAttribute('style', 'fill: rgba(0, 0, 0, 0.75);');
+    expect(screen.getByText('secondWord')).not.toBeNull();
   });
 
   it('should render lines without individual words accurately', () => {
@@ -115,10 +117,11 @@ describe('PageTextDisplay', () => {
 
   it('should render text invisible if visibility is disabled', () => {
     const { rerender } = renderPage();
-    const firstLine = screen.getByText(svgTextMatcher('a firstWord on a line'));
+    let firstLine = screen.getByText(svgTextMatcher('a firstWord on a line'));
     expect(firstLine.previousElementSibling).toHaveAttribute('style', 'fill: rgba(255, 255, 255, 0.75);');
     expect(firstLine).toHaveAttribute('style', 'fill: rgba(0, 0, 0, 0.75);');
     renderPage({ visible: false }, rerender);
+    firstLine = screen.getByText(svgTextMatcher('a firstWord on a line'));
     expect(firstLine.previousElementSibling).toHaveAttribute('style', 'fill: rgba(255, 255, 255, 0);');
     expect(firstLine).toHaveAttribute('style', 'fill: rgba(0, 0, 0, 0);');
   });
@@ -134,5 +137,13 @@ describe('PageTextDisplay', () => {
     renderPage({ selectable: true }, rerender);
     fireEvent.pointerDown(firstLine);
     expect(topCallback).not.toHaveBeenCalled();
+  });
+
+  it('should render words as <text> elements when running under Gecko', () => {
+    global.navigator.userAgent = 'Mozilla/5.0 (X11; Linux x86_64; rv:10.0) Gecko/20100101 Firefox/10.0';
+    renderPage();
+    const word = screen.getByText('firstWord');
+    expect(word).not.toBeNull();
+    expect(word.tagName).toEqual('text');
   });
 });

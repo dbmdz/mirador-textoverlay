@@ -4,6 +4,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+/** Test if words should be rendered as <tspan>s wrapped in <text> line containers.
+ *
+ * Firefox/Gecko does not currently support the lengthAdjust parameter on
+ * <tspan> Elements, only on <text> (https://bugzilla.mozilla.org/show_bug.cgi?id=890692).
+ *
+ * Using <text> elements for words (and skipping the line-grouping) works fine
+ * in Firefox, but breaks selection behavior in Chrome (the selected text contains
+ * a newline after every word).
+ *
+ * So we have to use User Agent sniffing. Sorry :-/
+*/
+function shouldRenderWordsAsSpans() {
+  return navigator.userAgent.indexOf('Gecko/') < 0;
+}
 
 /** Page Text Display component that is optimized for fast panning/zooming
  *
@@ -25,6 +39,7 @@ class PageTextDisplay extends React.Component {
     // FIXME: We should be able to use React for this, but it somehow doesn't work
     this.svgContainerRef.current.addEventListener('pointerdown', this.onPointerDown);
   }
+
 
   /** Only update the component when some of the props changed.
    *
@@ -110,6 +125,16 @@ class PageTextDisplay extends React.Component {
     const boxStyle = { fill: `rgba(255, 255, 255, ${renderOpacity})` };
     const textStyle = { fill: `rgba(0, 0, 0, ${renderOpacity})` };
     const renderLines = lines.filter((l) => l.width > 0 && l.height > 0);
+    let LineWrapper = React.Fragment;
+    // See comment on shouldRenderWordsAsSpans, this is a browser-specific hack to get pretty
+    // rendering of words *and* good selection behavior
+    // eslint-disable-next-line react/jsx-props-no-spreading, require-jsdoc
+    let WordElem = (props) => <text {...props} />;
+    if (shouldRenderWordsAsSpans()) {
+      LineWrapper = ({ children }) => <text style={textStyle}>{children}</text>;
+      // eslint-disable-next-line react/jsx-props-no-spreading, require-jsdoc
+      WordElem = (props) => <tspan {...props} />;
+    }
     return (
       <div
         ref={this.containerRef}
@@ -128,29 +153,30 @@ class PageTextDisplay extends React.Component {
               />
             ))}
 
-            {renderLines.map((line, lineIdx) => (
+            {renderLines.map((line) => (
               line.words
                 ? (
-                  <text style={textStyle}>
+                  <LineWrapper key={`line-${line.x}-${line.y}`}>
                     {line.words.filter((w) => w.width > 0 && w.height > 0).map(({
-                      x, width, text,
-                    }, wordIdx) => (
-                      <tspan
-                        key={`${lineIdx}-${wordIdx}`}
+                      x, y, width, text,
+                    }) => (
+                      <WordElem
+                        key={`text-${x}-${y}`}
                         x={x}
                         y={line.y + line.height * 0.75}
                         textLength={width}
-                        fontSize={`${line.height}px`}
+                        fontSize={`${line.height * 0.75}px`}
                         lengthAdjust="spacingAndGlyphs"
+                        style={textStyle}
                       >
                         {text}
-                      </tspan>
+                      </WordElem>
                     ))}
-                    )
-                  </text>
+                  </LineWrapper>
                 )
                 : (
                   <text
+                    key={`line-${line.x}-${line.y}`}
                     x={line.x}
                     y={line.y + line.height * 0.75}
                     textLength={line.width}
