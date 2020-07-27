@@ -133,7 +133,7 @@ class PageTextDisplay extends React.Component {
     if (isGecko) {
       LineWrapper = React.Fragment;
       // eslint-disable-next-line react/jsx-props-no-spreading, require-jsdoc
-      WordElem = (props) => <text {...props} />;
+      WordElem = (props) => <text style={textStyle} {...props} />;
     }
     return (
       <div
@@ -175,7 +175,6 @@ class PageTextDisplay extends React.Component {
                           textLength={renderWidth}
                           fontSize={`${line.height * 0.75}px`}
                           lengthAdjust="spacingAndGlyphs"
-                          style={textStyle}
                         >
                           {text}
                         </WordElem>
