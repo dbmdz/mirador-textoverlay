@@ -40,8 +40,12 @@ function parseHocrNode(node, endOfLine = false, scaleFactor = 1) {
     // Increase the width of the node to compensate for the extra characters
     if (!endOfLine) {
       width += charWidth * extraText.length;
+    } else if (text.slice(-1) !== '\u00AD') {
+      // Add newline if the line does not end on a hyphenation
+      text = `${text.trim()}\n`;
     }
   }
+
   let style = node.getAttribute('style');
   if (style) {
     style = style.replace(/font-size:.+;/, '');
@@ -49,7 +53,7 @@ function parseHocrNode(node, endOfLine = false, scaleFactor = 1) {
   return {
     height,
     style,
-    text: text.replace('\u00AD', '-'), // Soft hyphens should be visible
+    text,
     width,
     x: ulx,
     y: uly,
@@ -224,8 +228,17 @@ export function parseAlto(altoText, imgSize) {
       }
       line.text += text;
     }
+    if (line.words.length === 0) {
+      continue;
+    }
     if (!lineEndsHyphenated) {
-      line.words.slice(-1)[0].text += '\n';
+      const lastWord = line.words.slice(-1)[0];
+      if (lastWord.text.slice(-1)[0] === ' ') {
+        // Undo width expansion/space expansion
+        lastWord.text = lastWord.text.slice(0, -1);
+        lastWord.width -= (lastWord.width / lastWord.text.length);
+      }
+      lastWord.text += '\n';
     }
     lineEndsHyphenated = false;
     lines.push(line);
