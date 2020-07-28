@@ -39,15 +39,11 @@ class PageTextDisplay extends React.Component {
    * but this way we can more precisely control when we re-render.
    */
   shouldComponentUpdate(nextProps) {
-    const {
-      source, selectable, visible, textColor, bgColor,
-    } = this.props;
+    const { source, selectable, visible } = this.props;
     return (
       nextProps.source !== source
       || nextProps.selectable !== selectable
       || nextProps.visible !== visible
-      || nextProps.textColor !== textColor
-      || nextProps.bgColor !== bgColor
     );
   }
 
@@ -83,14 +79,13 @@ class PageTextDisplay extends React.Component {
    *
    * Again, intended to be called from the parent, again for performance reasons.
    */
-  updateOpacity(opacity) {
+  updateColors(textColor, bgColor, opacity) {
     if (!this.svgContainerRef.current) {
       return;
     }
-    // We need to apply the opacity to the individual rects and texts instead of
+    // We need to apply the colors to the individual rects and texts instead of
     // one of the containers, since otherwise the user's selection highlight would
     // become transparent as well or disappear entirely.
-    const { bgColor, textColor } = this.props;
     for (const rect of this.svgContainerRef.current.querySelectorAll('rect')) {
       rect.style.fill = changeAlpha(bgColor, opacity);
     }

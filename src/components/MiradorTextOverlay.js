@@ -31,7 +31,7 @@ class MiradorTextOverlay extends Component {
   /** Register OpenSeadragon callback when viewport changes */
   componentDidUpdate(prevProps) {
     const {
-      enabled, viewer, opacity, pageTexts,
+      enabled, viewer, opacity, pageTexts, textColor, bgColor,
     } = this.props;
 
     // OSD instance becomes available, register callback
@@ -48,11 +48,13 @@ class MiradorTextOverlay extends Component {
       this.onUpdateViewport();
     }
 
-    // Manually update SVG opacity for performance reasons
-    if (opacity !== prevProps.opacity) {
+    // Manually update SVG colors for performance reasons
+    if (opacity !== prevProps.opacity
+        || bgColor !== prevProps.bgColor
+        || textColor !== prevProps.textColor) {
       this.renderRefs
         .filter((ref) => ref.current != null)
-        .forEach((ref) => ref.current.updateOpacity(opacity));
+        .forEach((ref) => ref.current.updateColors(textColor, bgColor, opacity));
     }
   }
 

@@ -114,7 +114,7 @@ describe('PageTextDisplay', () => {
     const firstLine = screen.getByText(svgTextMatcher('a firstWord on a line'));
     expect(firstLine.previousElementSibling).toHaveAttribute('style', 'fill: rgba(255, 255, 255, 0.75);');
     expect(firstLine).toHaveAttribute('style', 'fill: rgba(0, 0, 0, 0.75);');
-    ref.current.updateOpacity(0.25);
+    ref.current.updateColors('#000000', '#ffffff', 0.25);
     expect(firstLine.previousElementSibling).toHaveAttribute('style', 'fill: rgba(255, 255, 255, 0.25);');
     expect(firstLine).toHaveAttribute('style', 'fill: rgba(0, 0, 0, 0.25);');
   });
