@@ -14,6 +14,160 @@ import useTheme from '@material-ui/core/styles/useTheme';
 import { changeAlpha } from '../lib/color';
 import TextSelectIcon from './TextSelectIcon';
 
+
+/** Container for a settings button */
+const ButtonContainer = ({
+  children, withBorder, paddingLeft, paddingRight,
+}) => {
+  const { palette } = useTheme();
+  const bubbleBg = palette.shades.main;
+  // CSS voodoo to render a border with a margin on the top and bottom
+  const bubbleFg = palette.getContrastText(bubbleBg);
+  const style = {
+    display: 'inline-block',
+    paddingRight,
+    paddingLeft,
+  };
+  if (withBorder) {
+    // CSS voodoo to render a border with a margin on the top and bottom
+    style.borderImageSource = 'linear-gradient('
+    + `to bottom, ${changeAlpha(bubbleFg, 0)}) 20%,`
+    + `${changeAlpha(bubbleFg, 0.2)} 20% 80%,`
+    + `${changeAlpha(bubbleFg, 0)} 80%`;
+    style.borderRight = `1px solid ${changeAlpha(bubbleFg, 0.2)}`;
+    style.borderImageSlice = 1;
+  }
+  return (
+    <div style={style}>
+      {children}
+    </div>
+  );
+};
+ButtonContainer.propTypes = {
+  children: PropTypes.node.isRequired,
+  withBorder: PropTypes.bool,
+  paddingRight: PropTypes.number,
+  paddingLeft: PropTypes.number,
+};
+ButtonContainer.defaultProps = {
+  withBorder: false,
+  paddingRight: undefined,
+  paddingLeft: undefined,
+};
+
+/** Widget to control the opacity of the displayed text */
+const OpacityWidget = ({ opacity, onChange, t }) => {
+  const { palette } = useTheme();
+  const bubbleBg = palette.shades.main;
+  return (
+    <div
+      data-test-id="text-opacity-slider"
+      id="text-opacity-slider"
+      aria-labelledby="text-opacity-slider-label"
+      className="MuiPaper-elevation4"
+      style={{
+        backgroundColor: changeAlpha(bubbleBg, 0.8),
+        borderRadius: '0px 0px 25px 25px',
+        height: '150px',
+        padding: '16px 8px 8px 8px',
+        position: 'absolute',
+        top: 48,
+        zIndex: 100,
+      }}
+    >
+      <Slider
+        orientation="vertical"
+        min={0}
+        max={100}
+        value={opacity * 100}
+        getAriaValueText={(value) => t('opacityCurrentValue', { value })}
+        onChange={(evt, val) => onChange(val / 100.0)}
+      />
+    </div>
+  );
+};
+OpacityWidget.propTypes = {
+  opacity: PropTypes.number.isRequired,
+  onChange: PropTypes.func.isRequired,
+  t: PropTypes.func.isRequired,
+};
+
+/** Input to select a color */
+const ColorInput = ({ color, onChange, title }) => (
+  <label
+    style={{
+      width: 48,
+      height: 48,
+      padding: 8,
+      boxSizing: 'border-box',
+    }}
+  >
+    <div
+      title={title}
+      className="MuiPaper-elevation2"
+      style={{
+        display: 'inline-block',
+        width: 32,
+        height: 32,
+        borderRadius: 16,
+        backgroundColor: color,
+      }}
+    />
+    <input
+      type="color"
+      value={color}
+      style={{ display: 'none' }}
+      onChange={(evt) => onChange(evt.target.value)}
+      onInput={(evt) => onChange(evt.target.value)}
+    />
+  </label>
+);
+ColorInput.propTypes = {
+  color: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired,
+  title: PropTypes.string.isRequired,
+};
+
+/** Widget to update text and background color */
+const ColorWidget = ({
+  textColor, bgColor, onChange, t,
+}) => {
+  const { palette } = useTheme();
+  const bubbleBg = palette.shades.main;
+  return (
+    <div
+      className="MuiPaper-elevation4"
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        position: 'absolute',
+        top: 48,
+        zIndex: 100,
+        borderRadius: '0 0 25px 25px',
+        backgroundColor: changeAlpha(bubbleBg, 0.8),
+      }}
+    >
+      <ColorInput
+        title={t('textColor')}
+        color={textColor}
+        onChange={(color) => onChange({ textColor: color, bgColor })}
+      />
+      <ColorInput
+        title={t('backgroundColor')}
+        color={bgColor}
+        onChange={(color) => onChange({ bgColor: color, textColor })}
+      />
+    </div>
+  );
+};
+ColorWidget.propTypes = {
+  textColor: PropTypes.string.isRequired,
+  bgColor: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired,
+  t: PropTypes.func.isRequired,
+};
+
+
 /** Control text overlay settings  */
 const TextOverlaySettingsBubble = ({
   windowTextOverlayOptions, imageToolsEnabled, textsAvailable,
@@ -28,13 +182,7 @@ const TextOverlaySettingsBubble = ({
 
   const { palette } = useTheme();
   const bubbleBg = palette.shades.main;
-  // CSS voodoo to render a border with a margin on the top and bottom
   const bubbleFg = palette.getContrastText(bubbleBg);
-  const borderImageSource = 'linear-gradient('
-    + `to bottom, ${changeAlpha(bubbleFg, 0)}) 20%,`
-    + `${changeAlpha(bubbleFg, 0.2)} 20% 80%,`
-    + `${changeAlpha(bubbleFg, 0)} 80%`;
-  const borderRight = `1px solid ${changeAlpha(bubbleFg, 0.2)}`;
   const toggledBubbleBg = changeAlpha(bubbleFg, 0.25);
 
   if (!enabled || !textsAvailable) {
@@ -57,14 +205,7 @@ const TextOverlaySettingsBubble = ({
       {(open && !textsFetching)
       && (
       <>
-        <div style={{
-          borderImageSlice: 1,
-          borderImageSource,
-          borderRight,
-          display: 'inline-block',
-          paddingRight: 8,
-        }}
-        >
+        <ButtonContainer withBorder paddingRight={8}>
           <MiradorMenuButton
             aria-label={t('textSelect')}
             onClick={() => updateWindowTextOverlayOptions({
@@ -76,8 +217,8 @@ const TextOverlaySettingsBubble = ({
           >
             <TextSelectIcon />
           </MiradorMenuButton>
-        </div>
-        <div style={{ display: 'inline-block', paddingLeft: 8 }}>
+        </ButtonContainer>
+        <ButtonContainer paddingLeft={8}>
           <MiradorMenuButton
             aria-label={t('textVisible')}
             onClick={() => {
@@ -97,11 +238,8 @@ const TextOverlaySettingsBubble = ({
           >
             <TextIcon />
           </MiradorMenuButton>
-        </div>
-        <div style={{
-          display: 'inline-block',
-        }}
-        >
+        </ButtonContainer>
+        <ButtonContainer>
           <MiradorMenuButton
             id="text-opacity-slider-label"
             disabled={!visible}
@@ -117,45 +255,17 @@ const TextOverlaySettingsBubble = ({
           </MiradorMenuButton>
           {visible && showOpacitySlider
           && (
-          <div
-            data-test-id="text-opacity-slider"
-            id="text-opacity-slider"
-            aria-labelledby="text-opacity-slider-label"
-            className="MuiPaper-elevation4"
-            style={{
-              backgroundColor: changeAlpha(bubbleBg, 0.8),
-              borderRadius: '0px 0px 25px 25px',
-              height: '150px',
-              padding: '16px 8px 8px 8px',
-              position: 'absolute',
-              top: 48,
-              zIndex: 100,
-            }}
-          >
-            <Slider
-              orientation="vertical"
-              min={0}
-              max={100}
-              value={opacity * 100}
-              getAriaValueText={(value) => t('opacityCurrentValue', { value })}
-              onChange={(evt, val) => updateWindowTextOverlayOptions({
-                ...windowTextOverlayOptions,
-                opacity: val / 100.0,
-              })}
-            />
-          </div>
+          <OpacityWidget
+            t={t}
+            opacity={opacity}
+            onChange={(newOpacity) => updateWindowTextOverlayOptions({
+              ...windowTextOverlayOptions,
+              opacity: newOpacity,
+            })}
+          />
           )}
-        </div>
-        <div
-          style={{
-            display: 'inline-block',
-            paddingRight: 8,
-            // CSS voodoo to render a border with a margin on the top and bottom
-            borderImageSlice: 1,
-            borderImageSource,
-            borderRight,
-          }}
-        >
+        </ButtonContainer>
+        <ButtonContainer withBorder paddingRight={8}>
           <MiradorMenuButton
             id="color-picker-label"
             disabled={!visible}
@@ -171,87 +281,18 @@ const TextOverlaySettingsBubble = ({
           </MiradorMenuButton>
           {visible && showColorPicker
           && (
-          <div
-            className="MuiPaper-elevation4"
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              position: 'absolute',
-              top: 48,
-              zIndex: 100,
-              borderRadius: '0 0 25px 25px',
-              backgroundColor: changeAlpha(bubbleBg, 0.8),
-            }}
-          >
-            <label
-              style={{
-                width: 48,
-                height: 48,
-                padding: 8,
-                boxSizing: 'border-box',
-              }}
-            >
-              <div
-                title={t('textColor')}
-                className="MuiPaper-elevation2"
-                style={{
-                  display: 'inline-block',
-                  width: 32,
-                  height: 32,
-                  borderRadius: 16,
-                  backgroundColor: textColor,
-                }}
-              />
-              <input
-                type="color"
-                value={textColor}
-                style={{ display: 'none' }}
-                onChange={(evt) => updateWindowTextOverlayOptions({
-                  ...windowTextOverlayOptions,
-                  textColor: evt.target.value,
-                })}
-                onInput={(evt) => updateWindowTextOverlayOptions({
-                  ...windowTextOverlayOptions,
-                  textColor: evt.target.value,
-                })}
-              />
-            </label>
-            <label
-              style={{
-                width: 48,
-                height: 48,
-                padding: 8,
-                boxSizing: 'border-box',
-              }}
-            >
-              <div
-                title={t('backgroundColor')}
-                className="MuiPaper-elevation2"
-                style={{
-                  display: 'inline-block',
-                  width: 32,
-                  height: 32,
-                  borderRadius: 16,
-                  backgroundColor: bgColor,
-                }}
-              />
-              <input
-                type="color"
-                value={bgColor}
-                style={{ display: 'none' }}
-                onChange={(evt) => updateWindowTextOverlayOptions({
-                  ...windowTextOverlayOptions,
-                  bgColor: evt.target.value,
-                })}
-                onInput={(evt) => updateWindowTextOverlayOptions({
-                  ...windowTextOverlayOptions,
-                  bgColor: evt.target.value,
-                })}
-              />
-            </label>
-          </div>
+          <ColorWidget
+            t={t}
+            bgColor={bgColor}
+            textColor={textColor}
+            onChange={({ textColor: newText, bgColor: newBg }) => updateWindowTextOverlayOptions({
+              ...windowTextOverlayOptions,
+              bgColor: newBg,
+              textColor: newText,
+            })}
+          />
           )}
-        </div>
+        </ButtonContainer>
       </>
       )}
       {textsFetching

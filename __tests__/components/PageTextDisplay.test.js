@@ -38,6 +38,8 @@ function renderPage(props = {}, renderFn = render) {
       height={2970}
       source="http://example.com/page/1"
       lines={lineFixtures.withWords}
+      bgColor="#ffffff"
+      textColor="#000000"
       {...props}
     />
   );
