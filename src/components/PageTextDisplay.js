@@ -30,7 +30,6 @@ class PageTextDisplay extends React.Component {
     this.svgContainerRef.current.addEventListener('pointerdown', this.onPointerDown);
   }
 
-
   /** Only update the component when some of the props changed.
    *
    * Yes, this is a horrible, horrible, hack, that will bite us in the behind at
