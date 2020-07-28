@@ -93,13 +93,16 @@ OpacityWidget.propTypes = {
 };
 
 /** Input to select a color */
-const ColorInput = ({ color, onChange, title }) => (
+const ColorInput = ({
+  color, onChange, title, style,
+}) => (
   <label
     style={{
       width: 48,
       height: 48,
       padding: 8,
       boxSizing: 'border-box',
+      ...style,
     }}
   >
     <div
@@ -126,6 +129,11 @@ ColorInput.propTypes = {
   color: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
   title: PropTypes.string.isRequired,
+  // eslint-disable-next-line react/forbid-prop-types
+  style: PropTypes.object,
+};
+ColorInput.defaultProps = {
+  style: {},
 };
 
 /** Widget to update text and background color */
@@ -151,11 +159,21 @@ const ColorWidget = ({
         title={t('textColor')}
         color={textColor}
         onChange={(color) => onChange({ textColor: color, bgColor })}
+        style={{
+          height: 40,
+          padding: '8px 8px 0px 8px',
+        }}
       />
       <ColorInput
         title={t('backgroundColor')}
         color={bgColor}
         onChange={(color) => onChange({ bgColor: color, textColor })}
+        style={{
+          marginTop: -6,
+          zIndex: -5,
+          height: 40,
+          padding: '0px 8px 8px 8px',
+        }}
       />
     </div>
   );

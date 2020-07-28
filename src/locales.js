@@ -21,6 +21,6 @@ export default {
     textVisible: 'Text Visible',
     colorPicker: 'Color Picker',
     textColor: 'Text Color',
-    backgroundColor: 'Line Backgrouund Color',
+    backgroundColor: 'Line Background Color',
   },
 };
