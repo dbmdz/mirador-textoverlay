@@ -31,7 +31,7 @@ class MiradorTextOverlay extends Component {
   /** Register OpenSeadragon callback when viewport changes */
   componentDidUpdate(prevProps) {
     const {
-      enabled, viewer, opacity, pageTexts, textColor, bgColor,
+      enabled, viewer, opacity, pageTexts, textColor, bgColor, useAutoColors,
     } = this.props;
 
     // OSD instance becomes available, register callback
@@ -49,12 +49,29 @@ class MiradorTextOverlay extends Component {
     }
 
     // Manually update SVG colors for performance reasons
+    // eslint-disable-next-line require-jsdoc
+    const hasPageColors = (text) => text.textColor !== undefined;
     if (opacity !== prevProps.opacity
         || bgColor !== prevProps.bgColor
-        || textColor !== prevProps.textColor) {
-      this.renderRefs
-        .filter((ref) => ref.current != null)
-        .forEach((ref) => ref.current.updateColors(textColor, bgColor, opacity));
+        || textColor !== prevProps.textColor
+        || useAutoColors !== prevProps.useAutoColors
+        || (pageTexts.filter(hasPageColors).length
+            !== prevProps.pageTexts.filter(hasPageColors).length)) {
+      this.renderRefs.forEach((ref, idx) => {
+        if (!ref.current) {
+          return;
+        }
+        let fg = textColor;
+        let bg = bgColor;
+        if (useAutoColors) {
+          const { textColor: newFg, bgColor: newBg } = pageTexts[idx];
+          if (newFg) {
+            fg = newFg;
+            bg = newBg;
+          }
+        }
+        ref.current.updateColors(fg, bg, opacity);
+      });
     }
   }
 
@@ -114,7 +131,7 @@ class MiradorTextOverlay extends Component {
   /** Render the text overlay SVG */
   render() {
     const {
-      pageTexts, selectable, visible, viewer, opacity, textColor, bgColor,
+      pageTexts, selectable, visible, viewer, opacity, textColor, bgColor, useAutoColors,
     } = this.props;
     if (!this.shouldRender() || !viewer || !pageTexts) {
       return null;
@@ -124,6 +141,7 @@ class MiradorTextOverlay extends Component {
         {pageTexts
           .map(({
             lines, source, width: pageWidth, height: pageHeight,
+            textColor: pageFg, bgColor: pageBg,
           }, idx) => {
             if (!this.shouldRenderPage({ lines })) {
               return null;
@@ -141,6 +159,8 @@ class MiradorTextOverlay extends Component {
                 height={pageHeight}
                 textColor={textColor}
                 bgColor={bgColor}
+                useAutoColors={useAutoColors}
+                pageColors={pageFg ? { textColor: pageFg, bgColor: pageBg } : undefined}
               />
             );
           })}
@@ -160,6 +180,7 @@ MiradorTextOverlay.propTypes = {
   visible: PropTypes.bool,
   textColor: PropTypes.string,
   bgColor: PropTypes.string,
+  useAutoColors: PropTypes.bool,
 };
 
 MiradorTextOverlay.defaultProps = {
@@ -172,6 +193,7 @@ MiradorTextOverlay.defaultProps = {
   visible: false,
   textColor: '#000000',
   bgColor: '#ffffff',
+  useAutoColors: true,
 };
 
 export default MiradorTextOverlay;

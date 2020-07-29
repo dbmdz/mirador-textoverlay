@@ -98,6 +98,7 @@ class PageTextDisplay extends React.Component {
   render() {
     const {
       selectable, visible, lines, width: pageWidth, height: pageHeight, opacity, textColor, bgColor,
+      useAutoColors, pageColors,
     } = this.props;
 
     const containerStyle = {
@@ -112,9 +113,16 @@ class PageTextDisplay extends React.Component {
       height: pageHeight,
       cursor: selectable ? undefined : 'default',
     };
+    let fg = textColor;
+    let bg = bgColor;
+    if (useAutoColors && pageColors) {
+      fg = pageColors.textColor;
+      bg = pageColors.bgColor;
+    }
+
     const renderOpacity = (!visible && selectable) ? 0 : opacity;
-    const boxStyle = { fill: changeAlpha(bgColor, renderOpacity) };
-    const textStyle = { fill: changeAlpha(textColor, renderOpacity) };
+    const boxStyle = { fill: changeAlpha(bg, renderOpacity) };
+    const textStyle = { fill: changeAlpha(fg, renderOpacity) };
     const renderLines = lines.filter((l) => l.width > 0 && l.height > 0);
 
     /* Firefox/Gecko does not currently support the lengthAdjust parameter on
@@ -209,11 +217,17 @@ PageTextDisplay.propTypes = {
   opacity: PropTypes.number.isRequired,
   textColor: PropTypes.string.isRequired,
   bgColor: PropTypes.string.isRequired,
+  useAutoColors: PropTypes.bool.isRequired,
   width: PropTypes.number.isRequired,
   height: PropTypes.number.isRequired,
   // eslint-disable-next-line react/forbid-prop-types
   lines: PropTypes.array.isRequired,
   source: PropTypes.string.isRequired,
+  // eslint-disable-next-line react/forbid-prop-types
+  pageColors: PropTypes.object,
+};
+PageTextDisplay.defaultProps = {
+  pageColors: undefined,
 };
 
 export default PageTextDisplay;

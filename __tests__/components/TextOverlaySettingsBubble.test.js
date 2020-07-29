@@ -43,25 +43,33 @@ jest.mock('@material-ui/core/Slider', () => (props) => {
 });
 
 /** Render a bubble to the testing screen */
-function renderBubble(props = {}) {
+function renderBubble(props = {}, renderFn = render) {
   const updateOptionsMock = jest.fn();
   const options = {
     enabled: true,
     opacity: 1,
     selectable: false,
     visible: false,
+    textColor: '#000000',
+    bgColor: '#ffffff',
+    useAutoColors: false,
     ...(props.windowTextOverlayOptions ?? {}),
   };
-  render(<TextOverlaySettingsBubble
+  const pageColors = [
+    { textColor: '#111111', bgColor: '#eeeeee' },
+    { textColor: '#222222', bgColor: '#dddddd' },
+  ];
+  const { rerender } = renderFn(<TextOverlaySettingsBubble
     imageToolsEnabled={false}
     t={(key) => key}
     textsAvailable
     textsFetching={false}
     updateWindowTextOverlayOptions={updateOptionsMock}
+    pageColors={pageColors}
     {...props}
     windowTextOverlayOptions={options}
   />);
-  return { options, updateOptionsMock };
+  return { rerender, options, updateOptionsMock };
 }
 
 describe('TextOverlaySettingsBubble', () => {
@@ -205,7 +213,7 @@ describe('TextOverlaySettingsBubble', () => {
       .toHaveStyle('top: 66px');
   });
 
-  it('should be closed, disabled and surrounded by a progress bar when texts are fetching', () => {
+  it('should be closed, disabled and surrounded by a progress spinner when texts are fetching', () => {
     renderBubble({ textsFetching: true, visible: true });
     expect(screen.getByRole('progressbar')).toBeVisible();
     expect(screen.getByLabelText('expandTextOverlayOptions')).toBeVisible();
@@ -213,5 +221,95 @@ describe('TextOverlaySettingsBubble', () => {
     expect(screen.queryByLabelText('textSelect')).toBeNull();
     expect(screen.queryByLabelText('textVisible')).toBeNull();
     expect(screen.queryByLabelText('textOpacity')).toBeNull();
+  });
+
+  it('should allow manually setting the foreground and background colors', () => {
+    const { options, updateOptionsMock } = renderBubble(
+      { windowTextOverlayOptions: { visible: true, textColor: '#bbbbbb', bgColor: '#444444' } },
+    );
+    fireEvent.click(screen.getByLabelText('colorPicker'));
+
+    expect(screen.queryByLabelText('resetTextColors')).not.toBeDisabled();
+
+    const textLabel = screen.getByTitle('textColor');
+    const textInput = textLabel.nextElementSibling;
+    expect(textLabel).toHaveStyle({ 'background-color': '#bbbbbb' });
+    expect(textInput).toHaveValue('#bbbbbb');
+    fireEvent.input(textInput, { target: { value: '#cccccc' } });
+    expect(updateOptionsMock).toHaveBeenCalledWith({ ...options, textColor: '#cccccc' });
+    fireEvent.change(textInput, { target: { value: '#dddddd' } });
+    expect(updateOptionsMock).toHaveBeenCalledWith({ ...options, textColor: '#dddddd' });
+
+    const bgLabel = screen.getByTitle('backgroundColor');
+    const bgInput = bgLabel.nextElementSibling;
+    expect(bgLabel).toHaveStyle({ 'background-color': '#444444' });
+    expect(bgInput).toHaveValue('#444444');
+  });
+
+  it('should not render the auto-color button if no page colors are available', () => {
+    renderBubble({
+      windowTextOverlayOptions: { visible: true },
+      pageColors: [undefined, undefined],
+    });
+    fireEvent.click(screen.getByLabelText('colorPicker'));
+    expect(screen.queryByLabelText('resetTextColors')).toBeNull();
+  });
+
+  it('should disable auto-color reset and render gradients in the pickers if auto colors are being used', () => {
+    renderBubble({ windowTextOverlayOptions: { visible: true, useAutoColors: true } });
+    fireEvent.click(screen.getByLabelText('colorPicker'));
+    expect(screen.queryByLabelText('resetTextColors')).toBeNull();
+    const textLabel = screen.getByTitle('textColor');
+    // This will fail due to a jsdom bug, unfortunately :-/
+    // https://github.com/jsdom/jsdom/issues/2166
+    // expect(textLabel).toHaveStyle({
+    //  'background-image': 'linear-gradient(90deg, #111111 50%, #222222 50%)',
+    // });
+    // Text color should be the first pages' auto textColor
+    const textInput = textLabel.nextElementSibling;
+    expect(textInput).toHaveValue('#111111');
+    // Same for the backgroundColor
+    expect(screen.getByTitle('backgroundColor').nextElementSibling).toHaveValue('#eeeeee');
+  });
+
+  it('should disable auto-colors if colors are manually selected', () => {
+    const { updateOptionsMock, options } = renderBubble(
+      { windowTextOverlayOptions: { visible: true, useAutoColors: true } },
+    );
+    fireEvent.click(screen.getByLabelText('colorPicker'));
+    const textLabel = screen.getByTitle('backgroundColor');
+    const textInput = textLabel.nextElementSibling;
+    fireEvent.change(textInput, { target: { value: '#deadbe' } });
+    expect(updateOptionsMock).toHaveBeenCalledWith({
+      ...options,
+      bgColor: '#deadbe',
+      useAutoColors: false,
+    });
+  });
+
+  it('should not disable auto-colors if manual color selection is canceled', () => {
+    const { updateOptionsMock } = renderBubble(
+      { windowTextOverlayOptions: { visible: true, useAutoColors: true } },
+    );
+    fireEvent.click(screen.getByLabelText('colorPicker'));
+    const textLabel = screen.getByTitle('backgroundColor');
+    const textInput = textLabel.nextElementSibling;
+    // Color is the same as the fixture auto backgroundColor
+    fireEvent.change(textInput, { target: { value: '#eeeeee' } });
+    expect(updateOptionsMock).not.toHaveBeenCalled();
+  });
+
+  it('should reset the colors to auto if the colors were manipulated and the reset button is clicked', () => {
+    const { updateOptionsMock, options } = renderBubble(
+      { windowTextOverlayOptions: { visible: true } },
+    );
+    fireEvent.click(screen.getByLabelText('colorPicker'));
+    fireEvent.click(screen.getByLabelText('resetTextColors'));
+    expect(updateOptionsMock).toHaveBeenCalledWith({
+      ...options,
+      useAutoColors: true,
+      textColor: '#111111',
+      bgColor: '#eeeeee',
+    });
   });
 });

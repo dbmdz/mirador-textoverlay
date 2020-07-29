@@ -1,19 +1,24 @@
 import { select, call } from 'redux-saga/effects';
 import { expectSaga } from 'redux-saga-test-plan';
 import { throwError } from 'redux-saga-test-plan/providers';
-import { getWindowConfig, getCanvases, getVisibleCanvases } from 'mirador/dist/es/src/state/selectors';
-
-import { receiveAnnotation } from 'mirador/dist/es/src/state/actions';
 import {
-  discoveredText, requestText, receiveText, receiveTextFailure,
+  getWindowConfig, getCanvases, getVisibleCanvases, selectInfoResponse,
+} from 'mirador/dist/es/src/state/selectors';
+import { receiveAnnotation } from 'mirador/dist/es/src/state/actions';
+import ActionTypes from 'mirador/dist/es/src/state/actions/action-types';
+import { Canvas } from 'manifesto.js';
+
+import {
+  discoveredText, requestText, receiveText, receiveTextFailure, requestColors, receiveColors,
 } from '../../src/state/actions';
 import {
   discoverExternalOcr, fetchAndProcessOcr, fetchOcrMarkup,
   fetchExternalAnnotationResources, fetchAnnotationResource,
-  processTextsFromAnnotations, onConfigChange,
+  processTextsFromAnnotations, onConfigChange, fetchColors,
 } from '../../src/state/sagas';
 import { getTexts, getTextsForVisibleCanvases } from '../../src/state/selectors';
 import { parseOcr, parseIiifAnnotations } from '../../src/lib/ocrFormats';
+import { getLineColors } from '../../src/lib/color';
 
 const canvasSize = {
   height: 1000,
@@ -29,26 +34,52 @@ describe('Discovering external OCR resources', () => {
     },
   };
   const canvases = [
-    {
-      __jsonld: {
-        ...canvasSize,
-        seeAlso: {
-          '@id': 'http://example.com/ocr/canvasA',
-          format: 'application/xml+alto',
-        },
+    new Canvas({
+      '@id': 'canvasA',
+      ...canvasSize,
+      seeAlso: {
+        '@id': 'http://example.com/ocr/canvasA',
+        format: 'application/xml+alto',
       },
-      id: 'canvasA',
-    },
-    {
-      __jsonld: {
-        ...canvasSize,
-        seeAlso: {
-          '@id': 'http://example.com/ocr/canvasB',
-          format: 'text/vnd.hocr+html',
+      images: [{
+        '@type': 'oa:Annotation',
+        motivation: 'sc:painting',
+        resource: {
+          '@id': 'http://example.com/canvas/canvasA',
+          '@type': 'dctypes:Image',
+          format: 'image/jpeg',
+          ...canvasSize,
+          service: {
+            '@context': 'http://iiif.io/api/image/2/context.json',
+            '@id': 'http://example.com/iiif/image/canvasA',
+            profile: 'http://iiif.io/api/image/2/level1.json',
+          },
         },
+      }],
+    }),
+    new Canvas({
+      ...canvasSize,
+      '@id': 'canvasB',
+      seeAlso: {
+        '@id': 'http://example.com/ocr/canvasB',
+        format: 'text/vnd.hocr+html',
       },
-      id: 'canvasB',
-    },
+      images: [{
+        '@type': 'oa:Annotation',
+        motivation: 'sc:painting',
+        resource: {
+          '@id': 'http://example.com/canvas/canvasB',
+          '@type': 'dctypes:Image',
+          format: 'image/jpeg',
+          ...canvasSize,
+          service: {
+            '@context': 'http://iiif.io/api/image/2/context.json',
+            '@id': 'http://example.com/iiif/image/canvasB',
+            profile: 'http://iiif.io/api/image/2/level1.json',
+          },
+        },
+      }],
+    }),
   ];
   const windowId = '31337';
 
@@ -107,6 +138,21 @@ describe('Discovering external OCR resources', () => {
         expect(effects.select).toHaveLength(1);
         expect(effects.put).toBeUndefined();
       }));
+
+  it('should request colors for each canvas with an associated resource',
+    () => expectSaga(
+      discoverExternalOcr,
+      { visibleCanvases: ['canvasA', 'canvasB'], windowId },
+    ).provide([
+      [select(getWindowConfig, { windowId }), windowConfig],
+      [select(getCanvases, { windowId }), canvases],
+      [select(getTexts), {}],
+    ])
+      .put(discoveredText('canvasA', 'http://example.com/ocr/canvasA'))
+      .put(discoveredText('canvasB', 'http://example.com/ocr/canvasB'))
+      .put(requestColors('canvasA', 'http://example.com/iiif/image/canvasA'))
+      .put(requestColors('canvasB', 'http://example.com/iiif/image/canvasB'))
+      .run());
 });
 
 describe('Fetching and processing external OCR', () => {
@@ -287,5 +333,47 @@ describe('Reacting to configuration changes', () => {
       .run().then(({ effects }) => {
         expect(effects.select).toBeUndefined();
         expect(effects.call).toBeUndefined();
+      }));
+});
+
+describe('Fetching page colors', () => {
+  const targetId = 'canvasA';
+  const infoId = 'http://example.com/iiif/image/canvasA';
+  it('should immediately trigger a fetch if info response is available',
+    () => expectSaga(fetchColors, { targetId, infoId })
+      .provide([
+        [select(selectInfoResponse, { infoId }), { id: infoId }],
+        [call(getLineColors, infoId), { textColor: '#abcdef', bgColor: '#fedcba' }],
+      ])
+      .put(receiveColors(targetId, '#abcdef', '#fedcba'))
+      .run());
+
+  it('should wait for info response reception if it is initially unavailable',
+    () => expectSaga(fetchColors, { targetId, infoId })
+      .provide([
+        [select(selectInfoResponse, { infoId }), undefined],
+        [call(getLineColors, infoId), { textColor: '#abcdef', bgColor: '#fedcba' }],
+      ])
+      .dispatch({
+        type: ActionTypes.RECEIVE_INFO_RESPONSE,
+        infoId,
+        infoJson: { '@id': infoId },
+      })
+      .put(receiveColors(targetId, '#abcdef', '#fedcba'))
+      .run());
+
+  it('should not do anything if the info response reception has failed',
+    () => expectSaga(fetchColors, { targetId, infoId })
+      .provide([
+        [select(selectInfoResponse, { infoId }), undefined],
+      ])
+      .dispatch({
+        type: ActionTypes.RECEIVE_INFO_RESPONSE_FAILURE,
+        infoId,
+      })
+      .run()
+      .then(({ effects }) => {
+        expect(effects.call).toBeUndefined();
+        expect(effects.put).toBeUndefined();
       }));
 });

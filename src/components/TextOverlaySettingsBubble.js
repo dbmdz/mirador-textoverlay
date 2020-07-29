@@ -8,10 +8,11 @@ import CloseIcon from '@material-ui/icons/Close';
 import SubjectIcon from '@material-ui/icons/Subject';
 import OpacityIcon from '@material-ui/icons/Opacity';
 import PaletteIcon from '@material-ui/icons/Palette';
+import ResetColorsIcon from '@material-ui/icons/SettingsBackupRestore';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import useTheme from '@material-ui/core/styles/useTheme';
 
-import { changeAlpha } from '../lib/color';
+import { changeAlpha, toHexRgb } from '../lib/color';
 import TextSelectIcon from './TextSelectIcon';
 
 
@@ -92,9 +93,25 @@ OpacityWidget.propTypes = {
   t: PropTypes.func.isRequired,
 };
 
+/** Get the styles to render the automatically determined color(s) */
+function getAutoColorStyle(manualColor, colors) {
+  if (!colors) {
+    return {};
+  }
+  const validColors = colors.filter((c) => c);
+  if (validColors.length !== 2) {
+    return {
+      backgroundColor: validColors?.[0] ?? manualColor,
+    };
+  }
+  return {
+    backgroundImage: `linear-gradient(90deg, ${colors[0] ?? manualColor} 50%, ${colors[1] ?? manualColor} 50%)`,
+  };
+}
+
 /** Input to select a color */
 const ColorInput = ({
-  color, onChange, title, style,
+  color, onChange, title, style, autoColors,
 }) => (
   <label
     style={{
@@ -114,11 +131,12 @@ const ColorInput = ({
         height: 32,
         borderRadius: 16,
         backgroundColor: color,
+        ...getAutoColorStyle(color, autoColors),
       }}
     />
     <input
       type="color"
-      value={color}
+      value={toHexRgb((autoColors && autoColors[0]) ? autoColors[0] : color)}
       style={{ display: 'none' }}
       onChange={(evt) => onChange(evt.target.value)}
       onInput={(evt) => onChange(evt.target.value)}
@@ -131,17 +149,24 @@ ColorInput.propTypes = {
   title: PropTypes.string.isRequired,
   // eslint-disable-next-line react/forbid-prop-types
   style: PropTypes.object,
+  autoColors: PropTypes.arrayOf(PropTypes.string),
 };
 ColorInput.defaultProps = {
   style: {},
+  autoColors: undefined,
 };
 
 /** Widget to update text and background color */
 const ColorWidget = ({
-  textColor, bgColor, onChange, t,
+  textColor, bgColor, onChange, t, pageColors, useAutoColors,
 }) => {
   const { palette } = useTheme();
   const bubbleBg = palette.shades.main;
+  const showResetButton = (
+    !useAutoColors
+    && pageColors
+    && pageColors.some((c) => c && (c.textColor || c.bgColor))
+  );
   return (
     <div
       className="MuiPaper-elevation4"
@@ -155,19 +180,54 @@ const ColorWidget = ({
         backgroundColor: changeAlpha(bubbleBg, 0.8),
       }}
     >
+      {showResetButton && (
+      <MiradorMenuButton
+        aria-label={t('resetTextColors')}
+        onClick={() => onChange({
+          useAutoColors: true,
+          textColor: pageColors.map((cs) => cs.textColor).filter((x) => x)[0] ?? textColor,
+          bgColor: pageColors.map((cs) => cs.bgColor).filter((x) => x)[0] ?? bgColor,
+        })}
+        disabled={useAutoColors}
+      >
+        <ResetColorsIcon />
+      </MiradorMenuButton>
+      )}
       <ColorInput
         title={t('textColor')}
+        autoColors={useAutoColors
+          ? pageColors.map((colors) => colors.textColor)
+          : undefined}
         color={textColor}
-        onChange={(color) => onChange({ textColor: color, bgColor })}
+        onChange={(color) => {
+          // Lackluster way to check if selection was canceled: The chance of users picking
+          // the exact same colors as the autodetected one is extremely slim, so if we get that,
+          // the user probably aborted the color picking and we don't have to update the color
+          // settings.
+          if (useAutoColors && color === toHexRgb(pageColors?.[0]?.bgColor)) {
+            return;
+          }
+          onChange({ textColor: color, bgColor, useAutoColors: false });
+        }}
         style={{
           height: 40,
           padding: '8px 8px 0px 8px',
+          marginTop: showResetButton ? -12 : undefined,
         }}
       />
       <ColorInput
         title={t('backgroundColor')}
         color={bgColor}
-        onChange={(color) => onChange({ bgColor: color, textColor })}
+        autoColors={useAutoColors
+          ? pageColors.map((colors) => colors.bgColor)
+          : undefined}
+        onChange={(color) => {
+          // See comment on previous ColorInput onChange callback
+          if (useAutoColors && color === toHexRgb(pageColors?.[0]?.bgColor)) {
+            return;
+          }
+          onChange({ bgColor: color, textColor, useAutoColors: false });
+        }}
         style={{
           marginTop: -6,
           zIndex: -5,
@@ -183,16 +243,22 @@ ColorWidget.propTypes = {
   bgColor: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
   t: PropTypes.func.isRequired,
+  useAutoColors: PropTypes.bool.isRequired,
+  pageColors: PropTypes.arrayOf(
+    PropTypes.shape({
+      textColor: PropTypes.string, bgColor: PropTypes.string,
+    }),
+  ).isRequired,
 };
 
 
 /** Control text overlay settings  */
 const TextOverlaySettingsBubble = ({
   windowTextOverlayOptions, imageToolsEnabled, textsAvailable,
-  textsFetching, updateWindowTextOverlayOptions, t,
+  textsFetching, updateWindowTextOverlayOptions, t, pageColors,
 }) => {
   const {
-    enabled, visible, selectable, opacity, textColor, bgColor,
+    enabled, visible, selectable, opacity, textColor, bgColor, useAutoColors,
   } = windowTextOverlayOptions;
   const [open, setOpen] = useState(enabled && (visible || selectable));
   const [showOpacitySlider, setShowOpacitySlider] = useState(false);
@@ -303,10 +369,11 @@ const TextOverlaySettingsBubble = ({
             t={t}
             bgColor={bgColor}
             textColor={textColor}
-            onChange={({ textColor: newText, bgColor: newBg }) => updateWindowTextOverlayOptions({
+            pageColors={pageColors}
+            useAutoColors={useAutoColors}
+            onChange={(newOpts) => updateWindowTextOverlayOptions({
               ...windowTextOverlayOptions,
-              bgColor: newBg,
-              textColor: newText,
+              ...newOpts,
             })}
           />
           )}
@@ -336,6 +403,11 @@ TextOverlaySettingsBubble.propTypes = {
   updateWindowTextOverlayOptions: PropTypes.func.isRequired,
   // eslint-disable-next-line react/forbid-prop-types
   windowTextOverlayOptions: PropTypes.object.isRequired,
+  pageColors: PropTypes.arrayOf(
+    PropTypes.shape({
+      textColor: PropTypes.string, bgColor: PropTypes.string,
+    }),
+  ).isRequired,
 };
 
 export default TextOverlaySettingsBubble;

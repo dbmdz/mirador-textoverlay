@@ -56,6 +56,15 @@ export const textsReducer = (state = {}, action) => {
           sourceType: action.sourceType,
         },
       };
+    case PluginActionTypes.RECEIVE_COLORS:
+      return {
+        ...state,
+        [action.targetId]: {
+          ...state[action.targetId],
+          bgColor: action.bgColor,
+          textColor: action.textColor,
+        },
+      };
     default: return state;
   }
 };

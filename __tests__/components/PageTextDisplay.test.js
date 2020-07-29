@@ -40,6 +40,7 @@ function renderPage(props = {}, renderFn = render) {
       lines={lineFixtures.withWords}
       bgColor="#ffffff"
       textColor="#000000"
+      useAutoColors={false}
       {...props}
     />
   );
@@ -160,5 +161,20 @@ describe('PageTextDisplay', () => {
     global.navigator.userAgent = prevAgent;
     const word = screen.getByText('firstWord');
     expect(word).toHaveAttribute('textLength', '198');
+  });
+
+  it('should use automatically determined colors for the initial render if available and enabled', () => {
+    const pageColors = { textColor: '#111111', bgColor: '#eeeeee' };
+    renderPage({ useAutoColors: true, pageColors });
+    const firstLine = screen.getByText(svgTextMatcher('a firstWord on a line'));
+    expect(firstLine).toHaveAttribute('style', 'fill: rgba(17, 17, 17, 0.75);');
+    expect(firstLine.previousElementSibling).toHaveAttribute('style', 'fill: rgba(238, 238, 238, 0.75);');
+  });
+
+  it('should use hardcoded colors for the initial render if enabled, but not available', () => {
+    renderPage({ useAutoColors: true, pageColors: undefined });
+    const firstLine = screen.getByText(svgTextMatcher('a firstWord on a line'));
+    expect(firstLine).toHaveAttribute('style', 'fill: rgba(0, 0, 0, 0.75);');
+    expect(firstLine.previousElementSibling).toHaveAttribute('style', 'fill: rgba(255, 255, 255, 0.75);');
   });
 });
