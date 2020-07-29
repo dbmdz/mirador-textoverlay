@@ -15,10 +15,11 @@ import {
   discoverExternalOcr, fetchAndProcessOcr, fetchOcrMarkup,
   fetchExternalAnnotationResources, fetchAnnotationResource,
   processTextsFromAnnotations, onConfigChange, fetchColors,
+  loadImageData,
 } from '../../src/state/sagas';
 import { getTexts, getTextsForVisibleCanvases } from '../../src/state/selectors';
 import { parseOcr, parseIiifAnnotations } from '../../src/lib/ocrFormats';
-import { getLineColors } from '../../src/lib/color';
+import { getPageColors } from '../../src/lib/color';
 
 const canvasSize = {
   height: 1000,
@@ -343,7 +344,8 @@ describe('Fetching page colors', () => {
     () => expectSaga(fetchColors, { targetId, infoId })
       .provide([
         [select(selectInfoResponse, { infoId }), { id: infoId }],
-        [call(getLineColors, infoId), { textColor: '#abcdef', bgColor: '#fedcba' }],
+        [call(loadImageData, `${infoId}/full/200,/0/default.jpg`), 'data'],
+        [call(getPageColors, 'data'), { textColor: '#abcdef', bgColor: '#fedcba' }],
       ])
       .put(receiveColors(targetId, '#abcdef', '#fedcba'))
       .run());
@@ -352,7 +354,8 @@ describe('Fetching page colors', () => {
     () => expectSaga(fetchColors, { targetId, infoId })
       .provide([
         [select(selectInfoResponse, { infoId }), undefined],
-        [call(getLineColors, infoId), { textColor: '#abcdef', bgColor: '#fedcba' }],
+        [call(loadImageData, `${infoId}/full/200,/0/default.jpg`), 'data'],
+        [call(getPageColors, 'data'), { textColor: '#abcdef', bgColor: '#fedcba' }],
       ])
       .dispatch({
         type: ActionTypes.RECEIVE_INFO_RESPONSE,

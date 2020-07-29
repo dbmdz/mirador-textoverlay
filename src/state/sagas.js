@@ -19,7 +19,7 @@ import {
 import { getTexts, getTextsForVisibleCanvases } from './selectors';
 import translations from '../locales';
 import { parseIiifAnnotations, parseOcr } from '../lib/ocrFormats';
-import { getLineColors } from '../lib/color';
+import { getPageColors } from '../lib/color';
 
 const charFragmentPattern = /^(.+)#char=(\d+),(\d+)$/;
 
@@ -184,6 +184,22 @@ export function* injectTranslations() {
   }));
 }
 
+/** Load image data for image */
+export async function loadImageData(imgUrl) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = 'Anonymous';
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+      resolve(ctx.getImageData(0, 0, img.width, img.height).data);
+    };
+    img.onerror = reject;
+    img.src = imgUrl;
+  });
+}
+
 /** Try to determine text and background color for the target */
 export function* fetchColors({ targetId, infoId }) {
   const infoResp = yield select(selectInfoResponse, { infoId });
@@ -203,7 +219,11 @@ export function* fetchColors({ targetId, infoId }) {
     serviceId = infoSuccess.infoJson?.['@id'];
   }
   try {
-    const { textColor, bgColor } = yield call(getLineColors, serviceId);
+    // FIXME: This assumes a Level 2 endpoint, we should probably use one of the sizes listed
+    //        explicitely in the info response instead.
+    const imgUrl = `${serviceId}/full/200,/0/default.jpg`;
+    const imgData = yield call(loadImageData, imgUrl);
+    const { textColor, bgColor } = yield call(getPageColors, imgData);
     yield put(receiveColors(targetId, textColor, bgColor));
   } catch (error) {
     console.error(error);

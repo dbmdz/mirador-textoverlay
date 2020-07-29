@@ -43,34 +43,14 @@ export function toHexRgb(rgbColor) {
     .join('');
 }
 
-/** Load image data for image */
-async function loadImage(imgUrl) {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.crossOrigin = 'Anonymous';
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0);
-      resolve(ctx.getImageData(0, 0, img.width, img.height).data);
-    };
-    img.onerror = reject;
-    img.src = imgUrl;
-  });
-}
-
 /** Determine foreground and background color from text image. */
-export async function getLineColors(imageService) {
-  // FIXME: This assumes a Level 2 endpoint, we should probably use one of the sizes listed
-  //        explicitely in the info response instead.
-  const imgUrl = `${imageService}/full/200,/0/default.jpg`;
-  const data = await loadImage(imgUrl);
+export function getPageColors(imgData) {
   const colors = {};
   // Data is a flat array containing the image pixels as uint8 RGBA values in the range [0, 255]
-  for (let i = 0; i < data.length - 3; i += 4) {
-    const r = data[i];
-    const g = data[i + 1];
-    const b = data[i + 2];
+  for (let i = 0; i < imgData.length - 3; i += 4) {
+    const r = imgData[i];
+    const g = imgData[i + 1];
+    const b = imgData[i + 2];
     const rgb = `rgb(${r},${g},${b})`;
     colors[rgb] = (colors[rgb] ?? 0) + 1;
   }
@@ -78,6 +58,9 @@ export async function getLineColors(imageService) {
   // the next most frequent color is the background. This can and should probably be tweaked
   // with some heuristics in the future (converting to HSL seems worthwhile), but it's good
   // enough for now.
+  // FIXME: Testing with a cairo-backed canvas revelead that this approach relies a lot on
+  //        the implementations in Firefox and Chrome, i.e. we got lucky. Needs more work
+  //        to be more reliable and testable!
   const [textColor, bgColor] = Object.entries(colors)
     .sort((a, b) => b[1] - a[1])
     .slice(0, 2)
