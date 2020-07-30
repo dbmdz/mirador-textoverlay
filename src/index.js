@@ -36,14 +36,24 @@ export default [
         updateWindow(windowId, { textOverlay: options }),
       ),
     }),
-    mapStateToProps: (state, { windowId }) => ({
-      imageToolsEnabled: getWindowConfig(state, { windowId }).imageToolsEnabled ?? false,
-      textsAvailable: getTextsForVisibleCanvases(state, { windowId }).length > 0,
-      textsFetching: getTextsForVisibleCanvases(state, { windowId }).some((t) => t.isFetching),
-      pageColors: getTextsForVisibleCanvases(state, { windowId })
-        .map(({ textColor, bgColor }) => ({ textColor, bgColor })),
-      windowTextOverlayOptions: getWindowTextOverlayOptions(state, { windowId }),
-    }),
+    mapStateToProps: (state, { windowId, PluginComponents }) => {
+      // Check if mirador-image-tools plugin is available. We can't rely on the presence of
+      // the `imageToolsEnabled` window option, since the plugin is currently enabled by default,
+      // even in the absence of the option.
+      // FIXME: This should be removed once ProjectMirador/mirador-image-tools#23 is merged
+      const imageToolsPresent = PluginComponents
+        .filter(({ WrappedComponent: { name } }) => name === 'MiradorImageTools')
+        .length > 0;
+      const { imageToolsEnabled } = getWindowConfig(state, { windowId });
+      return {
+        imageToolsEnabled: imageToolsEnabled ?? imageToolsPresent,
+        textsAvailable: getTextsForVisibleCanvases(state, { windowId }).length > 0,
+        textsFetching: getTextsForVisibleCanvases(state, { windowId }).some((t) => t.isFetching),
+        pageColors: getTextsForVisibleCanvases(state, { windowId })
+          .map(({ textColor, bgColor }) => ({ textColor, bgColor })),
+        windowTextOverlayOptions: getWindowTextOverlayOptions(state, { windowId }),
+      };
+    },
     mode: 'add',
     target: 'OpenSeadragonViewer',
   },
