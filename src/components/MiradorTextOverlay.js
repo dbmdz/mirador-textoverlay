@@ -89,23 +89,24 @@ class MiradorTextOverlay extends Component {
     const vpBounds = viewer.viewport.getBounds(true);
     const viewportZoom = viewer.viewport.getZoom(true);
     if (this.containerRef.current) {
+      const { clientWidth: containerWidth, clientHeight: containerHeight } = viewer.container;
       const flip = viewer.viewport.getFlip();
       const rotation = viewer.viewport.getRotation();
       const transforms = [];
       if (flip) {
-        transforms.push(`translate(${viewer.container.clientWidth}px, 0px)`);
+        transforms.push(`translate(${containerWidth}px, 0px)`);
         transforms.push('scale(-1, 1)');
       }
       if (rotation !== 0) {
         switch (rotation) {
           case 90:
-            transforms.push(`translate(${viewer.container.clientWidth}px, 0px)`);
+            transforms.push(`translate(${containerWidth}px, 0px)`);
             break;
           case 180:
-            transforms.push(`translate(${viewer.container.clientWidth}px, ${viewer.container.clientHeight}px)`);
+            transforms.push(`translate(${containerWidth}px, ${containerHeight}px)`);
             break;
           case 270:
-            transforms.push(`translate(0px, ${viewer.container.clientHeight}px)`);
+            transforms.push(`translate(0px, ${containerHeight}px)`);
             break;
           default:
             console.error(`Unsupported rotation: ${rotation}`);
