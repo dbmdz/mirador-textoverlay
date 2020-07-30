@@ -1,20 +1,25 @@
 /* eslint-disable no-underscore-dangle */
 import uniq from 'lodash/uniq';
 import {
-  all, call, put, select, takeEvery,
+  all, call, put, select, take, takeEvery, race,
 } from 'redux-saga/effects';
 import fetch from 'isomorphic-unfetch';
 
 import ActionTypes from 'mirador/dist/es/src/state/actions/action-types';
 import { receiveAnnotation, updateConfig } from 'mirador/dist/es/src/state/actions';
-import { getCanvases, getWindowConfig, getVisibleCanvases } from 'mirador/dist/es/src/state/selectors';
+import {
+  getCanvases, getWindowConfig, getVisibleCanvases, selectInfoResponse,
+} from 'mirador/dist/es/src/state/selectors';
+import MiradorCanvas from 'mirador/dist/es/src/lib/MiradorCanvas';
 
 import {
-  PluginActionTypes, requestText, receiveText, receiveTextFailure, discoveredText,
+  PluginActionTypes, requestText, receiveText, receiveTextFailure, discoveredText, requestColors,
+  receiveColors,
 } from './actions';
 import { getTexts, getTextsForVisibleCanvases } from './selectors';
 import translations from '../locales';
 import { parseIiifAnnotations, parseOcr } from '../lib/ocrFormats';
+import { getPageColors } from '../lib/color';
 
 const charFragmentPattern = /^(.+)#char=(\d+),(\d+)$/;
 
@@ -77,6 +82,16 @@ export function* discoverExternalOcr({ visibleCanvases: visibleCanvasIds, window
       } else {
         yield put(discoveredText(canvas.id, ocrSource));
       }
+      // Get the IIIF Image Service from the canvas to determine text/background colors
+      // NOTE: We don't do this in the `fetchColors` saga, since it's kind of a pain to get
+      // a canvas object from an id, and we have one already here, so it's just simpler.
+      const miradorCanvas = new MiradorCanvas(canvas);
+      const image = miradorCanvas.iiifImageResources[0];
+      const infoId = image?.getServices()[0].id;
+      if (!infoId) {
+        return;
+      }
+      yield put(requestColors(canvas.id, infoId));
     }
   }
 }
@@ -169,6 +184,53 @@ export function* injectTranslations() {
   }));
 }
 
+/** Load image data for image */
+export async function loadImageData(imgUrl) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = 'Anonymous';
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+      resolve(ctx.getImageData(0, 0, img.width, img.height).data);
+    };
+    img.onerror = reject;
+    img.src = imgUrl;
+  });
+}
+
+/** Try to determine text and background color for the target */
+export function* fetchColors({ targetId, infoId }) {
+  const infoResp = yield select(selectInfoResponse, { infoId });
+  let serviceId = infoResp?.id;
+  if (!serviceId) {
+    const { success: infoSuccess, failure: infoFailure } = yield race({
+      success: take((a) => (
+        a.type === ActionTypes.RECEIVE_INFO_RESPONSE
+            && a.infoId === infoId)),
+      failure: take((a) => (
+        a.type === ActionTypes.RECEIVE_INFO_RESPONSE_FAILURE
+            && a.infoId === infoId)),
+    });
+    if (infoFailure) {
+      return;
+    }
+    serviceId = infoSuccess.infoJson?.['@id'];
+  }
+  try {
+    // FIXME: This assumes a Level 2 endpoint, we should probably use one of the sizes listed
+    //        explicitely in the info response instead.
+    const imgUrl = `${serviceId}/full/200,/0/default.jpg`;
+    const imgData = yield call(loadImageData, imgUrl);
+    const { textColor, bgColor } = yield call(getPageColors, imgData);
+    yield put(receiveColors(targetId, textColor, bgColor));
+  } catch (error) {
+    console.error(error);
+    // NOP
+  }
+}
+
 /** Root saga for the plugin */
 export default function* textSaga() {
   yield all([
@@ -178,5 +240,6 @@ export default function* textSaga() {
     takeEvery(ActionTypes.SET_CANVAS, discoverExternalOcr),
     takeEvery(ActionTypes.UPDATE_WINDOW, onConfigChange),
     takeEvery(PluginActionTypes.REQUEST_TEXT, fetchAndProcessOcr),
+    takeEvery(PluginActionTypes.REQUEST_COLORS, fetchColors),
   ]);
 }

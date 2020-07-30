@@ -16,6 +16,8 @@ export default [
         .map((canvasText) => ({
           ...canvasText.text,
           source: canvasText.source,
+          textColor: canvasText.textColor,
+          bgColor: canvasText.bgColor,
         })),
       windowId,
       ...getWindowTextOverlayOptions(state, { windowId }),
@@ -38,6 +40,8 @@ export default [
       imageToolsEnabled: getWindowConfig(state, { windowId }).imageToolsEnabled ?? false,
       textsAvailable: getTextsForVisibleCanvases(state, { windowId }).length > 0,
       textsFetching: getTextsForVisibleCanvases(state, { windowId }).some((t) => t.isFetching),
+      pageColors: getTextsForVisibleCanvases(state, { windowId })
+        .map(({ textColor, bgColor }) => ({ textColor, bgColor })),
       windowTextOverlayOptions: getWindowTextOverlayOptions(state, { windowId }),
     }),
     mode: 'add',

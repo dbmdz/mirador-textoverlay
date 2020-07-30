@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect';
 
-import { getCanvas, getWindowConfig, getVisibleCanvases } from 'mirador/dist/es/src/state/selectors';
+import { getWindowConfig, getVisibleCanvases } from 'mirador/dist/es/src/state/selectors';
 import { miradorSlice } from 'mirador/dist/es/src/state/selectors/utils';
 
 const defaultConfig = {
@@ -12,6 +12,12 @@ const defaultConfig = {
   selectable: false,
   // Overlay text overlay by default
   visible: false,
+  // Try to automatically determine the text and background color
+  useAutoColors: true,
+  // Color of rendered text, used as a fallback if auto-detection is enabled and fails
+  textColor: '#000000',
+  // Color of line background, used as a fallback if auto-detection is enabled and fails
+  bgColor: '#ffffff',
 };
 
 /** Selector to get text display options for a given window */
@@ -25,23 +31,6 @@ export const getWindowTextOverlayOptions = createSelector(
 
 /** Selector to get all loaded texts */
 export const getTexts = (state) => miradorSlice(state).texts;
-
-/** Selector for a single canvas' text */
-export const getTextForCanvas = createSelector(
-  [
-    getCanvas,
-    getTexts,
-  ],
-  (canvas, texts) => {
-    if (!texts || !canvas) return null;
-    if (!texts[canvas.id]) return null;
-
-    return texts[canvas.id] && {
-      ...texts[canvas.id].text,
-      source: texts[canvas.id].source,
-    };
-  },
-);
 
 /** Selector for text on all visible canvases */
 export const getTextsForVisibleCanvases = createSelector(

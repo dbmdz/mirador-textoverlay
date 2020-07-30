@@ -4,6 +4,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import { changeAlpha } from '../lib/color';
+
 /** Check if we're running in Gecko */
 function runningInGecko() {
   return navigator.userAgent.indexOf('Gecko/') >= 0;
@@ -77,25 +79,26 @@ class PageTextDisplay extends React.Component {
    *
    * Again, intended to be called from the parent, again for performance reasons.
    */
-  updateOpacity(opacity) {
+  updateColors(textColor, bgColor, opacity) {
     if (!this.svgContainerRef.current) {
       return;
     }
-    // We need to apply the opacity to the individual rects and texts instead of
+    // We need to apply the colors to the individual rects and texts instead of
     // one of the containers, since otherwise the user's selection highlight would
     // become transparent as well or disappear entirely.
     for (const rect of this.svgContainerRef.current.querySelectorAll('rect')) {
-      rect.style.fill = `rgba(255, 255, 255, ${opacity})`;
+      rect.style.fill = changeAlpha(bgColor, opacity);
     }
     for (const text of this.svgContainerRef.current.querySelectorAll('text')) {
-      text.style.fill = `rgba(0, 0, 0, ${opacity})`;
+      text.style.fill = changeAlpha(textColor, opacity);
     }
   }
 
   /** Render the page overlay */
   render() {
     const {
-      selectable, visible, lines, width: pageWidth, height: pageHeight, opacity,
+      selectable, visible, lines, width: pageWidth, height: pageHeight, opacity, textColor, bgColor,
+      useAutoColors, pageColors,
     } = this.props;
 
     const containerStyle = {
@@ -110,9 +113,16 @@ class PageTextDisplay extends React.Component {
       height: pageHeight,
       cursor: selectable ? undefined : 'default',
     };
+    let fg = textColor;
+    let bg = bgColor;
+    if (useAutoColors && pageColors) {
+      fg = pageColors.textColor;
+      bg = pageColors.bgColor;
+    }
+
     const renderOpacity = (!visible && selectable) ? 0 : opacity;
-    const boxStyle = { fill: `rgba(255, 255, 255, ${renderOpacity})` };
-    const textStyle = { fill: `rgba(0, 0, 0, ${renderOpacity})` };
+    const boxStyle = { fill: changeAlpha(bg, renderOpacity) };
+    const textStyle = { fill: changeAlpha(fg, renderOpacity) };
     const renderLines = lines.filter((l) => l.width > 0 && l.height > 0);
 
     /* Firefox/Gecko does not currently support the lengthAdjust parameter on
@@ -205,11 +215,19 @@ PageTextDisplay.propTypes = {
   selectable: PropTypes.bool.isRequired,
   visible: PropTypes.bool.isRequired,
   opacity: PropTypes.number.isRequired,
+  textColor: PropTypes.string.isRequired,
+  bgColor: PropTypes.string.isRequired,
+  useAutoColors: PropTypes.bool.isRequired,
   width: PropTypes.number.isRequired,
   height: PropTypes.number.isRequired,
   // eslint-disable-next-line react/forbid-prop-types
   lines: PropTypes.array.isRequired,
   source: PropTypes.string.isRequired,
+  // eslint-disable-next-line react/forbid-prop-types
+  pageColors: PropTypes.object,
+};
+PageTextDisplay.defaultProps = {
+  pageColors: undefined,
 };
 
 export default PageTextDisplay;
