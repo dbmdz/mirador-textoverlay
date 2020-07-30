@@ -32,8 +32,9 @@ class MiradorTextOverlay extends Component {
   /** Register OpenSeadragon callback when viewport changes */
   componentDidUpdate(prevProps) {
     const {
-      enabled, viewer, opacity, pageTexts, textColor, bgColor, useAutoColors,
+      enabled, viewer, pageTexts, textColor, bgColor, useAutoColors, visible,
     } = this.props;
+    let { opacity } = this.props;
 
     // OSD instance becomes available, register callback
     if (enabled && viewer && viewer !== prevProps.viewer) {
@@ -58,6 +59,9 @@ class MiradorTextOverlay extends Component {
         || useAutoColors !== prevProps.useAutoColors
         || (pageTexts.filter(hasPageColors).length
             !== prevProps.pageTexts.filter(hasPageColors).length)) {
+      if (!visible) {
+        opacity = 0;
+      }
       this.renderRefs.forEach((ref, idx) => {
         if (!ref.current) {
           return;
