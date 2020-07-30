@@ -113,7 +113,7 @@ class PageTextDisplay extends React.Component {
     const svgStyle = {
       width: pageWidth,
       height: pageHeight,
-      cursor: selectable ? undefined : 'default',
+      userSelect: selectable ? 'text' : 'none',
     };
     let fg = textColor;
     let bg = bgColor;
