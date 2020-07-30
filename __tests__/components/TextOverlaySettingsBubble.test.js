@@ -246,7 +246,7 @@ describe('TextOverlaySettingsBubble', () => {
     expect(bgInput).toHaveValue('#444444');
   });
 
-  it('should not render the auto-color button if no page colors are available', () => {
+  it('should not render the reset button if no page colors are available', () => {
     renderBubble({
       windowTextOverlayOptions: { visible: true },
       pageColors: [undefined, undefined],

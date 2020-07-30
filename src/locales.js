@@ -10,7 +10,7 @@ export default {
     colorPicker: 'Farbauswahl',
     textColor: 'Farbe für Text',
     backgroundColor: 'Farbe für Zeilenhintergrund',
-    resetColors: 'Farben zurücksetzen',
+    resetTextColors: 'Farben zurücksetzen',
   },
   en: {
     collapseTextOverlayOptions: 'Contract text overlay options',
@@ -23,6 +23,6 @@ export default {
     colorPicker: 'Color Picker',
     textColor: 'Text Color',
     backgroundColor: 'Line Background Color',
-    resetColors: 'Reset Colors',
+    resetTextColors: 'Reset Colors',
   },
 };

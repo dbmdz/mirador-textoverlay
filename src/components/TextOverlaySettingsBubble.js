@@ -188,7 +188,6 @@ const ColorWidget = ({
           textColor: pageColors.map((cs) => cs.textColor).filter((x) => x)[0] ?? textColor,
           bgColor: pageColors.map((cs) => cs.bgColor).filter((x) => x)[0] ?? bgColor,
         })}
-        disabled={useAutoColors}
       >
         <ResetColorsIcon />
       </MiradorMenuButton>

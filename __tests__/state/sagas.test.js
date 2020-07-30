@@ -340,14 +340,15 @@ describe('Reacting to configuration changes', () => {
 describe('Fetching page colors', () => {
   const targetId = 'canvasA';
   const infoId = 'http://example.com/iiif/image/canvasA';
+  const colors = { textColor: '#abcdef', bgColor: '#fedcba' };
   it('should immediately trigger a fetch if info response is available',
     () => expectSaga(fetchColors, { targetId, infoId })
       .provide([
         [select(selectInfoResponse, { infoId }), { id: infoId }],
         [call(loadImageData, `${infoId}/full/200,/0/default.jpg`), 'data'],
-        [call(getPageColors, 'data'), { textColor: '#abcdef', bgColor: '#fedcba' }],
+        [call(getPageColors, 'data'), colors],
       ])
-      .put(receiveColors(targetId, '#abcdef', '#fedcba'))
+      .put(receiveColors(targetId, colors.textColor, colors.bgColor))
       .run());
 
   it('should wait for info response reception if it is initially unavailable',
@@ -355,14 +356,14 @@ describe('Fetching page colors', () => {
       .provide([
         [select(selectInfoResponse, { infoId }), undefined],
         [call(loadImageData, `${infoId}/full/200,/0/default.jpg`), 'data'],
-        [call(getPageColors, 'data'), { textColor: '#abcdef', bgColor: '#fedcba' }],
+        [call(getPageColors, 'data'), colors],
       ])
       .dispatch({
         type: ActionTypes.RECEIVE_INFO_RESPONSE,
         infoId,
         infoJson: { '@id': infoId },
       })
-      .put(receiveColors(targetId, '#abcdef', '#fedcba'))
+      .put(receiveColors(targetId, colors.textColor, colors.bgColor))
       .run());
 
   it('should not do anything if the info response reception has failed',
