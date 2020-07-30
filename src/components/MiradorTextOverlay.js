@@ -18,6 +18,7 @@ class MiradorTextOverlay extends Component {
       React.createRef(),
       React.createRef(),
     ];
+    this.containerRef = React.createRef();
   }
 
   /** Register OpenSeadragon callback on initial mount */
@@ -87,6 +88,33 @@ class MiradorTextOverlay extends Component {
     // Determine new scale factor and position for each page
     const vpBounds = viewer.viewport.getBounds(true);
     const viewportZoom = viewer.viewport.getZoom(true);
+    if (this.containerRef.current) {
+      const { clientWidth: containerWidth, clientHeight: containerHeight } = viewer.container;
+      const flip = viewer.viewport.getFlip();
+      const rotation = viewer.viewport.getRotation();
+      const transforms = [];
+      if (flip) {
+        transforms.push(`translate(${containerWidth}px, 0px)`);
+        transforms.push('scale(-1, 1)');
+      }
+      if (rotation !== 0) {
+        switch (rotation) {
+          case 90:
+            transforms.push(`translate(${containerWidth}px, 0px)`);
+            break;
+          case 180:
+            transforms.push(`translate(${containerWidth}px, ${containerHeight}px)`);
+            break;
+          case 270:
+            transforms.push(`translate(0px, ${containerHeight}px)`);
+            break;
+          default:
+            console.error(`Unsupported rotation: ${rotation}`);
+        }
+        transforms.push(`rotate(${rotation}deg)`);
+      }
+      this.containerRef.current.style.transform = transforms.join(' ');
+    }
     for (let itemNo = 0; itemNo < viewer.world.getItemCount(); itemNo += 1) {
       // Skip update if we don't have a reference to the PageTextDisplay instance
       if (!this.renderRefs[itemNo].current) {
@@ -137,7 +165,7 @@ class MiradorTextOverlay extends Component {
       return null;
     }
     return ReactDOM.createPortal(
-      <>
+      <div ref={this.containerRef} style={{ position: 'absolute' }}>
         {pageTexts
           .map(({
             lines, source, width: pageWidth, height: pageHeight,
@@ -164,7 +192,7 @@ class MiradorTextOverlay extends Component {
               />
             );
           })}
-      </>,
+      </div>,
       viewer.canvas,
     );
   }

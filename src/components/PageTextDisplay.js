@@ -65,6 +65,8 @@ class PageTextDisplay extends React.Component {
       return;
     }
     const { width, height } = this.props;
+    // Scaling is done from the center of the container, so we have to update the
+    // horizontal and vertical offsets we got from OSD.
     const translateX = ((scaleFactor - 1) * width / 2) + (x * scaleFactor * -1);
     const translateY = ((scaleFactor - 1) * height / 2) + (y * scaleFactor * -1);
     const containerTransforms = [
