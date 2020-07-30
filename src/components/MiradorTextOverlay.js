@@ -113,7 +113,7 @@ class MiradorTextOverlay extends Component {
         }
         transforms.push(`rotate(${rotation}deg)`);
       }
-      this.containerRef.current.style.transform = transforms.join('');
+      this.containerRef.current.style.transform = transforms.join(' ');
     }
     for (let itemNo = 0; itemNo < viewer.world.getItemCount(); itemNo += 1) {
       // Skip update if we don't have a reference to the PageTextDisplay instance
