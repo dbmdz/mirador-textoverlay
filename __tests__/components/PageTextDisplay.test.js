@@ -144,6 +144,21 @@ describe('PageTextDisplay', () => {
     expect(topCallback).not.toHaveBeenCalled();
   });
 
+  it('should let pointerdown events through if touch screen is detected', () => {
+    const origTouchStart = global.window.ontouchstart;
+    global.window.ontouchstart = true;
+    const topCallback = jest.fn();
+    const { rerender, container } = renderPage({ selectable: false });
+    container.addEventListener('pointerdown', topCallback);
+    fireEvent.pointerDown(screen.getByText(svgTextMatcher('a firstWord on a line')));
+    expect(topCallback).toHaveBeenCalled();
+    topCallback.mockClear();
+    renderPage({ selectable: true }, rerender);
+    fireEvent.pointerDown(screen.getByText(svgTextMatcher('a firstWord on a line')));
+    global.window.ontouchstart = origTouchStart;
+    expect(topCallback).toHaveBeenCalled();
+  });
+
   it('should render words as <text> elements when running under Gecko', () => {
     const prevAgent = global.navigator.userAgent;
     global.navigator.userAgent = 'Mozilla/5.0 (X11; Linux x86_64; rv:10.0) Gecko/20100101 Firefox/10.0';
