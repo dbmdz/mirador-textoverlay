@@ -23,13 +23,14 @@ class PageTextDisplay extends React.Component {
   constructor(props) {
     super(props);
     this.containerRef = React.createRef();
-    this.svgContainerRef = React.createRef();
+    this.textContainerRef = React.createRef();
+    this.boxContainerRef = React.createRef();
   }
 
   /** Register pointerdown handler on SVG container */
   componentDidMount() {
     // FIXME: We should be able to use React for this, but it somehow doesn't work
-    this.svgContainerRef.current.addEventListener('pointerdown', this.onPointerDown);
+    this.textContainerRef.current.addEventListener('pointerdown', this.onPointerDown);
   }
 
   /** Only update the component when some of the props changed.
@@ -82,16 +83,16 @@ class PageTextDisplay extends React.Component {
    * Again, intended to be called from the parent, again for performance reasons.
    */
   updateColors(textColor, bgColor, opacity) {
-    if (!this.svgContainerRef.current) {
+    if (!this.textContainerRef.current || !this.boxContainerRef.current) {
       return;
     }
     // We need to apply the colors to the individual rects and texts instead of
     // one of the containers, since otherwise the user's selection highlight would
     // become transparent as well or disappear entirely.
-    for (const rect of this.svgContainerRef.current.querySelectorAll('rect')) {
+    for (const rect of this.boxContainerRef.current.querySelectorAll('rect')) {
       rect.style.fill = changeAlpha(bgColor, opacity);
     }
-    for (const text of this.svgContainerRef.current.querySelectorAll('text')) {
+    for (const text of this.textContainerRef.current.querySelectorAll('text')) {
       text.style.fill = changeAlpha(textColor, opacity);
     }
   }
@@ -111,6 +112,8 @@ class PageTextDisplay extends React.Component {
       display: 'none', // will be cleared by first update
     };
     const svgStyle = {
+      left: 0,
+      top: 0,
       width: pageWidth,
       height: pageHeight,
       userSelect: selectable ? 'text' : 'none',
@@ -151,8 +154,21 @@ class PageTextDisplay extends React.Component {
         ref={this.containerRef}
         style={containerStyle}
       >
-        <svg style={svgStyle}>
-          <g ref={this.svgContainerRef}>
+        {/**
+         * NOTE: We have to render the line background rectangles in a separate SVG and can't
+         * include them in the same one as the text. Why? Because doing so breaks text selection in
+         * WebKit-based browsers :/
+         * It seems that if we render the rectangles first (since we don't want rectangles occluding
+         * text), very often when a user's selection leaves the current line rectangle and crosses
+         * over to the next, the selection will *end* where the user wanted it to start and instead
+         * start from the very top of the page.
+         * A simpler solution would've been to just render the line rectangles *after* the text to
+         * avoid this issue, but unfortunately SVG determines draw order from the element order,
+         * i.e. the rectangles would have completely occluded the text.
+         * So we have to resort to this, it's a hack, but it works.
+         */}
+        <svg style={{ ...svgStyle, userSelect: 'none' }}>
+          <g ref={this.boxContainerRef}>
             {renderLines.map((line) => (
               <rect
                 key={`rect-${line.x}.${line.y}`}
@@ -163,7 +179,10 @@ class PageTextDisplay extends React.Component {
                 style={boxStyle}
               />
             ))}
-
+          </g>
+        </svg>
+        <svg style={{ ...svgStyle, position: 'absolute' }}>
+          <g ref={this.textContainerRef}>
             {renderLines.map((line) => (
               line.words
                 ? (
