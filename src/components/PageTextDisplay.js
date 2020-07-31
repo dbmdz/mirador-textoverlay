@@ -130,21 +130,21 @@ class PageTextDisplay extends React.Component {
     /* Firefox/Gecko does not currently support the lengthAdjust parameter on
      * <tspan> Elements, only on <text> (https://bugzilla.mozilla.org/show_bug.cgi?id=890692).
      *
-     * Using <text> elements for words (and skipping the line-grouping) works fine
+     * Using <text> elements for spans (and skipping the line-grouping) works fine
      * in Firefox, but breaks selection behavior in Chrome (the selected text contains
      * a newline after every word).
      *
      * So we have to go against best practices and use user agent sniffing to determine dynamically
-     * how to render lines and words, sorry :-/ */
+     * how to render lines and spans, sorry :-/ */
     const isGecko = runningInGecko();
     // eslint-disable-next-line require-jsdoc
     let LineWrapper = ({ children }) => <text style={textStyle}>{children}</text>;
     // eslint-disable-next-line react/jsx-props-no-spreading, require-jsdoc
-    let WordElem = (props) => <tspan {...props} />;
+    let SpanElem = (props) => <tspan {...props} />;
     if (isGecko) {
       LineWrapper = React.Fragment;
       // eslint-disable-next-line react/jsx-props-no-spreading, require-jsdoc
-      WordElem = (props) => <text style={textStyle} {...props} />;
+      SpanElem = (props) => <text style={textStyle} {...props} />;
     }
     return (
       <div
@@ -165,32 +165,23 @@ class PageTextDisplay extends React.Component {
             ))}
 
             {renderLines.map((line) => (
-              line.words
+              line.spans
                 ? (
                   <LineWrapper key={`line-${line.x}-${line.y}`}>
-                    {line.words.filter((w) => w.width > 0 && w.height > 0).map(({
+                    {line.spans.filter((w) => w.width > 0 && w.height > 0).map(({
                       x, y, width, text,
-                    }) => {
-                      // Another ugly user agent sniffing hack:
-                      // In Gecko, whitespace is not stretched, unlike in Chrome.
-                      // Thus. we have to exclude the space's width from the rendered word's width.
-                      let renderWidth = width;
-                      if (isGecko && text.slice(-1) === ' ') {
-                        renderWidth -= (renderWidth / text.length);
-                      }
-                      return (
-                        <WordElem
-                          key={`text-${x}-${y}`}
-                          x={x}
-                          y={line.y + line.height * 0.75}
-                          textLength={renderWidth}
-                          fontSize={`${line.height * 0.75}px`}
-                          lengthAdjust="spacingAndGlyphs"
-                        >
-                          {text}
-                        </WordElem>
-                      );
-                    })}
+                    }) => (
+                      <SpanElem
+                        key={`text-${x}-${y}`}
+                        x={x}
+                        y={line.y + line.height * 0.75}
+                        textLength={width}
+                        fontSize={`${line.height * 0.75}px`}
+                        lengthAdjust="spacingAndGlyphs"
+                      >
+                        {text}
+                      </SpanElem>
+                    ))}
                   </LineWrapper>
                 )
                 : (

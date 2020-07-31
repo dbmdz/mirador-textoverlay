@@ -17,7 +17,6 @@ function svgTextMatcher(text) {
     if (element.tagName === 'text') {
       const elementText = Array.from(element.querySelectorAll('tspan'))
         .map((el) => el.textContent)
-        .map((el) => (el.slice(-1) === ' ' ? el : `${el} `))
         .join('');
       return elementText.trimEnd() === text;
     }
@@ -37,7 +36,7 @@ function renderPage(props = {}, renderFn = render) {
       width={2100}
       height={2970}
       source="http://example.com/page/1"
-      lines={lineFixtures.withWords}
+      lines={lineFixtures.withSpans}
       bgColor="#ffffff"
       textColor="#000000"
       useAutoColors={false}
@@ -48,7 +47,7 @@ function renderPage(props = {}, renderFn = render) {
 }
 
 describe('PageTextDisplay', () => {
-  it('should render lines with individual words accurately', () => {
+  it('should render lines with individual spans accurately', () => {
     renderPage();
     const firstLine = screen.getByText(svgTextMatcher('a firstWord on a line'));
     expect(firstLine).not.toBeNull();
@@ -63,8 +62,8 @@ describe('PageTextDisplay', () => {
     expect(screen.getByText('secondWord')).not.toBeNull();
   });
 
-  it('should render lines without individual words accurately', () => {
-    renderPage({ lines: lineFixtures.withoutWords });
+  it('should render lines without individual spans accurately', () => {
+    renderPage({ lines: lineFixtures.withoutSpans });
     const firstLine = screen.getByText('a word on a line');
     expect(firstLine).not.toBeNull();
     expect(firstLine.previousElementSibling).toHaveAttribute('style', 'fill: rgba(255, 255, 255, 0.75);');
@@ -94,7 +93,7 @@ describe('PageTextDisplay', () => {
   it('should re-render when the source changes', () => {
     const { rerender } = renderPage();
     expect(screen.getByText(svgTextMatcher('a firstWord on a line'))).not.toBeNull();
-    renderPage({ source: 'http://example.com/pages/2', lines: lineFixtures.withoutWords, opacity: 0.25 }, rerender);
+    renderPage({ source: 'http://example.com/pages/2', lines: lineFixtures.withoutSpans, opacity: 0.25 }, rerender);
     expect(screen.getByText('a word on a line'))
       .toHaveAttribute('style', 'fill: rgba(0, 0, 0, 0.25);');
   });
@@ -144,7 +143,7 @@ describe('PageTextDisplay', () => {
     expect(topCallback).not.toHaveBeenCalled();
   });
 
-  it('should render words as <text> elements when running under Gecko', () => {
+  it('should render spans as <text> elements when running under Gecko', () => {
     const prevAgent = global.navigator.userAgent;
     global.navigator.userAgent = 'Mozilla/5.0 (X11; Linux x86_64; rv:10.0) Gecko/20100101 Firefox/10.0';
     renderPage();
@@ -152,15 +151,6 @@ describe('PageTextDisplay', () => {
     const word = screen.getByText('firstWord');
     expect(word).not.toBeNull();
     expect(word.tagName).toEqual('text');
-  });
-
-  it('should render words with smaller width in Gecko to account for rendering differences', () => {
-    const prevAgent = global.navigator.userAgent;
-    global.navigator.userAgent = 'Mozilla/5.0 (X11; Linux x86_64; rv:10.0) Gecko/20100101 Firefox/10.0';
-    renderPage();
-    global.navigator.userAgent = prevAgent;
-    const word = screen.getByText('firstWord');
-    expect(word).toHaveAttribute('textLength', '198');
   });
 
   it('should use automatically determined colors for the initial render if available and enabled', () => {

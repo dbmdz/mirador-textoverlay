@@ -1,12 +1,7 @@
+/** Functions to parse OCR boxes from various formats and render them as SVG. */
 import max from 'lodash/max';
 
-/** Functions to parse OCR boxes from various formats and render them as SVG. */
 const parser = new DOMParser();
-const namespaces = {
-  alto2: 'http://www.loc.gov/standards/alto/ns-v2#',
-  alto3: 'http://www.loc.gov/standards/alto/ns-v3#',
-  alto4: 'http://www.loc.gov/standards/alto/ns-v4#',
-};
 
 /** Parse hOCR attributes from a node's title attribute */
 function parseHocrAttribs(titleAttrib) {
@@ -30,34 +25,40 @@ function parseHocrAttribs(titleAttrib) {
 /** Parse an hOCR node */
 function parseHocrNode(node, endOfLine = false, scaleFactor = 1) {
   const [ulx, uly, lrx, lry] = parseHocrAttribs(node.title).bbox.map((dim) => dim * scaleFactor);
-  let width = lrx - ulx;
-  const height = lry - uly;
-  let text = node.textContent;
-  if (node.nextSibling instanceof Text) {
-    const charWidth = (lrx - ulx) / text.length;
-    const extraText = node.nextSibling.wholeText.replace(/\s+/, ' ');
-    text += extraText;
-    // Increase the width of the node to compensate for the extra characters
-    if (!endOfLine) {
-      width += charWidth * extraText.length;
-    } else if (text.slice(-1) !== '\u00AD') {
-      // Add newline if the line does not end on a hyphenation
-      text = `${text.trim()}\n`;
-    }
-  }
-
   let style = node.getAttribute('style');
   if (style) {
     style = style.replace(/font-size:.+;/, '');
   }
-  return {
-    height,
+  const spans = [{
+    height: lry - uly,
     style,
-    text,
-    width,
+    text: node.textContent,
+    width: lrx - ulx,
     x: ulx,
     y: uly,
-  };
+    isExtra: false,
+  }];
+
+  // Add an extra space span if the following text node contains something
+  if (node.nextSibling instanceof Text) {
+    let extraText = node.nextSibling.wholeText.replace(/\s+/, ' ');
+    if (endOfLine && spans[0].text.slice(-1) !== '\u00AD') {
+      // Add newline if the line does not end on a hyphenation
+      extraText = `${extraText.trim()}\n`;
+    }
+    if (extraText.length > 0) {
+      spans.push({
+        height: lry - uly,
+        text: extraText,
+        x: lrx,
+        y: uly,
+        // NOTE: This span has no width initially, will be set when we encounter
+        //       the next word. (extra spans always fill the area between two words)
+        isExtra: true,
+      });
+    }
+  }
+  return spans;
 }
 
 
@@ -87,14 +88,29 @@ export function parseHocr(hocrText, referenceSize) {
     if (wordNodes.length === 0) {
       lines.push(parseHocrNode(lineNode, true, scaleFactor));
     } else {
-      const line = parseHocrNode(lineNode, true, scaleFactor);
-      const words = [];
+      const line = parseHocrNode(lineNode, true, scaleFactor)[0];
+      const spans = [];
       // eslint-disable-next-line no-unused-vars
       for (const [i, wordNode] of wordNodes.entries()) {
-        words.push(parseHocrNode(wordNode, i === wordNodes.length - 1, scaleFactor));
+        const textSpans = parseHocrNode(wordNode, i === wordNodes.length - 1, scaleFactor);
+
+        // Calculate width of previous extra span
+        const previousExtraSpan = spans.slice(-1).filter((s) => s.isExtra)?.[0];
+        if (previousExtraSpan) {
+          previousExtraSpan.width = textSpans[0].x - previousExtraSpan.x;
+        }
+
+        spans.push(...textSpans);
       }
-      line.words = words;
-      line.text = words.map((w) => w.text).join('').trim();
+
+      // Update with of extra span at end of line
+      const endExtraSpan = spans.slice(-1).filter((s) => s.isExtra)?.[0];
+      if (endExtraSpan) {
+        endExtraSpan.width = (line.x + line.width) - endExtraSpan.x;
+      }
+
+      line.spans = spans;
+      line.text = spans.map((w) => w.text).join('').trim();
       lines.push(line);
     }
   }
@@ -144,15 +160,6 @@ function altoStyleNodeToCSS(styleNode) {
 export function parseAlto(altoText, imgSize) {
   const doc = parser.parseFromString(altoText, 'text/xml');
   // We assume ALTO is set as the default namespace
-  const altoNamespace = doc.firstElementChild.getAttribute('xmlns');
-  if (
-    altoNamespace !== namespaces.alto2
-    && altoNamespace !== namespaces.alto3
-    && altoNamespace !== namespaces.alto4
-  ) {
-    console.error('Unsupported ALTO namespace: ', altoNamespace);
-    return null;
-  }
   /** Namespace resolver that forrces the ALTO namespace */
   const measurementUnit = doc.querySelector(
     'alto > Description > MeasurementUnit',
@@ -180,20 +187,20 @@ export function parseAlto(altoText, imgSize) {
 
   const hasSpaces = doc.querySelector('SP') !== null;
   const lines = [];
-  const lineElems = doc.querySelectorAll('TextLine');
   let lineEndsHyphenated = false;
-  for (const lineNode of lineElems) {
+  for (const lineNode of doc.querySelectorAll('TextLine')) {
     const line = {
       height: Number.parseInt(lineNode.getAttribute('HEIGHT'), 10) * scaleFactorY,
       text: '',
       width: Number.parseInt(lineNode.getAttribute('WIDTH'), 10) * scaleFactorX,
-      words: [],
+      spans: [],
       x: Number.parseInt(lineNode.getAttribute('HPOS'), 10) * scaleFactorX,
       y: Number.parseInt(lineNode.getAttribute('VPOS'), 10) * scaleFactorY,
     };
-    const wordElems = lineNode.querySelectorAll('String, SP, HYP');
-    for (const wordNode of wordElems) {
-      const styleRefs = wordNode.getAttribute('STYLEREFS');
+    const textNodes = lineNode.querySelectorAll('String, SP, HYP');
+    for (const [textIdx, textNode] of textNodes.entries()) {
+      const endOfLine = textIdx === (textNodes.length - 1);
+      const styleRefs = textNode.getAttribute('STYLEREFS');
       let style = null;
       if (styleRefs !== null) {
         style = styleRefs
@@ -202,45 +209,55 @@ export function parseAlto(altoText, imgSize) {
           .filter((s) => s !== undefined)
           .join('');
       }
-      let text;
-      if (wordNode.tagName === 'String') {
-        text = wordNode.getAttribute('CONTENT');
-      } else if (wordNode.tagName === 'SP') {
-        text = ' ';
-      } else if (wordNode.tagName === 'HYP') {
-        lineEndsHyphenated = true;
-      }
-      // NOTE: Hyphenation elements are ignored
-      let width = Number.parseInt(wordNode.getAttribute('WIDTH'), 10) * scaleFactorX;
-      const height = Number.parseInt(wordNode.getAttribute('HEIGHT'), 10) * scaleFactorY;
-      const x = Number.parseInt(wordNode.getAttribute('HPOS'), 10) * scaleFactorX;
-      const y = Number.parseInt(wordNode.getAttribute('VPOS'), 10) * scaleFactorY;
 
-      // Not at end of line and doc doesn't encode spaces, add whitespace after word
-      if (!hasSpaces && text !== ' ' && wordNode) {
-        width += width / text.length;
-        text += ' ';
+      const width = Number.parseInt(textNode.getAttribute('WIDTH'), 10) * scaleFactorX;
+      let height = Number.parseInt(textNode.getAttribute('HEIGHT'), 10) * scaleFactorY;
+      if (Number.isNaN(height)) {
+        height = line.height;
       }
-      if (text) {
-        line.words.push({
-          height, style, text, width, x, y,
+      const x = Number.parseInt(textNode.getAttribute('HPOS'), 10) * scaleFactorX;
+      let y = Number.parseInt(textNode.getAttribute('VPOS'), 10) * scaleFactorY;
+      if (Number.isNaN(y)) {
+        y = line.y;
+      }
+
+      if (textNode.tagName === 'String' || textNode.tagName === 'HYP') {
+        const text = textNode.getAttribute('CONTENT');
+
+        // Update the width of a preceding extra space span to fill the area
+        // between the previous word and this one.
+        const previousExtraSpan = line.spans.slice(-1).filter((s) => s.isExtra)?.[0];
+        if (previousExtraSpan) {
+          previousExtraSpan.width = x - previousExtraSpan.x;
+        }
+
+        line.spans.push({
+          isExtra: false, x, y, width, height, text, style,
+        });
+
+        // Add extra space span if ALTO does not encode spaces itself
+        if (!hasSpaces && !endOfLine) {
+          line.spans.push({
+            isExtra: true, x: x + width, y, height, text: ' ',
+            // NOTE: Does not have width initially, will be set when we encounter
+            //       the next proper word span
+          });
+        }
+        lineEndsHyphenated = textNode.tagName === 'HYP';
+      } else if (textNode.tagName === 'SP') {
+        line.spans.push({
+          isExtra: false, x, y, width, height, text: ' ',
         });
       }
-      line.text += text;
     }
-    if (line.words.length === 0) {
+    if (line.spans.length === 0) {
       continue;
     }
     if (!lineEndsHyphenated) {
-      const lastWord = line.words.slice(-1)[0];
-      if (lastWord.text.slice(-1)[0] === ' ') {
-        // Undo width expansion/space expansion
-        lastWord.text = lastWord.text.slice(0, -1);
-        lastWord.width -= (lastWord.width / lastWord.text.length);
-      }
-      lastWord.text += '\n';
+      line.spans.slice(-1)[0].text += '\n';
     }
     lineEndsHyphenated = false;
+    line.text = line.spans.map(({ text }) => text).join('');
     lines.push(line);
   }
   return {
