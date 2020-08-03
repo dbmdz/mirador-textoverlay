@@ -1,6 +1,8 @@
 import { createSelector } from 'reselect';
 
-import { getWindowConfig, getVisibleCanvases } from 'mirador/dist/es/src/state/selectors';
+import {
+  getWindowConfig, getVisibleCanvases, getTheme,
+} from 'mirador/dist/es/src/state/selectors';
 import { miradorSlice } from 'mirador/dist/es/src/state/selectors/utils';
 
 const defaultConfig = {
@@ -22,8 +24,9 @@ const defaultConfig = {
 
 /** Selector to get text display options for a given window */
 export const getWindowTextOverlayOptions = createSelector(
-  [getWindowConfig],
-  ({ textOverlay }) => ({
+  [getWindowConfig, getTheme],
+  ({ textOverlay }, { typography: { fontFamily } }) => ({
+    fontFamily,
     ...defaultConfig,
     ...(textOverlay ?? {}),
   }),

@@ -122,7 +122,7 @@ class PageTextDisplay extends React.Component {
   render() {
     const {
       selectable, visible, lines, width: pageWidth, height: pageHeight, opacity, textColor, bgColor,
-      useAutoColors, pageColors,
+      useAutoColors, pageColors, fontFamily,
     } = this.props;
 
     const containerStyle = {
@@ -148,7 +148,10 @@ class PageTextDisplay extends React.Component {
 
     const renderOpacity = (!visible && selectable) ? 0 : opacity;
     const boxStyle = { fill: changeAlpha(bg, renderOpacity) };
-    const textStyle = { fill: changeAlpha(fg, renderOpacity) };
+    const textStyle = {
+      fill: changeAlpha(fg, renderOpacity),
+      fontFamily,
+    };
     const renderLines = lines.filter((l) => l.width > 0 && l.height > 0);
 
     /* Firefox/Gecko does not currently support the lengthAdjust parameter on
@@ -249,6 +252,7 @@ PageTextDisplay.propTypes = {
   visible: PropTypes.bool.isRequired,
   opacity: PropTypes.number.isRequired,
   textColor: PropTypes.string.isRequired,
+  fontFamily: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
   bgColor: PropTypes.string.isRequired,
   useAutoColors: PropTypes.bool.isRequired,
   width: PropTypes.number.isRequired,
@@ -261,6 +265,9 @@ PageTextDisplay.propTypes = {
 };
 PageTextDisplay.defaultProps = {
   pageColors: undefined,
+};
+PageTextDisplay.defaultProps = {
+  fontFamily: undefined,
 };
 
 export default PageTextDisplay;

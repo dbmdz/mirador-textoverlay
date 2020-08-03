@@ -63,6 +63,7 @@ const miradorConfig = {
       selectable: true,  // allow selecting the text, also works if text is not visible,
       visible: true, // enable visible rendering of the text
       opacity: 0.5, // default opacity for the rendered text
+      fontFamily: ['Comic Sans MS', 'sans-serif']  // text font, defaults to the theme's font
     }
   }
 }

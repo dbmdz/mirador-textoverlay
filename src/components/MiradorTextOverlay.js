@@ -169,6 +169,7 @@ class MiradorTextOverlay extends Component {
   render() {
     const {
       pageTexts, selectable, visible, viewer, opacity, textColor, bgColor, useAutoColors,
+      fontFamily,
     } = this.props;
     if (!this.shouldRender() || !viewer || !pageTexts) {
       return null;
@@ -201,6 +202,7 @@ class MiradorTextOverlay extends Component {
                 width={pageWidth}
                 height={pageHeight}
                 textColor={textColor}
+                fontFamily={fontFamily}
                 bgColor={bgColor}
                 useAutoColors={useAutoColors}
                 pageColors={pageFg ? { textColor: pageFg, bgColor: pageBg } : undefined}
@@ -222,6 +224,7 @@ MiradorTextOverlay.propTypes = {
   viewer: PropTypes.object, // eslint-disable-line react/forbid-prop-types
   visible: PropTypes.bool,
   textColor: PropTypes.string,
+  fontFamily: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
   bgColor: PropTypes.string,
   useAutoColors: PropTypes.bool,
 };
@@ -235,6 +238,7 @@ MiradorTextOverlay.defaultProps = {
   viewer: undefined,
   visible: false,
   textColor: '#000000',
+  fontFamily: undefined,
   bgColor: '#ffffff',
   useAutoColors: true,
 };
