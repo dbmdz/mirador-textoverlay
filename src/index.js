@@ -36,17 +36,10 @@ export default [
         updateWindow(windowId, { textOverlay: options }),
       ),
     }),
-    mapStateToProps: (state, { windowId, PluginComponents }) => {
-      // Check if mirador-image-tools plugin is available. We can't rely on the presence of
-      // the `imageToolsEnabled` window option, since the plugin is currently enabled by default,
-      // even in the absence of the option.
-      // FIXME: This should be removed once ProjectMirador/mirador-image-tools#23 is merged
-      const imageToolsPresent = PluginComponents
-        .filter(({ WrappedComponent: { name } }) => name === 'MiradorImageTools')
-        .length > 0;
+    mapStateToProps: (state, { windowId }) => {
       const { imageToolsEnabled } = getWindowConfig(state, { windowId });
       return {
-        imageToolsEnabled: imageToolsEnabled ?? imageToolsPresent,
+        imageToolsEnabled,
         textsAvailable: getTextsForVisibleCanvases(state, { windowId }).length > 0,
         textsFetching: getTextsForVisibleCanvases(state, { windowId }).some((t) => t.isFetching),
         pageColors: getTextsForVisibleCanvases(state, { windowId })

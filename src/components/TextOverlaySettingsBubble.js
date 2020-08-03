@@ -78,7 +78,7 @@ const OpacityWidget = ({ opacity, onChange, t }) => {
     >
       <Slider
         orientation="vertical"
-        min={0}
+        min={1}
         max={100}
         value={opacity * 100}
         getAriaValueText={(value) => t('opacityCurrentValue', { value })}

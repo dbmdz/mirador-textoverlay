@@ -51,12 +51,8 @@ class PageTextDisplay extends React.Component {
    * but this way we can more precisely control when we re-render.
    */
   shouldComponentUpdate(nextProps) {
-    const { source, selectable, visible } = this.props;
-    return (
-      nextProps.source !== source
-      || nextProps.selectable !== selectable
-      || nextProps.visible !== visible
-    );
+    const { source } = this.props;
+    return nextProps.source !== source;
   }
 
   /** Swallow pointer events if selection is enabled */
@@ -109,6 +105,17 @@ class PageTextDisplay extends React.Component {
     for (const text of this.textContainerRef.current.querySelectorAll('text')) {
       text.style.fill = changeAlpha(textColor, opacity);
     }
+  }
+
+  /** Update the selectability of the text nodes.
+   *
+   * Again, intended to be called from the parent, again for performance reasons.
+   */
+  updateSelectability(selectable) {
+    if (!this.textContainerRef.current) {
+      return;
+    }
+    this.textContainerRef.current.parentElement.style.userSelect = selectable ? 'text' : 'none';
   }
 
   /** Render the page overlay */
