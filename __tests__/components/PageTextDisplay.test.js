@@ -128,17 +128,11 @@ describe('PageTextDisplay', () => {
   });
 
   it('should render text invisible if visibility is disabled', () => {
-    const { container, rerender } = renderPage();
-    container.querySelectorAll('rect').forEach(
-      (rect) => expect(rect).toHaveAttribute('style', 'fill: rgba(255, 255, 255, 0.75);'),
-    );
-    let firstLine = screen.getByText(svgTextMatcher('a firstWord on a line'));
-    expect(firstLine).toHaveAttribute('style', 'fill: rgba(0, 0, 0, 0.75);');
-    renderPage({ visible: false }, rerender);
+    const { container } = renderPage({ visible: false });
     container.querySelectorAll('rect').forEach(
       (rect) => expect(rect).toHaveAttribute('style', 'fill: rgba(255, 255, 255, 0);'),
     );
-    firstLine = screen.getByText(svgTextMatcher('a firstWord on a line'));
+    const firstLine = screen.getByText(svgTextMatcher('a firstWord on a line'));
     expect(firstLine).toHaveAttribute('style', 'fill: rgba(0, 0, 0, 0);');
   });
 
@@ -168,6 +162,13 @@ describe('PageTextDisplay', () => {
     fireEvent.pointerDown(screen.getByText(svgTextMatcher('a firstWord on a line')));
     global.window.ontouchstart = origTouchStart;
     expect(topCallback).toHaveBeenCalled();
+  });
+
+  it('should disable text selection if selection is disabled', () => {
+    const { ref, container } = renderPage();
+    expect(container.querySelectorAll('svg')[1]).toHaveStyle('user-select: text');
+    ref.current.updateSelectability(false);
+    expect(container.querySelectorAll('svg')[1]).not.toHaveStyle('user-select: text');
   });
 
   it('should render spans as <text> elements when running under Gecko', () => {

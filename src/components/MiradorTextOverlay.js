@@ -32,7 +32,7 @@ class MiradorTextOverlay extends Component {
   /** Register OpenSeadragon callback when viewport changes */
   componentDidUpdate(prevProps) {
     const {
-      enabled, viewer, pageTexts, textColor, bgColor, useAutoColors, visible,
+      enabled, viewer, pageTexts, textColor, bgColor, useAutoColors, visible, selectable,
     } = this.props;
     let { opacity } = this.props;
 
@@ -50,10 +50,17 @@ class MiradorTextOverlay extends Component {
       this.onUpdateViewport();
     }
 
+    if (selectable !== prevProps.selectable) {
+      this.renderRefs
+        .filter((ref) => ref.current)
+        .forEach((ref) => ref.current.updateSelectability(selectable));
+    }
+
     // Manually update SVG colors for performance reasons
     // eslint-disable-next-line require-jsdoc
     const hasPageColors = (text) => text.textColor !== undefined;
-    if (opacity !== prevProps.opacity
+    if (visible !== prevProps.visible
+        || opacity !== prevProps.opacity
         || bgColor !== prevProps.bgColor
         || textColor !== prevProps.textColor
         || useAutoColors !== prevProps.useAutoColors
@@ -148,10 +155,8 @@ class MiradorTextOverlay extends Component {
 
   /** If the overlay should be rendered at all */
   shouldRender(props) {
-    const {
-      enabled, visible, selectable, pageTexts,
-    } = props ?? this.props;
-    return (enabled && (visible || selectable) && pageTexts.length > 0);
+    const { enabled, pageTexts } = props ?? this.props;
+    return (enabled && pageTexts.length > 0);
   }
 
   /** Update container dimensions and page scale/offset every time the OSD viewport changes. */
@@ -169,7 +174,13 @@ class MiradorTextOverlay extends Component {
       return null;
     }
     return ReactDOM.createPortal(
-      <div ref={this.containerRef} style={{ position: 'absolute' }}>
+      <div
+        ref={this.containerRef}
+        style={{
+          position: 'absolute',
+          display: (selectable || visible) ? null : 'none',
+        }}
+      >
         {pageTexts
           .map(({
             lines, source, width: pageWidth, height: pageHeight,
