@@ -43,7 +43,7 @@ function parseHocrNode(node, endOfLine = false, scaleFactor = 1) {
   if (node.nextSibling instanceof Text) {
     let extraText = node.nextSibling.wholeText.replace(/\s+/, ' ');
     if (endOfLine && spans[0].text.slice(-1) !== '\u00AD') {
-      // Add newline if the line does not end on a hyphenation
+      // Add newline if the line does not end on a hyphenation (a soft hyphen)
       extraText = `${extraText.trim()}\n`;
     }
     if (extraText.length > 0) {
