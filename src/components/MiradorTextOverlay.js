@@ -144,7 +144,7 @@ class MiradorTextOverlay extends Component {
   shouldRenderPage = ({ lines }) => (
     lines
     && lines.length > 0
-    && lines.some(({ text, words }) => text || (words && words.length > 0)))
+    && lines.some(({ text, spans }) => text || (spans && spans.length > 0)))
 
   /** If the overlay should be rendered at all */
   shouldRender(props) {
