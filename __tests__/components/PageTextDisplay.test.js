@@ -48,10 +48,12 @@ function renderPage(props = {}, renderFn = render) {
 
 describe('PageTextDisplay', () => {
   it('should render lines with individual spans accurately', () => {
-    renderPage();
+    const { container } = renderPage();
+    container.querySelectorAll('rect').forEach(
+      (rect) => expect(rect).toHaveAttribute('style', 'fill: rgba(255, 255, 255, 0.75);'),
+    );
     const firstLine = screen.getByText(svgTextMatcher('a firstWord on a line'));
     expect(firstLine).not.toBeNull();
-    expect(firstLine.previousElementSibling).toHaveAttribute('style', 'fill: rgba(255, 255, 255, 0.75);');
     expect(firstLine).toHaveAttribute('style', 'fill: rgba(0, 0, 0, 0.75);');
     const word = screen.getByText('firstWord');
     expect(word).not.toBeNull();
@@ -63,10 +65,12 @@ describe('PageTextDisplay', () => {
   });
 
   it('should render lines without individual spans accurately', () => {
-    renderPage({ lines: lineFixtures.withoutSpans });
+    const { container } = renderPage({ lines: lineFixtures.withoutSpans });
+    container.querySelectorAll('rect').forEach(
+      (rect) => expect(rect).toHaveAttribute('style', 'fill: rgba(255, 255, 255, 0.75);'),
+    );
     const firstLine = screen.getByText('a word on a line');
     expect(firstLine).not.toBeNull();
-    expect(firstLine.previousElementSibling).toHaveAttribute('style', 'fill: rgba(255, 255, 255, 0.75);');
     expect(firstLine).toHaveAttribute('style', 'fill: rgba(0, 0, 0, 0.75);');
     expect(firstLine).toHaveAttribute('y', '190');
     expect(firstLine).toHaveAttribute('font-size', '120px');
@@ -110,23 +114,31 @@ describe('PageTextDisplay', () => {
   });
 
   it('should correctly set opacity to all rect and text elements', () => {
-    const { ref } = renderPage();
+    const { container, ref } = renderPage();
+    container.querySelectorAll('rect').forEach(
+      (rect) => expect(rect).toHaveAttribute('style', 'fill: rgba(255, 255, 255, 0.75);'),
+    );
     const firstLine = screen.getByText(svgTextMatcher('a firstWord on a line'));
-    expect(firstLine.previousElementSibling).toHaveAttribute('style', 'fill: rgba(255, 255, 255, 0.75);');
     expect(firstLine).toHaveAttribute('style', 'fill: rgba(0, 0, 0, 0.75);');
     ref.current.updateColors('#000000', '#ffffff', 0.25);
-    expect(firstLine.previousElementSibling).toHaveAttribute('style', 'fill: rgba(255, 255, 255, 0.25);');
+    container.querySelectorAll('rect').forEach(
+      (rect) => expect(rect).toHaveAttribute('style', 'fill: rgba(255, 255, 255, 0.25);'),
+    );
     expect(firstLine).toHaveAttribute('style', 'fill: rgba(0, 0, 0, 0.25);');
   });
 
   it('should render text invisible if visibility is disabled', () => {
-    const { rerender } = renderPage();
+    const { container, rerender } = renderPage();
+    container.querySelectorAll('rect').forEach(
+      (rect) => expect(rect).toHaveAttribute('style', 'fill: rgba(255, 255, 255, 0.75);'),
+    );
     let firstLine = screen.getByText(svgTextMatcher('a firstWord on a line'));
-    expect(firstLine.previousElementSibling).toHaveAttribute('style', 'fill: rgba(255, 255, 255, 0.75);');
     expect(firstLine).toHaveAttribute('style', 'fill: rgba(0, 0, 0, 0.75);');
     renderPage({ visible: false }, rerender);
+    container.querySelectorAll('rect').forEach(
+      (rect) => expect(rect).toHaveAttribute('style', 'fill: rgba(255, 255, 255, 0);'),
+    );
     firstLine = screen.getByText(svgTextMatcher('a firstWord on a line'));
-    expect(firstLine.previousElementSibling).toHaveAttribute('style', 'fill: rgba(255, 255, 255, 0);');
     expect(firstLine).toHaveAttribute('style', 'fill: rgba(0, 0, 0, 0);');
   });
 
@@ -143,6 +155,21 @@ describe('PageTextDisplay', () => {
     expect(topCallback).not.toHaveBeenCalled();
   });
 
+  it('should let pointerdown events through if touch screen is detected', () => {
+    const origTouchStart = global.window.ontouchstart;
+    global.window.ontouchstart = true;
+    const topCallback = jest.fn();
+    const { rerender, container } = renderPage({ selectable: false });
+    container.addEventListener('pointerdown', topCallback);
+    fireEvent.pointerDown(screen.getByText(svgTextMatcher('a firstWord on a line')));
+    expect(topCallback).toHaveBeenCalled();
+    topCallback.mockClear();
+    renderPage({ selectable: true }, rerender);
+    fireEvent.pointerDown(screen.getByText(svgTextMatcher('a firstWord on a line')));
+    global.window.ontouchstart = origTouchStart;
+    expect(topCallback).toHaveBeenCalled();
+  });
+
   it('should render spans as <text> elements when running under Gecko', () => {
     const prevAgent = global.navigator.userAgent;
     global.navigator.userAgent = 'Mozilla/5.0 (X11; Linux x86_64; rv:10.0) Gecko/20100101 Firefox/10.0';
@@ -155,16 +182,20 @@ describe('PageTextDisplay', () => {
 
   it('should use automatically determined colors for the initial render if available and enabled', () => {
     const pageColors = { textColor: '#111111', bgColor: '#eeeeee' };
-    renderPage({ useAutoColors: true, pageColors });
+    const { container } = renderPage({ useAutoColors: true, pageColors });
     const firstLine = screen.getByText(svgTextMatcher('a firstWord on a line'));
     expect(firstLine).toHaveAttribute('style', 'fill: rgba(17, 17, 17, 0.75);');
-    expect(firstLine.previousElementSibling).toHaveAttribute('style', 'fill: rgba(238, 238, 238, 0.75);');
+    container.querySelectorAll('rect').forEach(
+      (rect) => expect(rect).toHaveAttribute('style', 'fill: rgba(238, 238, 238, 0.75);'),
+    );
   });
 
   it('should use hardcoded colors for the initial render if enabled, but not available', () => {
-    renderPage({ useAutoColors: true, pageColors: undefined });
+    const { container } = renderPage({ useAutoColors: true, pageColors: undefined });
     const firstLine = screen.getByText(svgTextMatcher('a firstWord on a line'));
     expect(firstLine).toHaveAttribute('style', 'fill: rgba(0, 0, 0, 0.75);');
-    expect(firstLine.previousElementSibling).toHaveAttribute('style', 'fill: rgba(255, 255, 255, 0.75);');
+    container.querySelectorAll('rect').forEach(
+      (rect) => expect(rect).toHaveAttribute('style', 'fill: rgba(255, 255, 255, 0.75);'),
+    );
   });
 });
