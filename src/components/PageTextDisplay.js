@@ -21,7 +21,6 @@ function runningOnTouchScreen() {
   );
 }
 
-
 /** Page Text Display component that is optimized for fast panning/zooming
  *
  * NOTE: This component is doing stuff that is NOT RECOMMENDED GENERALLY, like

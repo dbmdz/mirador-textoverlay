@@ -15,7 +15,6 @@ import useTheme from '@material-ui/core/styles/useTheme';
 import { changeAlpha, toHexRgb } from '../lib/color';
 import TextSelectIcon from './TextSelectIcon';
 
-
 /** Container for a settings button */
 const ButtonContainer = ({
   children, withBorder, paddingLeft, paddingRight,
@@ -249,7 +248,6 @@ ColorWidget.propTypes = {
     }),
   ).isRequired,
 };
-
 
 /** Control text overlay settings  */
 const TextOverlaySettingsBubble = ({

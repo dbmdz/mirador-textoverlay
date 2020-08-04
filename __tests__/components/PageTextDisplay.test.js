@@ -10,7 +10,6 @@ import PageTextDisplay from '../../src/components/PageTextDisplay';
 
 import lineFixtures from '../../__fixtures__/lines.json';
 
-
 /** Helper function to match against an elements inner text */
 function svgTextMatcher(text) {
   return (content, element) => {

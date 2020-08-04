@@ -21,7 +21,6 @@ function parseHocrAttribs(titleAttrib) {
   }, {});
 }
 
-
 /** Parse an hOCR node */
 function parseHocrNode(node, endOfLine = false, scaleFactor = 1) {
   const [ulx, uly, lrx, lry] = parseHocrAttribs(node.title).bbox.map((dim) => dim * scaleFactor);
@@ -60,7 +59,6 @@ function parseHocrNode(node, endOfLine = false, scaleFactor = 1) {
   }
   return spans;
 }
-
 
 /** Parse an hOCR document */
 export function parseHocr(hocrText, referenceSize) {
@@ -121,7 +119,6 @@ export function parseHocr(hocrText, referenceSize) {
   };
 }
 
-
 /** Create CSS directives from an ALTO TextStyle node */
 function altoStyleNodeToCSS(styleNode) {
   // NOTE: We don't map super/subscript, since it would change the font size
@@ -149,7 +146,6 @@ function altoStyleNodeToCSS(styleNode) {
   }
   return styles.join(';');
 }
-
 
 /**
  * Parse an ALTO document.
@@ -293,7 +289,6 @@ export function parseOcr(ocrText, referenceSize) {
   }
   return parse;
 }
-
 
 /** Parse OCR data from IIIF annotations.
  *

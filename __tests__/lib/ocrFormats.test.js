@@ -18,7 +18,6 @@ const closeTo = (expected, precision = 1) => ({
   asymmetricMatch: (actual) => Math.abs(expected - actual) < Math.pow(10, -precision) / 2,
 });
 
-
 describe('parsing ALTO', () => {
   const altoMarkup = fs.readFileSync('__fixtures__/alto.xml', 'utf8');
   const parsed = parseAlto(altoMarkup, { height: 1925, width: 1248 });
