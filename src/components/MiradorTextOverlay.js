@@ -169,7 +169,7 @@ class MiradorTextOverlay extends Component {
   }
 
   /**
-   * Patch the neighboring AnnotatinOverlay container to work with the text overlay.
+   * Patch the neighboring AnnotationOverlay container to work with the text overlay.
    *
    * FIXME: This is almost criminally hacky and brittle.
    *
