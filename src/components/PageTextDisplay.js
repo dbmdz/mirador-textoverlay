@@ -137,6 +137,7 @@ class PageTextDisplay extends React.Component {
       width: pageWidth,
       height: pageHeight,
       userSelect: selectable ? 'text' : 'none',
+      whiteSpace: 'pre',
     };
     let fg = textColor;
     let bg = bgColor;

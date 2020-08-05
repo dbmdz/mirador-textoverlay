@@ -76,7 +76,7 @@ describe('parsing hOCR', () => {
       x: 219,
       y: 2097,
     });
-    expect(parsed.lines[29].spans).toHaveLength(26);
+    expect(parsed.lines[29].spans).toHaveLength(25);
     expect(parsed.lines[29].spans[14]).toMatchObject({
       height: 56,
       text: '„aber',
@@ -90,6 +90,13 @@ describe('parsing hOCR', () => {
       width: 21,
       x: 1041,
       y: 2097,
+    });
+    expect(parsed.lines[29].spans[24]).toMatchObject({
+      height: 26,
+      text: '—,\n',
+      width: 70,
+      x: 1453,
+      y: 2121,
     });
   });
 
