@@ -41,9 +41,9 @@ function parseHocrNode(node, endOfLine = false, scaleFactor = 1) {
   // Add an extra space span if the following text node contains something
   if (node.nextSibling instanceof Text) {
     let extraText = node.nextSibling.wholeText.replace(/\s+/, ' ');
-    if (endOfLine && spans[0].text.slice(-1) !== '\u00AD') {
-      // Add newline if the line does not end on a hyphenation (a soft hyphen)
-      extraText = `${extraText.trim()}\n`;
+    if (endOfLine) {
+      // We don't need trailing whitespace
+      extraText = extraText.trimEnd();
     }
     if (extraText.length > 0) {
       spans.push({
@@ -56,6 +56,11 @@ function parseHocrNode(node, endOfLine = false, scaleFactor = 1) {
         isExtra: true,
       });
     }
+  }
+  const lastSpan = spans.slice(-1)[0];
+  if (endOfLine && lastSpan.text.slice(-1) !== '\u00AD') {
+    // Add newline if the line does not end on a hyphenation (a soft hyphen)
+    lastSpan.text += '\n';
   }
   return spans;
 }
