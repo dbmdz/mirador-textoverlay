@@ -27,6 +27,7 @@ class MiradorTextOverlay extends Component {
     if (enabled && viewer) {
       this.registerOsdCallback();
     }
+    this.patchAnnotationOverlay();
   }
 
   /** Register OpenSeadragon callback when viewport changes */
@@ -35,6 +36,8 @@ class MiradorTextOverlay extends Component {
       enabled, viewer, pageTexts, textColor, bgColor, useAutoColors, visible, selectable,
     } = this.props;
     let { opacity } = this.props;
+
+    this.patchAnnotationOverlay();
 
     // OSD instance becomes available, register callback
     if (enabled && viewer && viewer !== prevProps.viewer) {
@@ -163,6 +166,49 @@ class MiradorTextOverlay extends Component {
   registerOsdCallback() {
     const { viewer } = this.props;
     viewer.addHandler('update-viewport', this.onUpdateViewport.bind(this));
+  }
+
+  /**
+   * Patch the neighboring AnnotationOverlay container to work with the text overlay.
+   *
+   * FIXME: This is almost criminally hacky and brittle.
+   *
+   * If Mirador renders an annotation overlay, it can either:
+   * - be rendered above the text overlay and intercept pointer events,
+   *   preventing selection
+   * - or be rendered below the text overlay, i.e. we occlude the annotations
+   *
+   * To fix both cases, we hard-code the z-index on the annotation overlay so
+   * it's always above us and set `pointer-events` to `none` if selectability
+   * is active (this has the effect of the annotation overlay becoming
+   * 'transparent' to pointer events, i.e. they reach us and allow the user
+   * to select text).
+   *
+   * We have to resort to manual DOM-wrangling since an attempt at using a
+   * wrapping plugin component around `AnnotationOverlay` fails on multiple
+   * levels:
+   * - Adjusting the styles on the wrapping element itself fails since the
+   *   annotation overlay renders with `React.createPortal`, i.e. outside of the
+   *   plugin components's DOM subtree.
+   * - Accessing the `ref` on `AnnotationOverlay` fails since we can't get a
+   *   handle on it via `props.children` in the wrapping component
+   *
+   *  So this is it, it's ugly, it's brittle, it's painful, but it works (for now...).
+   */
+  patchAnnotationOverlay() {
+    const { enabled, selectable } = this.props;
+    if (!enabled) {
+      return;
+    }
+    const annoCanvasContainer = this.containerRef.current
+      ?.parentElement
+      // This selector will currently only match the AnnotationOverlay's `canvas` node
+      .querySelector('div.openseadragon-canvas > div > canvas')
+      ?.parentElement;
+    if (annoCanvasContainer) {
+      annoCanvasContainer.style.zIndex = 100;
+      annoCanvasContainer.style.pointerEvents = selectable ? 'none' : null;
+    }
   }
 
   /** Render the text overlay SVG */
