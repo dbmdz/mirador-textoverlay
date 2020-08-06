@@ -1,6 +1,3 @@
-// This is OK since we're only ever doing shallow compares
-/* eslint-disable react/no-array-index-key */
-
 import React from 'react';
 import PropTypes from 'prop-types';
 
@@ -26,7 +23,7 @@ function runningOnTouchScreen() {
  * NOTE: This component is doing stuff that is NOT RECOMMENDED GENERALLY, like
  *       hacking shouldComponentUpdate to not-rerender on every prop change,
  *       setting styles manually via DOM refs, etc. This was all done to reach
- *       higher frame rates on low-end devices.
+ *       higher frame rates.
 */
 class PageTextDisplay extends React.Component {
   /** Set up refs for direct transforms and pointer callback registration */
@@ -43,11 +40,11 @@ class PageTextDisplay extends React.Component {
     this.textContainerRef.current.addEventListener('pointerdown', this.onPointerDown);
   }
 
-  /** Only update the component when some of the props changed.
+  /** Only update the component when the source changed (i.e. we need to re-render the text).
    *
    * Yes, this is a horrible, horrible, hack, that will bite us in the behind at
    * some point, and is going to trip someone up terribly while debugging in the future,
-   * but this way we can more precisely control when we re-render.
+   * but this *seriously* helps with performance.
    */
   shouldComponentUpdate(nextProps) {
     const { source } = this.props;
@@ -169,6 +166,9 @@ class PageTextDisplay extends React.Component {
     // eslint-disable-next-line react/jsx-props-no-spreading, require-jsdoc
     let SpanElem = (props) => <tspan {...props} />;
     if (isGecko) {
+      // NOTE: Gecko really works best with a flattened bunch of text nodes. Wrapping the
+      //       lines in a <g>, e.g. breaks text selection in similar ways to the below
+      //       WebKit-specific note, for some reason ¯\_(ツ)_/¯
       LineWrapper = React.Fragment;
       // eslint-disable-next-line react/jsx-props-no-spreading, require-jsdoc
       SpanElem = (props) => <text style={textStyle} {...props} />;
