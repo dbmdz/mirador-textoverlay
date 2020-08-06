@@ -8,20 +8,8 @@ import '@testing-library/jest-dom/extend-expect';
 
 import PageTextDisplay from '../../src/components/PageTextDisplay';
 
+import { svgTextMatcher } from '../utils';
 import lineFixtures from '../../__fixtures__/lines.json';
-
-/** Helper function to match against an elements inner text */
-function svgTextMatcher(text) {
-  return (content, element) => {
-    if (element.tagName === 'text') {
-      const elementText = Array.from(element.querySelectorAll('tspan'))
-        .map((el) => el.textContent)
-        .join('');
-      return elementText.trimEnd() === text;
-    }
-    return false;
-  };
-}
 
 /** Render a page overlay to the testing screen */
 function renderPage(props = {}, renderFn = render) {
