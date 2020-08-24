@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-
-import { changeAlpha } from '../lib/color';
+import { fade } from '@material-ui/core/styles/colorManipulator';
 
 /** Check if we're running in Gecko */
 function runningInGecko() {
@@ -96,10 +95,10 @@ class PageTextDisplay extends React.Component {
     // one of the containers, since otherwise the user's selection highlight would
     // become transparent as well or disappear entirely.
     for (const rect of this.boxContainerRef.current.querySelectorAll('rect')) {
-      rect.style.fill = changeAlpha(bgColor, opacity);
+      rect.style.fill = fade(bgColor, opacity);
     }
     for (const text of this.textContainerRef.current.querySelectorAll('text')) {
-      text.style.fill = changeAlpha(textColor, opacity);
+      text.style.fill = fade(textColor, opacity);
     }
   }
 
@@ -144,9 +143,9 @@ class PageTextDisplay extends React.Component {
     }
 
     const renderOpacity = (!visible && selectable) ? 0 : opacity;
-    const boxStyle = { fill: changeAlpha(bg, renderOpacity) };
+    const boxStyle = { fill: fade(bg, renderOpacity) };
     const textStyle = {
-      fill: changeAlpha(fg, renderOpacity),
+      fill: fade(fg, renderOpacity),
       fontFamily,
     };
     const renderLines = lines.filter((l) => l.width > 0 && l.height > 0);
