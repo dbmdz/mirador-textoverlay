@@ -1,0 +1,111 @@
+import React from 'react';
+import PropTypes from 'prop-types';
+import { MiradorMenuButton } from 'mirador/dist/es/src/components/MiradorMenuButton';
+import ResetColorsIcon from '@material-ui/icons/SettingsBackupRestore';
+import makeStyles from '@material-ui/core/styles/makeStyles';
+import { fade } from '@material-ui/core/styles/colorManipulator';
+
+import ColorInput from './ColorInput';
+import { toHexRgb } from '../../lib/color';
+
+const useStyles = makeStyles(({ palette }) => {
+  const bubbleBg = palette.shades.main;
+  return {
+    root: {
+      display: 'flex',
+      flexDirection: 'column',
+      position: 'absolute',
+      top: 48,
+      zIndex: 100,
+      borderRadius: '0 0 25px 25px',
+      backgroundColor: fade(bubbleBg, 0.8),
+    },
+    foreground: {
+      height: 40,
+      padding: '8px 8px 0px 8px',
+      marginTop: (props) => (props.showResetButton ? -12 : 0),
+    },
+    background: {
+      marginTop: -6,
+      zIndex: -5,
+      height: 40,
+      padding: '0px 8px 8px 8px',
+    },
+  };
+});
+
+/** Widget to update text and background color */
+const ColorWidget = ({
+  textColor, bgColor, onChange, t, pageColors, useAutoColors,
+}) => {
+  const showResetButton = (
+    !useAutoColors
+    && pageColors
+    && pageColors.some((c) => c && (c.textColor || c.bgColor))
+  );
+  const classes = useStyles({ showResetButton });
+
+  return (
+    <div className={`MuiPaper-elevation4 ${classes.root}`}>
+      {showResetButton && (
+      <MiradorMenuButton
+        aria-label={t('resetTextColors')}
+        onClick={() => onChange({
+          useAutoColors: true,
+          textColor: pageColors.map((cs) => cs.textColor).filter((x) => x)[0] ?? textColor,
+          bgColor: pageColors.map((cs) => cs.bgColor).filter((x) => x)[0] ?? bgColor,
+        })}
+      >
+        <ResetColorsIcon />
+      </MiradorMenuButton>
+      )}
+      <ColorInput
+        title={t('textColor')}
+        autoColors={useAutoColors
+          ? pageColors.map((colors) => colors.textColor)
+          : undefined}
+        color={textColor}
+        onChange={(color) => {
+          // Lackluster way to check if selection was canceled: The chance of users picking
+          // the exact same colors as the autodetected one is extremely slim, so if we get that,
+          // the user probably aborted the color picking and we don't have to update the color
+          // settings.
+          if (useAutoColors && color === toHexRgb(pageColors?.[0]?.bgColor)) {
+            return;
+          }
+          onChange({ textColor: color, bgColor, useAutoColors: false });
+        }}
+        className={classes.foreground}
+      />
+      <ColorInput
+        title={t('backgroundColor')}
+        color={bgColor}
+        autoColors={useAutoColors
+          ? pageColors.map((colors) => colors.bgColor)
+          : undefined}
+        onChange={(color) => {
+          // See comment on previous ColorInput onChange callback
+          if (useAutoColors && color === toHexRgb(pageColors?.[0]?.bgColor)) {
+            return;
+          }
+          onChange({ bgColor: color, textColor, useAutoColors: false });
+        }}
+        className={classes.background}
+      />
+    </div>
+  );
+};
+ColorWidget.propTypes = {
+  textColor: PropTypes.string.isRequired,
+  bgColor: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired,
+  t: PropTypes.func.isRequired,
+  useAutoColors: PropTypes.bool.isRequired,
+  pageColors: PropTypes.arrayOf(
+    PropTypes.shape({
+      textColor: PropTypes.string, bgColor: PropTypes.string,
+    }),
+  ).isRequired,
+};
+
+export default ColorWidget;

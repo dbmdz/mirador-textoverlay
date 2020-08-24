@@ -5,7 +5,7 @@ import { textsReducer } from './state/reducers';
 import textSaga from './state/sagas';
 import { getTextsForVisibleCanvases, getWindowTextOverlayOptions } from './state/selectors';
 import MiradorTextOverlay from './components/MiradorTextOverlay';
-import TextOverlaySettingsBubble from './components/TextOverlaySettingsBubble';
+import OverlaySettings from './components/settings/OverlaySettings';
 
 export default [
   {
@@ -30,7 +30,7 @@ export default [
     target: 'OpenSeadragonViewer',
   },
   {
-    component: TextOverlaySettingsBubble,
+    component: OverlaySettings,
     mapDispatchToProps: (dispatch, { windowId }) => ({
       updateWindowTextOverlayOptions: (options) => dispatch(
         updateWindow(windowId, { textOverlay: options }),
