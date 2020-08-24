@@ -1,6 +1,6 @@
 {
   "name": "mirador-textoverlay",
-  "version": "0.3.1",
+  "version": "0.3.2-pre",
   "description": "Mirador 3 plugin to render a hidden (but selectable) or visible text overlay",
   "main": "lib/index.js",
   "module": "es/index.js",

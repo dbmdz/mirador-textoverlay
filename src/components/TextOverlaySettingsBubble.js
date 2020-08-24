@@ -11,8 +11,9 @@ import PaletteIcon from '@material-ui/icons/Palette';
 import ResetColorsIcon from '@material-ui/icons/SettingsBackupRestore';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import useTheme from '@material-ui/core/styles/useTheme';
+import { fade } from '@material-ui/core/styles/colorManipulator';
 
-import { changeAlpha, toHexRgb } from '../lib/color';
+import { toHexRgb } from '../lib/color';
 import TextSelectIcon from './TextSelectIcon';
 
 /** Container for a settings button */
@@ -31,10 +32,10 @@ const ButtonContainer = ({
   if (withBorder) {
     // CSS voodoo to render a border with a margin on the top and bottom
     style.borderImageSource = 'linear-gradient('
-    + `to bottom, ${changeAlpha(bubbleFg, 0)}) 20%,`
-    + `${changeAlpha(bubbleFg, 0.2)} 20% 80%,`
-    + `${changeAlpha(bubbleFg, 0)} 80%`;
-    style.borderRight = `1px solid ${changeAlpha(bubbleFg, 0.2)}`;
+    + `to bottom, ${fade(bubbleFg, 0)}) 20%,`
+    + `${fade(bubbleFg, 0.2)} 20% 80%,`
+    + `${fade(bubbleFg, 0)} 80%`;
+    style.borderRight = `1px solid ${fade(bubbleFg, 0.2)}`;
     style.borderImageSlice = 1;
   }
   return (
@@ -66,7 +67,7 @@ const OpacityWidget = ({ opacity, onChange, t }) => {
       aria-labelledby="text-opacity-slider-label"
       className="MuiPaper-elevation4"
       style={{
-        backgroundColor: changeAlpha(bubbleBg, 0.8),
+        backgroundColor: fade(bubbleBg, 0.8),
         borderRadius: '0px 0px 25px 25px',
         height: '150px',
         padding: '16px 8px 8px 8px',
@@ -176,7 +177,7 @@ const ColorWidget = ({
         top: 48,
         zIndex: 100,
         borderRadius: '0 0 25px 25px',
-        backgroundColor: changeAlpha(bubbleBg, 0.8),
+        backgroundColor: fade(bubbleBg, 0.8),
       }}
     >
       {showResetButton && (
@@ -264,7 +265,7 @@ const TextOverlaySettingsBubble = ({
   const { palette } = useTheme();
   const bubbleBg = palette.shades.main;
   const bubbleFg = palette.getContrastText(bubbleBg);
-  const toggledBubbleBg = changeAlpha(bubbleFg, 0.25);
+  const toggledBubbleBg = fade(bubbleFg, 0.25);
 
   if (!enabled || !textsAvailable) {
     return null;
@@ -273,7 +274,7 @@ const TextOverlaySettingsBubble = ({
     <div
       className="MuiPaper-elevation4"
       style={{
-        backgroundColor: changeAlpha(bubbleBg, 0.8),
+        backgroundColor: fade(bubbleBg, 0.8),
         borderRadius: 25,
         position: 'absolute',
         right: 8,
@@ -329,7 +330,7 @@ const TextOverlaySettingsBubble = ({
             aria-expanded={showOpacitySlider}
             onClick={() => setShowOpacitySlider(!showOpacitySlider)}
             style={{
-              backgroundColor: showOpacitySlider && changeAlpha(bubbleFg, 0.1),
+              backgroundColor: showOpacitySlider && fade(bubbleFg, 0.1),
             }}
           >
             <OpacityIcon />
@@ -355,7 +356,7 @@ const TextOverlaySettingsBubble = ({
             aria-expanded={showColorPicker}
             onClick={() => setShowColorPicker(!showColorPicker)}
             style={{
-              backgroundColor: showColorPicker && changeAlpha(bubbleFg, 0.1),
+              backgroundColor: showColorPicker && fade(bubbleFg, 0.1),
             }}
           >
             <PaletteIcon />
