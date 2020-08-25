@@ -6,7 +6,6 @@ import {
   fireEvent, render, screen, queryByRole,
 } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
-import useTheme from '@material-ui/core/styles/useTheme';
 import { ThemeProvider } from '@material-ui/core/styles';
 import MuiDefaultTheme from '@material-ui/core/styles/defaultTheme';
 
@@ -23,11 +22,6 @@ const mockTheme = {
     },
   },
 };
-// Very simple mock theme so that our previous hardcoded asserts work
-/*
-jest.mock('@material-ui/core/styles/useTheme');
-useTheme.mockImplementation(() => mockTheme);
-*/
 
 // Mocked MUI slider for easier testing, taken from
 // https://stackoverflow.com/a/61628815 (CC BY-SA 4.0)
@@ -219,7 +213,7 @@ describe('TextOverlaySettingsBubble', () => {
 
   it('should be positioned lower if mirador-image-tools is enabled', () => {
     renderSettings({ imageToolsEnabled: true });
-    expect(screen.getByLabelText('expandTextOverlayOptions').parentElement)
+    expect(screen.getByLabelText('expandTextOverlayOptions').parentElement.parentElement)
       .toHaveStyle('top: 66px');
   });
 
