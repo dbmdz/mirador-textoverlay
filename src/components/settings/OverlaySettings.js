@@ -32,6 +32,11 @@ const useStyles = makeStyles(({ palette, breakpoints }) => {
       // so if it's active, position the menu lower
       top: (props) => (props.imageToolsEnabled ? 66 : 8),
       zIndex: 999,
+      [breakpoints.down('sm')]: {
+        flexDirection: 'column-reverse',
+        top: (props) => 8, // FIXME: Needs to be a func for some reason
+        right: (props) => (props.imageToolsEnabled ? 66 : 8),
+      },
     },
   };
 });
@@ -62,15 +67,17 @@ const OverlaySettings = ({
     ? pageColors.map((cs) => cs.bgColor).filter((x) => x)[0] ?? defaultBgColor
     : defaultBgColor;
 
+  const showAllButtons = open && !textsFetching;
+
   if (!enabled || !textsAvailable) {
     return null;
   }
   return (
     <div className={`MuiPaper-elevation4 ${classes.bubbleContainer}`}>
-      {(open && !textsFetching)
+      {showAllButtons
       && (
       <>
-        <ButtonContainer withBorder paddingRight={8}>
+        <ButtonContainer withBorder paddingNext={8}>
           <MiradorMenuButton
             aria-label={t('textSelect')}
             onClick={() => updateWindowTextOverlayOptions({
@@ -83,7 +90,7 @@ const OverlaySettings = ({
             <TextSelectIcon />
           </MiradorMenuButton>
         </ButtonContainer>
-        <ButtonContainer paddingLeft={8}>
+        <ButtonContainer paddingPrev={8}>
           <MiradorMenuButton
             aria-label={t('textVisible')}
             onClick={() => {
@@ -130,7 +137,7 @@ const OverlaySettings = ({
           />
           )}
         </ButtonContainer>
-        <ButtonContainer withBorder paddingRight={8}>
+        <ButtonContainer withBorder paddingNext={8}>
           <MiradorMenuButton
             id="color-picker-label"
             disabled={!visible}
@@ -168,7 +175,7 @@ const OverlaySettings = ({
         disabled={textsFetching}
         onClick={() => setOpen(!open)}
       >
-        { (open && !textsFetching)
+        {showAllButtons
           ? <CloseIcon />
           : <SubjectIcon />}
       </MiradorMenuButton>

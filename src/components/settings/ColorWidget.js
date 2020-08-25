@@ -8,7 +8,7 @@ import { fade } from '@material-ui/core/styles/colorManipulator';
 import ColorInput from './ColorInput';
 import { toHexRgb } from '../../lib/color';
 
-const useStyles = makeStyles(({ palette }) => {
+const useStyles = makeStyles(({ palette, breakpoints }) => {
   const bubbleBg = palette.shades.main;
   return {
     root: {
@@ -17,19 +17,41 @@ const useStyles = makeStyles(({ palette }) => {
       position: 'absolute',
       top: 48,
       zIndex: 100,
-      borderRadius: '0 0 25px 25px',
+      borderRadius: [[0, 0, 25, 25]],
       backgroundColor: fade(bubbleBg, 0.8),
+      [breakpoints.down('sm')]: {
+        flexDirection: 'row',
+        right: 48,
+        top: 'auto',
+        borderRadius: [[25, 0, 0, 25]],
+        // Truncate right box shadow
+        clipPath: 'inset(-8px 0 -8px -8px)',
+      },
     },
     foreground: {
       height: 40,
-      padding: '8px 8px 0px 8px',
-      marginTop: (props) => (props.showResetButton ? -12 : 0),
+      padding: [[8, 8, 0, 8]],
+      margin: (props) => [[props.showResetButton ? -12 : 0, 0, 0, 0]],
+      [breakpoints.down('sm')]: {
+        height: 48,
+        width: 40,
+        padding: [[8, 0, 8, 8]],
+        marginTop: 0,
+        margin: (props) => [[0, 0, 0, props.showResetButton ? -12 : 0]],
+      },
     },
     background: {
       marginTop: -6,
       zIndex: -5,
       height: 40,
-      padding: '0px 8px 8px 8px',
+      padding: [[0, 8, 8, 8]],
+      [breakpoints.down('sm')]: {
+        height: 48,
+        width: 40,
+        padding: [[8, 8, 8, 0]],
+        marginTop: 0,
+        marginLeft: -6,
+      },
     },
   };
 });

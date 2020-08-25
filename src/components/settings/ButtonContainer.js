@@ -15,17 +15,17 @@ const useStyles = makeStyles(({ palette, breakpoints }) => {
   return {
     root: {
       display: 'flex',
-      paddingRight: (props) => props.paddingRight,
-      paddingLeft: (props) => props.paddingLeft,
+      padding: ({ paddingPrev, paddingNext }) => [[0, paddingNext ?? 0, 0, paddingPrev ?? 0]],
       borderRight: ({ withBorder }) => (withBorder ? `1px solid ${fade(bubbleFg, 0.2)}` : 'none'),
       borderImageSlice: ({ withBorder }) => (withBorder ? 1 : undefined),
       borderImageSource: ({ withBorder }) => (withBorder ? borderImgRight : undefined),
       flexDirection: 'column',
       [breakpoints.down('sm')]: {
         flexDirection: 'row',
-        borderRight: 'none',
+        borderRight: (props) => 'none', // FIXME: Needs to be a func for some reason
         borderBottom: ({ withBorder }) => (withBorder ? `1px solid ${fade(bubbleFg, 0.2)}` : 'none'),
         borderImageSource: ({ withBorder }) => (withBorder ? borderImgBottom : undefined),
+        padding: ({ paddingPrev, paddingNext }) => [[paddingPrev ?? 0, 0, paddingNext ?? 0, 0]],
       },
     },
   };
@@ -33,9 +33,9 @@ const useStyles = makeStyles(({ palette, breakpoints }) => {
 
 /** Container for a settings button */
 const ButtonContainer = ({
-  children, withBorder, paddingLeft, paddingRight,
+  children, withBorder, paddingPrev, paddingNext,
 }) => {
-  const classes = useStyles({ withBorder, paddingLeft, paddingRight });
+  const classes = useStyles({ withBorder, paddingPrev, paddingNext });
   return (
     <div className={classes.root}>
       {children}
@@ -45,13 +45,13 @@ const ButtonContainer = ({
 ButtonContainer.propTypes = {
   children: PropTypes.node.isRequired,
   withBorder: PropTypes.bool,
-  paddingRight: PropTypes.number,
-  paddingLeft: PropTypes.number,
+  paddingNext: PropTypes.number,
+  paddingPrev: PropTypes.number,
 };
 ButtonContainer.defaultProps = {
   withBorder: false,
-  paddingRight: undefined,
-  paddingLeft: undefined,
+  paddingNext: undefined,
+  paddingPrev: undefined,
 };
 
 export default ButtonContainer;
