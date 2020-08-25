@@ -26,7 +26,7 @@ const useStyles = makeStyles(({ palette, breakpoints }) => {
       display: 'flex',
       flexDirection: 'row',
       backgroundColor: fade(bubbleBg, 0.8),
-      borderRadius: 25,
+      borderRadius: (props) => [[25, 25, 25, 25]],
       position: 'absolute',
       right: 8,
       // The mirador-image-tools plugin renders itself at the same position,
@@ -37,6 +37,7 @@ const useStyles = makeStyles(({ palette, breakpoints }) => {
         flexDirection: 'column',
         top: (props) => 8, // FIXME: Needs to be a func for some reason
         right: (props) => (props.imageToolsEnabled ? 66 : 8),
+        borderRadius: (props) => [[25, 25, 25, props.open && props.showColorPicker ? 0 : 25]],
       },
     },
   };
@@ -61,7 +62,7 @@ const OverlaySettings = ({
   const bubbleBg = palette.shades.main;
   const bubbleFg = palette.getContrastText(bubbleBg);
   const toggledBubbleBg = fade(bubbleFg, 0.25);
-  const classes = useStyles({ imageToolsEnabled });
+  const classes = useStyles({ imageToolsEnabled, open, showColorPicker });
 
   const textColor = useAutoColors
     ? pageColors.map((cs) => cs.textColor).filter((x) => x)[0] ?? defaultTextColor
@@ -77,8 +78,8 @@ const OverlaySettings = ({
   }
 
   /** Button for toggling the menu  */
-  const ToggleButton = () => (
-    <ButtonContainer withBorder={isSmallDisplay}>
+  const toggleButton = (
+    <ButtonContainer withBorder={open && isSmallDisplay}>
       <MiradorMenuButton
         aria-label={open ? t('collapseTextOverlayOptions') : t('expandTextOverlayOptions')}
         disabled={textsFetching}
@@ -92,7 +93,7 @@ const OverlaySettings = ({
   );
   return (
     <div className={`MuiPaper-elevation4 ${classes.bubbleContainer}`}>
-      {isSmallDisplay && <ToggleButton />}
+      {isSmallDisplay && toggleButton}
       {showAllButtons
       && (
       <>
@@ -189,7 +190,7 @@ const OverlaySettings = ({
       )}
       {textsFetching
         && <CircularProgress disableShrink size={50} style={{ position: 'absolute' }} />}
-      {!isSmallDisplay && <ToggleButton />}
+      {!isSmallDisplay && toggleButton}
     </div>
   );
 };
