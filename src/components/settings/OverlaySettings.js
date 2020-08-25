@@ -37,7 +37,9 @@ const useStyles = makeStyles(({ palette, breakpoints }) => {
         flexDirection: 'column',
         top: (props) => 8, // FIXME: Needs to be a func for some reason
         right: (props) => (props.imageToolsEnabled ? 66 : 8),
-        borderRadius: (props) => [[25, 25, 25, props.open && props.showColorPicker ? 0 : 25]],
+        borderRadius: (props) => [[
+          25, 25, 25, !props.textsFetching && props.open && props.showColorPicker ? 0 : 25,
+        ]],
       },
     },
   };
@@ -62,7 +64,9 @@ const OverlaySettings = ({
   const bubbleBg = palette.shades.main;
   const bubbleFg = palette.getContrastText(bubbleBg);
   const toggledBubbleBg = fade(bubbleFg, 0.25);
-  const classes = useStyles({ imageToolsEnabled, open, showColorPicker });
+  const classes = useStyles({
+    imageToolsEnabled, open, showColorPicker, textsFetching,
+  });
 
   const textColor = useAutoColors
     ? pageColors.map((cs) => cs.textColor).filter((x) => x)[0] ?? defaultTextColor
@@ -79,7 +83,7 @@ const OverlaySettings = ({
 
   /** Button for toggling the menu  */
   const toggleButton = (
-    <ButtonContainer withBorder={open && isSmallDisplay}>
+    <ButtonContainer withBorder={!textsFetching && open && isSmallDisplay}>
       <MiradorMenuButton
         aria-label={open ? t('collapseTextOverlayOptions') : t('expandTextOverlayOptions')}
         disabled={textsFetching}
