@@ -78,15 +78,17 @@ const OverlaySettings = ({
 
   /** Button for toggling the menu  */
   const ToggleButton = () => (
-    <MiradorMenuButton
-      aria-label={open ? t('collapseTextOverlayOptions') : t('expandTextOverlayOptions')}
-      disabled={textsFetching}
-      onClick={() => setOpen(!open)}
-    >
-      {showAllButtons
-        ? <CloseIcon />
-        : <SubjectIcon />}
-    </MiradorMenuButton>
+    <ButtonContainer withBorder={isSmallDisplay}>
+      <MiradorMenuButton
+        aria-label={open ? t('collapseTextOverlayOptions') : t('expandTextOverlayOptions')}
+        disabled={textsFetching}
+        onClick={() => setOpen(!open)}
+      >
+        {showAllButtons
+          ? <CloseIcon />
+          : <SubjectIcon />}
+      </MiradorMenuButton>
+    </ButtonContainer>
   );
   return (
     <div className={`MuiPaper-elevation4 ${classes.bubbleContainer}`}>
@@ -94,7 +96,7 @@ const OverlaySettings = ({
       {showAllButtons
       && (
       <>
-        <ButtonContainer withBorder paddingNext={8}>
+        <ButtonContainer withBorder paddingPrev={isSmallDisplay ? 8 : 0} paddingNext={8}>
           <MiradorMenuButton
             aria-label={t('textSelect')}
             onClick={() => updateWindowTextOverlayOptions({
@@ -154,7 +156,7 @@ const OverlaySettings = ({
           />
           )}
         </ButtonContainer>
-        <ButtonContainer withBorder paddingNext={8}>
+        <ButtonContainer withBorder={!isSmallDisplay} paddingNext={isSmallDisplay ? 0 : 8}>
           <MiradorMenuButton
             id="color-picker-label"
             disabled={!visible}
