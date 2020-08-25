@@ -10,6 +10,7 @@ import PaletteIcon from '@material-ui/icons/Palette';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import useTheme from '@material-ui/core/styles/useTheme';
 import makeStyles from '@material-ui/core/styles/makeStyles';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
 import { fade } from '@material-ui/core/styles/colorManipulator';
 
 import TextSelectIcon from '../TextSelectIcon';
@@ -33,7 +34,7 @@ const useStyles = makeStyles(({ palette, breakpoints }) => {
       top: (props) => (props.imageToolsEnabled ? 66 : 8),
       zIndex: 999,
       [breakpoints.down('sm')]: {
-        flexDirection: 'column-reverse',
+        flexDirection: 'column',
         top: (props) => 8, // FIXME: Needs to be a func for some reason
         right: (props) => (props.imageToolsEnabled ? 66 : 8),
       },
@@ -53,6 +54,8 @@ const OverlaySettings = ({
   const [open, setOpen] = useState(enabled && (visible || selectable));
   const [showOpacitySlider, setShowOpacitySlider] = useState(false);
   const [showColorPicker, setShowColorPicker] = useState(false);
+  const theme = useTheme();
+  const isSmallDisplay = useMediaQuery(theme.breakpoints.down('sm'));
 
   const { palette } = useTheme();
   const bubbleBg = palette.shades.main;
@@ -72,8 +75,22 @@ const OverlaySettings = ({
   if (!enabled || !textsAvailable) {
     return null;
   }
+
+  /** Button for toggling the menu  */
+  const ToggleButton = () => (
+    <MiradorMenuButton
+      aria-label={open ? t('collapseTextOverlayOptions') : t('expandTextOverlayOptions')}
+      disabled={textsFetching}
+      onClick={() => setOpen(!open)}
+    >
+      {showAllButtons
+        ? <CloseIcon />
+        : <SubjectIcon />}
+    </MiradorMenuButton>
+  );
   return (
     <div className={`MuiPaper-elevation4 ${classes.bubbleContainer}`}>
+      {isSmallDisplay && <ToggleButton />}
       {showAllButtons
       && (
       <>
@@ -170,15 +187,7 @@ const OverlaySettings = ({
       )}
       {textsFetching
         && <CircularProgress disableShrink size={50} style={{ position: 'absolute' }} />}
-      <MiradorMenuButton
-        aria-label={open ? t('collapseTextOverlayOptions') : t('expandTextOverlayOptions')}
-        disabled={textsFetching}
-        onClick={() => setOpen(!open)}
-      >
-        {showAllButtons
-          ? <CloseIcon />
-          : <SubjectIcon />}
-      </MiradorMenuButton>
+      {!isSmallDisplay && <ToggleButton />}
     </div>
   );
 };
