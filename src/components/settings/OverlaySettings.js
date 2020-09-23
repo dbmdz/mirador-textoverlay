@@ -49,6 +49,7 @@ const useStyles = makeStyles(({ palette, breakpoints }) => {
 const OverlaySettings = ({
   windowTextOverlayOptions, imageToolsEnabled, textsAvailable,
   textsFetching, updateWindowTextOverlayOptions, t, pageColors,
+  containerId,
 }) => {
   const {
     enabled, visible, selectable, opacity, textColor: defaultTextColor, bgColor: defaultBgColor,
@@ -85,6 +86,7 @@ const OverlaySettings = ({
   const toggleButton = (
     <ButtonContainer withBorder={!textsFetching && open && isSmallDisplay}>
       <MiradorMenuButton
+        containerId={containerId}
         aria-label={open ? t('collapseTextOverlayOptions') : t('expandTextOverlayOptions')}
         disabled={textsFetching}
         onClick={() => setOpen(!open)}
@@ -103,6 +105,7 @@ const OverlaySettings = ({
       <>
         <ButtonContainer withBorder paddingPrev={isSmallDisplay ? 8 : 0} paddingNext={8}>
           <MiradorMenuButton
+            containerId={containerId}
             aria-label={t('textSelect')}
             onClick={() => updateWindowTextOverlayOptions({
               ...windowTextOverlayOptions,
@@ -116,6 +119,7 @@ const OverlaySettings = ({
         </ButtonContainer>
         <ButtonContainer paddingPrev={8}>
           <MiradorMenuButton
+            containerId={containerId}
             aria-label={t('textVisible')}
             onClick={() => {
               updateWindowTextOverlayOptions({
@@ -138,6 +142,7 @@ const OverlaySettings = ({
         <ButtonContainer>
           <MiradorMenuButton
             id="text-opacity-slider-label"
+            containerId={containerId}
             disabled={!visible}
             aria-label={t('textOpacity')}
             aria-controls="text-opacity-slider"
@@ -164,6 +169,7 @@ const OverlaySettings = ({
         <ButtonContainer withBorder={!isSmallDisplay} paddingNext={isSmallDisplay ? 0 : 8}>
           <MiradorMenuButton
             id="color-picker-label"
+            containerId={containerId}
             disabled={!visible}
             aria-label={t('colorPicker')}
             aria-controls="color-picker"
@@ -179,6 +185,7 @@ const OverlaySettings = ({
           && (
           <ColorWidget
             t={t}
+            containerId={containerId}
             bgColor={bgColor}
             textColor={textColor}
             pageColors={pageColors}
@@ -200,6 +207,7 @@ const OverlaySettings = ({
 };
 
 OverlaySettings.propTypes = {
+  containerId: PropTypes.string.isRequired,
   imageToolsEnabled: PropTypes.bool.isRequired,
   t: PropTypes.func.isRequired,
   textsAvailable: PropTypes.bool.isRequired,
