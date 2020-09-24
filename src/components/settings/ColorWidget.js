@@ -58,7 +58,7 @@ const useStyles = makeStyles(({ palette, breakpoints }) => {
 
 /** Widget to update text and background color */
 const ColorWidget = ({
-  textColor, bgColor, onChange, t, pageColors, useAutoColors,
+  textColor, bgColor, onChange, t, pageColors, useAutoColors, containerId,
 }) => {
   const showResetButton = (
     !useAutoColors
@@ -71,6 +71,7 @@ const ColorWidget = ({
     <div className={`MuiPaper-elevation4 ${classes.root}`}>
       {showResetButton && (
       <MiradorMenuButton
+        containerId={containerId}
         aria-label={t('resetTextColors')}
         onClick={() => onChange({
           useAutoColors: true,
@@ -118,6 +119,7 @@ const ColorWidget = ({
   );
 };
 ColorWidget.propTypes = {
+  containerId: PropTypes.string.isRequired,
   textColor: PropTypes.string.isRequired,
   bgColor: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,

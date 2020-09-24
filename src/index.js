@@ -1,5 +1,5 @@
 import { updateWindow } from 'mirador/dist/es/src/state/actions';
-import { getWindowConfig } from 'mirador/dist/es/src/state/selectors';
+import { getWindowConfig, getContainerId } from 'mirador/dist/es/src/state/selectors';
 
 import { textsReducer } from './state/reducers';
 import textSaga from './state/sagas';
@@ -39,6 +39,7 @@ export default [
     mapStateToProps: (state, { windowId }) => {
       const { imageToolsEnabled } = getWindowConfig(state, { windowId });
       return {
+        containerId: getContainerId(state),
         imageToolsEnabled,
         textsAvailable: getTextsForVisibleCanvases(state, { windowId }).length > 0,
         textsFetching: getTextsForVisibleCanvases(state, { windowId }).some((t) => t.isFetching),
