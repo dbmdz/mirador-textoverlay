@@ -13,7 +13,7 @@ export default {
     resetTextColors: 'Farben zurücksetzen',
   },
   en: {
-    collapseTextOverlayOptions: 'Contract text overlay options',
+    collapseTextOverlayOptions: 'Collapse text overlay options',
     disableTextOverlay: 'Disable text overlay',
     enableTextOverlay: 'Enable text overlay',
     expandTextOverlayOptions: 'Expand text overlay options',
