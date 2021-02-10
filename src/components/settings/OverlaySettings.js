@@ -87,6 +87,8 @@ const OverlaySettings = ({
     <ButtonContainer withBorder={!textsFetching && open && isSmallDisplay}>
       <MiradorMenuButton
         containerId={containerId}
+        aria-expanded={showAllButtons}
+        aria-haspopup={true}
         aria-label={open ? t('collapseTextOverlayOptions') : t('expandTextOverlayOptions')}
         disabled={textsFetching}
         onClick={() => setOpen(!open)}
