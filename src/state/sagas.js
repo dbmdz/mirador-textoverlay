@@ -168,7 +168,7 @@ export function* onConfigChange({ payload, id: windowId }) {
   // Check if we need to discover external OCR
   const needsDiscovery = (
     texts.length === 0
-    || texts.filter(({ sourceType }) => sourceType === 'annos').length > 0
+    || texts.filter(({ sourceType } = {}) => sourceType === 'annos').length > 0
   );
   if (needsDiscovery) {
     const visibleCanvases = yield select(getVisibleCanvases, { windowId });

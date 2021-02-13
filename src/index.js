@@ -12,13 +12,17 @@ export default [
     component: MiradorTextOverlay,
     mapStateToProps: (state, { windowId }) => ({
       pageTexts: getTextsForVisibleCanvases(state, { windowId })
-        .filter((canvasText) => !canvasText.isFetching)
-        .map((canvasText) => ({
-          ...canvasText.text,
-          source: canvasText.source,
-          textColor: canvasText.textColor,
-          bgColor: canvasText.bgColor,
-        })),
+        .map((canvasText) => {
+          if (canvasText === undefined || canvasText.isFetching) {
+            return undefined;
+          }
+          return {
+            ...canvasText.text,
+            source: canvasText.source,
+            textColor: canvasText.textColor,
+            bgColor: canvasText.bgColor,
+          };
+        }),
       windowId,
       ...getWindowTextOverlayOptions(state, { windowId }),
     }),
@@ -37,13 +41,14 @@ export default [
       ),
     }),
     mapStateToProps: (state, { windowId }) => {
-      const { imageToolsEnabled } = getWindowConfig(state, { windowId });
+      const { imageToolsEnabled = false } = getWindowConfig(state, { windowId });
       return {
         containerId: getContainerId(state),
         imageToolsEnabled,
         textsAvailable: getTextsForVisibleCanvases(state, { windowId }).length > 0,
-        textsFetching: getTextsForVisibleCanvases(state, { windowId }).some((t) => t.isFetching),
+        textsFetching: getTextsForVisibleCanvases(state, { windowId }).some((t) => t?.isFetching),
         pageColors: getTextsForVisibleCanvases(state, { windowId })
+          .filter((p) => p !== undefined)
           .map(({ textColor, bgColor }) => ({ textColor, bgColor })),
         windowTextOverlayOptions: getWindowTextOverlayOptions(state, { windowId }),
       };

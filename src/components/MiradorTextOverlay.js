@@ -61,7 +61,7 @@ class MiradorTextOverlay extends Component {
 
     // Manually update SVG colors for performance reasons
     // eslint-disable-next-line require-jsdoc
-    const hasPageColors = (text) => text.textColor !== undefined;
+    const hasPageColors = (text = {}) => text.textColor !== undefined;
     if (visible !== prevProps.visible
         || opacity !== prevProps.opacity
         || bgColor !== prevProps.bgColor
@@ -151,7 +151,7 @@ class MiradorTextOverlay extends Component {
   }
 
   /** If the page should be rendered */
-  shouldRenderPage = ({ lines }) => (
+  shouldRenderPage = ({ lines } = {}) => (
     lines
     && lines.length > 0
     && lines.some(({ text, spans }) => text || (spans && spans.length > 0)))
@@ -229,13 +229,14 @@ class MiradorTextOverlay extends Component {
         }}
       >
         {pageTexts
-          .map(({
-            lines, source, width: pageWidth, height: pageHeight,
-            textColor: pageFg, bgColor: pageBg,
-          }, idx) => {
-            if (!this.shouldRenderPage({ lines })) {
+          .map((page, idx) => {
+            if (!page || !this.shouldRenderPage(page)) {
               return null;
             }
+            const {
+              lines, source, width: pageWidth, height: pageHeight,
+              textColor: pageFg, bgColor: pageBg,
+            } = page;
             return (
               <PageTextDisplay
                 ref={this.renderRefs[idx]}

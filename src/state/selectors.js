@@ -44,7 +44,6 @@ export const getTextsForVisibleCanvases = createSelector(
   (canvases, texts) => {
     if (!texts || !canvases) return null;
     return canvases.map((c) => c.id)
-      .map((targetId) => texts[targetId])
-      .filter((canvasText) => canvasText !== undefined);
+      .map((targetId) => texts[targetId]);
   },
 );
