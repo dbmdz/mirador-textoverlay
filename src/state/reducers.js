@@ -10,6 +10,7 @@ export const textsReducer = (state = {}, action) => {
           ...state[action.targetId],
           canvasId: action.targetId,
           source: action.textUri,
+          sourceType: action.sourceType,
         },
       };
     case PluginActionTypes.REQUEST_TEXT:

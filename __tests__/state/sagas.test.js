@@ -306,7 +306,7 @@ describe('Reacting to configuration changes', () => {
       { id: windowId, payload: { textOverlay: { ...config, selectable: true } } },
     ).provide([
       [select(getTextsForVisibleCanvases, { windowId }),
-        [{ sourceType: 'annos' }, { sourceType: 'ocr' }]],
+        [{ sourceType: 'annos' }, { sourceType: 'ocr', text: { } }]],
       [select(getVisibleCanvases, { windowId }),
         [{ id: 'canvasA' }, { id: 'canvasB' }]],
       [call(discoverExternalOcr, { visibleCanvases: ['canvasA', 'canvasB'], windowId }), {}],
@@ -335,6 +335,24 @@ describe('Reacting to configuration changes', () => {
         expect(effects.select).toBeUndefined();
         expect(effects.call).toBeUndefined();
       }));
+
+  it('should fetch texts for the visible canvases that were previously discovered but not yet requesteed',
+    () => expectSaga(
+      onConfigChange,
+      { id: windowId, payload: { textOverlay: { ...config, visible: true } } },
+    ).provide([
+      [select(getTextsForVisibleCanvases, { windowId }),
+        [
+          { sourceType: 'ocr', canvasId: 'canvasA', source: 'sourceA' },
+          { sourceType: 'ocr', canvasId: 'canvasB', source: 'sourceB' }]],
+      [select(getVisibleCanvases, { windowId }),
+        [
+          { id: 'canvasA', __jsonld: { width: 1000, height: 2000 } },
+          { id: 'canvasB', __jsonld: { width: 1500, height: 3000 } }]],
+    ])
+      .put(requestText('canvasA', 'sourceA', { width: 1000, height: 2000 }))
+      .put(requestText('canvasB', 'sourceB', { width: 1500, height: 3000 }))
+      .run());
 });
 
 describe('Fetching page colors', () => {

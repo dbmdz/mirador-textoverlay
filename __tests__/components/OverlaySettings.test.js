@@ -62,6 +62,7 @@ function renderSettings(props = {}, renderFn = render) {
   const { rerender } = renderFn(
     <ThemeProvider theme={mockTheme}>
       <OverlaySettings
+        containerId="foobar"
         imageToolsEnabled={false}
         t={(key) => key}
         textsAvailable
