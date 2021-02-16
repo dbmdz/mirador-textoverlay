@@ -165,13 +165,24 @@ export function* onConfigChange({ payload, id: windowId }) {
     return;
   }
   const texts = yield select(getTextsForVisibleCanvases, { windowId });
+  // Check if any of the texts need fetching
+  const needFetching = texts.filter(({ sourceType, text }) => sourceType === 'ocr' && text === undefined);
   // Check if we need to discover external OCR
   const needsDiscovery = (
     texts.length === 0
     || texts.filter(({ sourceType } = {}) => sourceType === 'annos').length > 0
   );
+  if (needFetching.length === 0 && !needsDiscovery) {
+    return;
+  }
+  const visibleCanvases = yield select(getVisibleCanvases, { windowId });
+  yield all(needFetching.map(({ canvasId, source }) => {
+    const { width, height } = visibleCanvases.find((c) => c.id === canvasId).__jsonld;
+    return put(requestText(
+      canvasId, source, { height, width },
+    ));
+  }));
   if (needsDiscovery) {
-    const visibleCanvases = yield select(getVisibleCanvases, { windowId });
     const canvasIds = visibleCanvases.map((c) => c.id);
     yield call(discoverExternalOcr, { visibleCanvases: canvasIds, windowId });
   }

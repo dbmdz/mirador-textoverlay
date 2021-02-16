@@ -13,10 +13,11 @@ export const PluginActionTypes = {
  * @param {String} targetId
  * @param {String} textUri
  */
-export function discoveredText(targetId, textUri) {
+export function discoveredText(targetId, textUri, sourceType = 'ocr') {
   return {
     targetId,
     textUri,
+    sourceType,
     type: PluginActionTypes.DISCOVERED_TEXT,
   };
 }
