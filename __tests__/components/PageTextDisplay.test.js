@@ -136,21 +136,6 @@ describe('PageTextDisplay', () => {
     expect(topCallback).not.toHaveBeenCalled();
   });
 
-  it('should let pointerdown events through if touch screen is detected', () => {
-    const origTouchStart = global.window.ontouchstart;
-    global.window.ontouchstart = true;
-    const topCallback = jest.fn();
-    const { rerender, container } = renderPage({ selectable: false });
-    container.addEventListener('pointerdown', topCallback);
-    fireEvent.pointerDown(screen.getByText(svgTextMatcher('a firstWord on a line')));
-    expect(topCallback).toHaveBeenCalled();
-    topCallback.mockClear();
-    renderPage({ selectable: true }, rerender);
-    fireEvent.pointerDown(screen.getByText(svgTextMatcher('a firstWord on a line')));
-    global.window.ontouchstart = origTouchStart;
-    expect(topCallback).toHaveBeenCalled();
-  });
-
   it('should disable text selection if selection is disabled', () => {
     const { ref, container } = renderPage();
     expect(container.querySelectorAll('svg')[1]).toHaveStyle('user-select: text');
