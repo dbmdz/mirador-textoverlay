@@ -7,16 +7,6 @@ function runningInGecko() {
   return navigator.userAgent.indexOf('Gecko/') >= 0;
 }
 
-/** Check if we're running on a touch screen */
-function runningOnTouchScreen() {
-  return (
-    'ontouchstart' in window
-    || (window.DocumentTouch && document instanceof window.DocumentTouch)
-    || navigator.maxTouchPoints > 0
-    || window.navigator.msMaxTouchPoints > 0
-  );
-}
-
 /** Page Text Display component that is optimized for fast panning/zooming
  *
  * NOTE: This component is doing stuff that is NOT RECOMMENDED GENERALLY, like
@@ -53,12 +43,10 @@ class PageTextDisplay extends React.Component {
   /** Swallow pointer events if selection is enabled */
   onPointerDown = (evt) => {
     const { selectable } = this.props;
-    // Let pointerdown events propagate on touch screens. Text selection is initiated by a long
-    // press gesture there, and disabling pointer down events make text selection very difficult,
-    // without having a lot of advantages.
-    if (!runningOnTouchScreen() && selectable) {
-      evt.stopPropagation();
+    if (!selectable) {
+      return;
     }
+    evt.stopPropagation();
   };
 
   /** Update the CSS transforms for the SVG container, i.e. scale and move the text overlay
