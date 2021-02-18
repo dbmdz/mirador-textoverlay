@@ -120,5 +120,5 @@ starting the work, so we can discuss if it's a fit.
 
 [screenshot]: .docassets/screenshot.jpg
 [demo]: https://mirador-textoverlay.netlify.com
-[demo-cfg]: https://github.com/dbmdz/mirador-textoverlay/blob/master/demo/src/index.js#L4-L24
-[demo-cfg-catalog]: https://github.com/dbmdz/mirador-textoverlay/blob/master/demo/src/index.js#L5-L13
+[demo-cfg]: https://github.com/dbmdz/mirador-textoverlay/blob/main/demo/src/index.js#L4-L24
+[demo-cfg-catalog]: https://github.com/dbmdz/mirador-textoverlay/blob/main/demo/src/index.js#L5-L13
