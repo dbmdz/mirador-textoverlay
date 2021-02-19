@@ -39,6 +39,10 @@ const ColorInput = ({
   color, onChange, title, autoColors, className,
 }) => {
   const classes = useStyles({ color, autoColors });
+  // We rely on the browser behavior that clicking on an input's label is equivalent
+  // to clicking the input to show a custom color picker button.
+  // However, mobile Safari doesn't show the picker if we `display: none` the actual input,
+  // so we use some CSS voodoo (Tailwind's `sr-only` utility) to visually hide it...
   return (
     <label className={`${classes.container} ${className}`}>
       <div
@@ -48,7 +52,17 @@ const ColorInput = ({
       <input
         type="color"
         value={toHexRgb((autoColors && autoColors[0]) ? autoColors[0] : color)}
-        style={{ display: 'none' }}
+        style={{
+          position: 'absolute',
+          width: 1,
+          height: 1,
+          padding: 0,
+          margin: -1,
+          overflow: 'hidden',
+          clip: 'rect(0, 0, 0, 0)',
+          whiteSpace: 'nowrap',
+          borderWidth: 0,
+        }}
         onChange={(evt) => onChange(evt.target.value)}
         onInput={(evt) => onChange(evt.target.value)}
       />

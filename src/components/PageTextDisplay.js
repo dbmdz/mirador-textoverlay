@@ -27,6 +27,8 @@ class PageTextDisplay extends React.Component {
   componentDidMount() {
     // FIXME: We should be able to use React for this, but it somehow doesn't work
     this.textContainerRef.current.addEventListener('pointerdown', this.onPointerDown);
+    // For mobile Safari <= 12.2
+    this.textContainerRef.current.addEventListener('touchstart', this.onPointerDown);
   }
 
   /** Only update the component when the source changed (i.e. we need to re-render the text).
