@@ -118,6 +118,15 @@ describe('parsing hOCR', () => {
     console.warn = origWarn;
     expect(mockWarn).toHaveBeenCalled();
   });
+
+  it('should ensure that whitespace spans have a minimum width', () => {
+    const parsed = parseHocr(hocrMarkup, { height: 2389, width: 1600 });
+    expect(parsed.lines[14].spans[9]).toMatchObject({
+      text: ' ',
+      width: 0.0001,
+      x: 861.9999,
+    });
+  });
 });
 
 describe('parsing text from IIIF annotations', () => {
