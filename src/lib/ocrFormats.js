@@ -100,16 +100,25 @@ export function parseHocr(hocrText, referenceSize) {
         // Calculate width of previous extra span
         const previousExtraSpan = spans.slice(-1).filter((s) => s.isExtra)?.[0];
         if (previousExtraSpan) {
-          previousExtraSpan.width = textSpans[0].x - previousExtraSpan.x;
+          let extraWidth = textSpans[0].x - previousExtraSpan.x;
+          if (extraWidth === 0) {
+            extraWidth = 0.0001;
+            previousExtraSpan.x -= extraWidth;
+          }
+          previousExtraSpan.width = extraWidth;
         }
-
         spans.push(...textSpans);
       }
 
       // Update with of extra span at end of line
       const endExtraSpan = spans.slice(-1).filter((s) => s.isExtra)?.[0];
       if (endExtraSpan) {
-        endExtraSpan.width = (line.x + line.width) - endExtraSpan.x;
+        let extraWidth = (line.x + line.width) - endExtraSpan.x;
+        if (extraWidth === 0) {
+          extraWidth = 0.0001;
+          endExtraSpan.x -= extraWidth;
+        }
+        endExtraSpan.width = extraWidth;
       }
 
       line.spans = spans;
@@ -211,12 +220,12 @@ export function parseAlto(altoText, imgSize) {
           .join('');
       }
 
-      const width = Number.parseInt(textNode.getAttribute('WIDTH'), 10) * scaleFactorX;
+      let width = Number.parseInt(textNode.getAttribute('WIDTH'), 10) * scaleFactorX;
       let height = Number.parseInt(textNode.getAttribute('HEIGHT'), 10) * scaleFactorY;
       if (Number.isNaN(height)) {
         height = line.height;
       }
-      const x = Number.parseInt(textNode.getAttribute('HPOS'), 10) * scaleFactorX;
+      let x = Number.parseInt(textNode.getAttribute('HPOS'), 10) * scaleFactorX;
       let y = Number.parseInt(textNode.getAttribute('VPOS'), 10) * scaleFactorY;
       if (Number.isNaN(y)) {
         y = line.y;
@@ -229,7 +238,13 @@ export function parseAlto(altoText, imgSize) {
         // between the previous word and this one.
         const previousExtraSpan = line.spans.slice(-1).filter((s) => s.isExtra)?.[0];
         if (previousExtraSpan) {
-          previousExtraSpan.width = x - previousExtraSpan.x;
+          let extraWidth = x - previousExtraSpan.x;
+          // Needed to force browsers to render the whitespace
+          if (extraWidth === 0) {
+            extraWidth = 0.0001;
+            previousExtraSpan.x -= extraWidth;
+          }
+          previousExtraSpan.width = extraWidth;
         }
 
         line.spans.push({
@@ -246,6 +261,11 @@ export function parseAlto(altoText, imgSize) {
         }
         lineEndsHyphenated = textNode.tagName === 'HYP';
       } else if (textNode.tagName === 'SP') {
+        // Needed to force browsers to render the whitespace
+        if (width === 0) {
+          width = 0.0001;
+          x -= width;
+        }
         line.spans.push({
           isExtra: false, x, y, width, height, text: ' ',
         });
