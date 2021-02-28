@@ -1,0 +1,377 @@
+{
+  "@context": "http://iiif.io/api/presentation/2/context.json",
+  "@type": "sc:Manifest",
+  "@id": "https://dbmdz.github.io/mirador-textoverlay/manifests/bsb00084914.json",
+  "label": "Yismaël, Rabbi: Mekhilta - BSB Cod.hebr. 117",
+  "metadata": [
+    {
+      "label": [
+        {
+          "@language": "de",
+          "@value": "Autor"
+        },
+        {
+          "@language": "zh",
+          "@value": "作者"
+        },
+        {
+          "@language": "en",
+          "@value": "Author"
+        }
+      ],
+      "value": "<span>Yismaël, Rabbi -- (GND: <a href='http://d-nb.info/gnd/152632697'>152632697</a>)</span>"
+    },
+    {
+      "label": [
+        {
+          "@language": "de",
+          "@value": "Titel"
+        },
+        {
+          "@language": "zh",
+          "@value": "書名"
+        },
+        {
+          "@language": "en",
+          "@value": "Title"
+        }
+      ],
+      "value": "Mekhilta - BSB Cod.hebr. 117"
+    },
+    {
+      "label": [
+        {
+          "@language": "de",
+          "@value": "Von"
+        },
+        {
+          "@language": "zh",
+          "@value": "由"
+        },
+        {
+          "@language": "en",
+          "@value": "By"
+        }
+      ],
+      "value": "Rabbi Ismael. Schreiber: Isaak ben Elieser ha-Kohen"
+    },
+    {
+      "label": [
+        {
+          "@language": "de",
+          "@value": "Entstehung"
+        },
+        {
+          "@language": "zh",
+          "@value": "生成"
+        },
+        {
+          "@language": "en",
+          "@value": "Creation"
+        }
+      ],
+      "value": "[S.l.] Italien, 1433"
+    },
+    {
+      "label": [
+        {
+          "@language": "de",
+          "@value": "Maße"
+        },
+        {
+          "@language": "zh",
+          "@value": "尺寸"
+        },
+        {
+          "@language": "en",
+          "@value": "Dimensions"
+        }
+      ],
+      "value": "27,5 x 20 cm"
+    },
+    {
+      "label": [
+        {
+          "@language": "de",
+          "@value": "Sprache"
+        },
+        {
+          "@language": "zh",
+          "@value": "語言"
+        },
+        {
+          "@language": "en",
+          "@value": "Language"
+        }
+      ],
+      "value": [
+        {
+          "@language": "de",
+          "@value": "Hebräisch"
+        },
+        {
+          "@language": "zh",
+          "@value": "希伯来文"
+        },
+        {
+          "@language": "en",
+          "@value": "Hebrew"
+        }
+      ]
+    },
+    {
+      "label": [
+        {
+          "@language": "de",
+          "@value": "Anmerkung"
+        },
+        {
+          "@language": "zh",
+          "@value": "說明"
+        },
+        {
+          "@language": "en",
+          "@value": "Note"
+        }
+      ],
+      "value": "gezählt 1-110, 202-218"
+    },
+    {
+      "label": [
+        {
+          "@language": "de",
+          "@value": "Anmerkung"
+        },
+        {
+          "@language": "zh",
+          "@value": "說明"
+        },
+        {
+          "@language": "en",
+          "@value": "Note"
+        }
+      ],
+      "value": "BSB-Provenienz: Abraham ben Menachem Alatrino; Arzt Mordechai (ab 1461); Johann Albrecht Widmanstetter (seit 1527); München, alte kurfürstliche Hofbibliothek vor 1803"
+    },
+    {
+      "label": [
+        {
+          "@language": "de",
+          "@value": "Anmerkung"
+        },
+        {
+          "@language": "zh",
+          "@value": "說明"
+        },
+        {
+          "@language": "en",
+          "@value": "Note"
+        }
+      ],
+      "value": "Kurzaufnahme einer Handschrift"
+    },
+    {
+      "label": [
+        {
+          "@language": "de",
+          "@value": "Standort"
+        },
+        {
+          "@language": "zh",
+          "@value": "位置"
+        },
+        {
+          "@language": "en",
+          "@value": "Location"
+        }
+      ],
+      "value": "München, Bayerische Staatsbibliothek -- Cod.hebr. 117"
+    },
+    {
+      "label": [
+        {
+          "@language": "de",
+          "@value": "Identifikator"
+        },
+        {
+          "@language": "zh",
+          "@value": "標識"
+        },
+        {
+          "@language": "en",
+          "@value": "Identifier"
+        }
+      ],
+      "value": "BSB-ID 12391784"
+    },
+    {
+      "label": [
+        {
+          "@language": "de",
+          "@value": "Identifikator"
+        },
+        {
+          "@language": "zh",
+          "@value": "標識"
+        },
+        {
+          "@language": "en",
+          "@value": "Identifier"
+        }
+      ],
+      "value": "BV040215351"
+    },
+    {
+      "label": [
+        {
+          "@language": "de",
+          "@value": "Identifikator"
+        },
+        {
+          "@language": "zh",
+          "@value": "標識"
+        },
+        {
+          "@language": "en",
+          "@value": "Identifier"
+        }
+      ],
+      "value": "OCLC 856789170"
+    },
+    {
+      "label": [
+        {
+          "@language": "de",
+          "@value": "Identifikator"
+        },
+        {
+          "@language": "zh",
+          "@value": "標識"
+        },
+        {
+          "@language": "en",
+          "@value": "Identifier"
+        }
+      ],
+      "value": "BSB-Hss Cod.hebr. 117"
+    },
+    {
+      "label": [
+        {
+          "@language": "de",
+          "@value": "Identifikator des digitalen Objekts"
+        },
+        {
+          "@language": "zh",
+          "@value": "數位物件標識"
+        },
+        {
+          "@language": "en",
+          "@value": "Digital Object Identifier"
+        }
+      ],
+      "value": "<a href='https://mdz-nbn-resolving.de/urn:nbn:de:bvb:12-bsb00084914-3'>urn:nbn:de:bvb:12-bsb00084914-3</a>"
+    },
+    {
+      "label": [
+        {
+          "@language": "de",
+          "@value": "Objektkategorie"
+        },
+        {
+          "@language": "zh",
+          "@value": "物件類別"
+        },
+        {
+          "@language": "en",
+          "@value": "Object Type"
+        }
+      ],
+      "value": "Buch"
+    }
+  ],
+  "navDate": "1433-01-01T00:00:00Z",
+  "license": "http://creativecommons.org/licenses/by-nc-sa/4.0/deed.de",
+  "attribution": "Bayerische Staatsbibliothek",
+  "seeAlso": [
+    {
+      "@id": "https://opacplus.bsb-muenchen.de/title/BV040215351",
+      "label": "OPAC",
+      "format": "text/html"
+    },
+    {
+      "@id": "https://opacplus.bsb-muenchen.de/title/BV040215351?format=marc",
+      "label": "MARCXML",
+      "format": "application/marcxml+xml",
+      "profile": "http://www.loc.gov/standards/marcxml/"
+    },
+    {
+      "@id": "https://opacplus.bsb-muenchen.de/title/BV040215351?format=rdf",
+      "label": "RDF",
+      "format": "application/rdf+xml",
+      "profile": "https://lod.b3kat.de/doc"
+    }
+  ],
+  "sequences": [
+    {
+      "@id": "https://dbmdz.github.io/mirador-textoverlay/manifests/bsb00084914/sequences/normal",
+      "@type": "sc:Sequence",
+      "canvases": [
+        {
+          "@id": "https://api.digitale-sammlungen.de/iiif/presentation/v2/bsb00084914/canvas/5",
+          "@type": "sc:Canvas",
+          "label": "1r (0005)",
+          "service": {
+            "@context": "http://iiif.io/api/annex/services/physdim/1/context.json",
+            "physicalScale": 0.006342012578616353,
+            "physicalUnits": "cm",
+            "profile": "http://iiif.io/api/annex/services/physdim"
+          },
+          "images": [
+            {
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00084914_00005/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00084914_00005",
+                  "profile": "http://iiif.io/api/image/2/level2.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3180,
+                "height": 4309
+              },
+              "on": "https://api.digitale-sammlungen.de/iiif/presentation/v2/bsb00084914/canvas/5"
+            }
+          ],
+          "width": 3180,
+          "height": 4309,
+          "seeAlso": {
+            "@id": "https://dbmdz.github.io/mirador-textoverlay/alto/bsb00084914_00005.xml",
+            "profile": "http://www.loc.gov/standards/alto/ns-v4#",
+            "format": "text/xml"
+          }
+        }
+      ]
+    }
+  ],
+  "viewingDirection": "left-to-right",
+  "thumbnail": {
+    "@id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00084914_00005/full/280,/0/default.jpg",
+    "service": {
+      "@context": "http://iiif.io/api/image/2/context.json",
+      "@id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00084914_00005",
+      "profile": "http://iiif.io/api/image/2/level2.json",
+      "protocol": "http://iiif.io/api/image"
+    },
+    "format": "image/jpeg"
+  },
+  "logo": {
+    "@id": "https://api.digitale-sammlungen.de/iiif/images/bsb_logo.png",
+    "format": "image/png"
+  },
+  "viewingHint": "paged"
+}
