@@ -4,12 +4,14 @@ export function toHexRgb(rgbColor) {
     return rgbColor;
   }
   // eslint-disable-next-line prefer-template
-  return '#' + rgbColor.replace(/rgba?\((.+)\)/, '$1')
-    .split(',').slice(0, 3)
+  return `#${rgbColor
+    .replace(/rgba?\((.+)\)/, '$1')
+    .split(',')
+    .slice(0, 3)
     .map((x) => x.trim())
     .map((x) => Number.parseInt(x, 10))
     .map((x) => x.toString(16))
-    .join('');
+    .join('')}`;
 }
 
 /** Determine foreground and background color from text image. */

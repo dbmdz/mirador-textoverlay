@@ -28,10 +28,11 @@ export const textsReducer = (state = {}, action) => {
         const currentText = state[action.targetId];
         // Don't overwrite the current text if we already have an OCR-sourced
         // text that was completely fetched without an error
-        const skipText = currentText !== undefined
-          && !currentText.error
-          && !currentText.isFetching
-          && currentText.sourceType === 'ocr';
+        const skipText =
+          currentText !== undefined &&
+          !currentText.error &&
+          !currentText.isFetching &&
+          currentText.sourceType === 'ocr';
         if (skipText) return state;
       }
       return {
@@ -66,6 +67,7 @@ export const textsReducer = (state = {}, action) => {
           textColor: action.textColor,
         },
       };
-    default: return state;
+    default:
+      return state;
   }
 };

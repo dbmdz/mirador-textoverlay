@@ -6,10 +6,11 @@ import { fade } from '@material-ui/core/styles/colorManipulator';
 const useStyles = makeStyles(({ palette, breakpoints }) => {
   const bubbleBg = palette.shades.main;
   const bubbleFg = palette.getContrastText(bubbleBg);
-  const borderImgRight = 'linear-gradient('
-    + `to bottom, ${fade(bubbleFg, 0)} 20%, `
-    + `${fade(bubbleFg, 0.2)} 20% 80%, `
-    + `${fade(bubbleFg, 0)} 80%)`;
+  const borderImgRight =
+    'linear-gradient(' +
+    `to bottom, ${fade(bubbleFg, 0)} 20%, ` +
+    `${fade(bubbleFg, 0.2)} 20% 80%, ` +
+    `${fade(bubbleFg, 0)} 80%)`;
   const borderImgBottom = borderImgRight.replace('to bottom', 'to right');
 
   return {
@@ -23,7 +24,8 @@ const useStyles = makeStyles(({ palette, breakpoints }) => {
       [breakpoints.down('sm')]: {
         flexDirection: 'row',
         borderRight: (props) => 'none', // FIXME: Needs to be a func for some reason
-        borderBottom: ({ withBorder }) => (withBorder ? `1px solid ${fade(bubbleFg, 0.2)}` : 'none'),
+        borderBottom: ({ withBorder }) =>
+          withBorder ? `1px solid ${fade(bubbleFg, 0.2)}` : 'none',
         borderImageSource: borderImgBottom,
         padding: ({ paddingPrev, paddingNext }) => [[paddingPrev ?? 0, 0, paddingNext ?? 0, 0]],
       },
@@ -32,15 +34,9 @@ const useStyles = makeStyles(({ palette, breakpoints }) => {
 });
 
 /** Container for a settings button */
-const ButtonContainer = ({
-  children, withBorder, paddingPrev, paddingNext,
-}) => {
+const ButtonContainer = ({ children, withBorder, paddingPrev, paddingNext }) => {
   const classes = useStyles({ withBorder, paddingPrev, paddingNext });
-  return (
-    <div className={classes.root}>
-      {children}
-    </div>
-  );
+  return <div className={classes.root}>{children}</div>;
 };
 ButtonContainer.propTypes = {
   children: PropTypes.node.isRequired,

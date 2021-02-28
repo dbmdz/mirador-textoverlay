@@ -37,9 +37,9 @@ const useStyles = makeStyles(({ palette, breakpoints }) => {
         flexDirection: 'column',
         top: (props) => 8, // FIXME: Needs to be a func for some reason
         right: (props) => (props.imageToolsEnabled ? 66 : 8),
-        borderRadius: (props) => [[
-          25, 25, 25, !props.textsFetching && props.open && props.showColorPicker ? 0 : 25,
-        ]],
+        borderRadius: (props) => [
+          [25, 25, 25, !props.textsFetching && props.open && props.showColorPicker ? 0 : 25],
+        ],
       },
     },
   };
@@ -47,12 +47,22 @@ const useStyles = makeStyles(({ palette, breakpoints }) => {
 
 /** Control text overlay settings  */
 const OverlaySettings = ({
-  windowTextOverlayOptions, imageToolsEnabled, textsAvailable,
-  textsFetching, updateWindowTextOverlayOptions, t, pageColors,
+  windowTextOverlayOptions,
+  imageToolsEnabled,
+  textsAvailable,
+  textsFetching,
+  updateWindowTextOverlayOptions,
+  t,
+  pageColors,
   containerId,
 }) => {
   const {
-    enabled, visible, selectable, opacity, textColor: defaultTextColor, bgColor: defaultBgColor,
+    enabled,
+    visible,
+    selectable,
+    opacity,
+    textColor: defaultTextColor,
+    bgColor: defaultBgColor,
     useAutoColors,
   } = windowTextOverlayOptions;
   const [open, setOpen] = useState(enabled && (visible || selectable));
@@ -66,7 +76,10 @@ const OverlaySettings = ({
   const bubbleFg = palette.getContrastText(bubbleBg);
   const toggledBubbleBg = fade(bubbleFg, 0.25);
   const classes = useStyles({
-    imageToolsEnabled, open, showColorPicker, textsFetching,
+    imageToolsEnabled,
+    open,
+    showColorPicker,
+    textsFetching,
   });
 
   const textColor = useAutoColors
@@ -93,116 +106,118 @@ const OverlaySettings = ({
         disabled={textsFetching}
         onClick={() => setOpen(!open)}
       >
-        {showAllButtons
-          ? <CloseIcon />
-          : <SubjectIcon />}
+        {showAllButtons ? <CloseIcon /> : <SubjectIcon />}
       </MiradorMenuButton>
     </ButtonContainer>
   );
   return (
     <div className={`MuiPaper-elevation4 ${classes.bubbleContainer}`}>
       {isSmallDisplay && toggleButton}
-      {showAllButtons
-      && (
-      <>
-        <ButtonContainer withBorder paddingPrev={isSmallDisplay ? 8 : 0} paddingNext={8}>
-          <MiradorMenuButton
-            containerId={containerId}
-            aria-label={t('textSelect')}
-            onClick={() => updateWindowTextOverlayOptions({
-              ...windowTextOverlayOptions,
-              selectable: !selectable,
-            })}
-            aria-pressed={selectable}
-            style={{ backgroundColor: selectable && toggledBubbleBg }}
-          >
-            <TextSelectIcon />
-          </MiradorMenuButton>
-        </ButtonContainer>
-        <ButtonContainer paddingPrev={8}>
-          <MiradorMenuButton
-            containerId={containerId}
-            aria-label={t('textVisible')}
-            onClick={() => {
-              updateWindowTextOverlayOptions({
-                ...windowTextOverlayOptions,
-                visible: !visible,
-              });
-              if (showOpacitySlider && visible) {
-                setShowOpacitySlider(false);
+      {showAllButtons && (
+        <>
+          <ButtonContainer withBorder paddingPrev={isSmallDisplay ? 8 : 0} paddingNext={8}>
+            <MiradorMenuButton
+              containerId={containerId}
+              aria-label={t('textSelect')}
+              onClick={() =>
+                updateWindowTextOverlayOptions({
+                  ...windowTextOverlayOptions,
+                  selectable: !selectable,
+                })
               }
-              if (showColorPicker && visible) {
-                setShowColorPicker(false);
-              }
-            }}
-            aria-pressed={visible}
-            style={{ backgroundColor: visible && toggledBubbleBg }}
-          >
-            <TextIcon />
-          </MiradorMenuButton>
-        </ButtonContainer>
-        <ButtonContainer>
-          <MiradorMenuButton
-            id="text-opacity-slider-label"
-            containerId={containerId}
-            disabled={!visible}
-            aria-label={t('textOpacity')}
-            aria-controls="text-opacity-slider"
-            aria-expanded={showOpacitySlider}
-            onClick={() => setShowOpacitySlider(!showOpacitySlider)}
-            style={{
-              backgroundColor: showOpacitySlider && fade(bubbleFg, 0.1),
-            }}
-          >
-            <OpacityIcon />
-          </MiradorMenuButton>
-          {visible && showOpacitySlider
-          && (
-          <OpacityWidget
-            t={t}
-            opacity={opacity}
-            onChange={(newOpacity) => updateWindowTextOverlayOptions({
-              ...windowTextOverlayOptions,
-              opacity: newOpacity,
-            })}
-          />
-          )}
-        </ButtonContainer>
-        <ButtonContainer withBorder={!isSmallDisplay} paddingNext={isSmallDisplay ? 0 : 8}>
-          <MiradorMenuButton
-            id="color-picker-label"
-            containerId={containerId}
-            disabled={!visible}
-            aria-label={t('colorPicker')}
-            aria-controls="color-picker"
-            aria-expanded={showColorPicker}
-            onClick={() => setShowColorPicker(!showColorPicker)}
-            style={{
-              backgroundColor: showColorPicker && fade(bubbleFg, 0.1),
-            }}
-          >
-            <PaletteIcon />
-          </MiradorMenuButton>
-          {visible && showColorPicker
-          && (
-          <ColorWidget
-            t={t}
-            containerId={containerId}
-            bgColor={bgColor}
-            textColor={textColor}
-            pageColors={pageColors}
-            useAutoColors={useAutoColors}
-            onChange={(newOpts) => updateWindowTextOverlayOptions({
-              ...windowTextOverlayOptions,
-              ...newOpts,
-            })}
-          />
-          )}
-        </ButtonContainer>
-      </>
+              aria-pressed={selectable}
+              style={{ backgroundColor: selectable && toggledBubbleBg }}
+            >
+              <TextSelectIcon />
+            </MiradorMenuButton>
+          </ButtonContainer>
+          <ButtonContainer paddingPrev={8}>
+            <MiradorMenuButton
+              containerId={containerId}
+              aria-label={t('textVisible')}
+              onClick={() => {
+                updateWindowTextOverlayOptions({
+                  ...windowTextOverlayOptions,
+                  visible: !visible,
+                });
+                if (showOpacitySlider && visible) {
+                  setShowOpacitySlider(false);
+                }
+                if (showColorPicker && visible) {
+                  setShowColorPicker(false);
+                }
+              }}
+              aria-pressed={visible}
+              style={{ backgroundColor: visible && toggledBubbleBg }}
+            >
+              <TextIcon />
+            </MiradorMenuButton>
+          </ButtonContainer>
+          <ButtonContainer>
+            <MiradorMenuButton
+              id="text-opacity-slider-label"
+              containerId={containerId}
+              disabled={!visible}
+              aria-label={t('textOpacity')}
+              aria-controls="text-opacity-slider"
+              aria-expanded={showOpacitySlider}
+              onClick={() => setShowOpacitySlider(!showOpacitySlider)}
+              style={{
+                backgroundColor: showOpacitySlider && fade(bubbleFg, 0.1),
+              }}
+            >
+              <OpacityIcon />
+            </MiradorMenuButton>
+            {visible && showOpacitySlider && (
+              <OpacityWidget
+                t={t}
+                opacity={opacity}
+                onChange={(newOpacity) =>
+                  updateWindowTextOverlayOptions({
+                    ...windowTextOverlayOptions,
+                    opacity: newOpacity,
+                  })
+                }
+              />
+            )}
+          </ButtonContainer>
+          <ButtonContainer withBorder={!isSmallDisplay} paddingNext={isSmallDisplay ? 0 : 8}>
+            <MiradorMenuButton
+              id="color-picker-label"
+              containerId={containerId}
+              disabled={!visible}
+              aria-label={t('colorPicker')}
+              aria-controls="color-picker"
+              aria-expanded={showColorPicker}
+              onClick={() => setShowColorPicker(!showColorPicker)}
+              style={{
+                backgroundColor: showColorPicker && fade(bubbleFg, 0.1),
+              }}
+            >
+              <PaletteIcon />
+            </MiradorMenuButton>
+            {visible && showColorPicker && (
+              <ColorWidget
+                t={t}
+                containerId={containerId}
+                bgColor={bgColor}
+                textColor={textColor}
+                pageColors={pageColors}
+                useAutoColors={useAutoColors}
+                onChange={(newOpts) =>
+                  updateWindowTextOverlayOptions({
+                    ...windowTextOverlayOptions,
+                    ...newOpts,
+                  })
+                }
+              />
+            )}
+          </ButtonContainer>
+        </>
       )}
-      {textsFetching
-        && <CircularProgress disableShrink size={50} style={{ position: 'absolute' }} />}
+      {textsFetching && (
+        <CircularProgress disableShrink size={50} style={{ position: 'absolute' }} />
+      )}
       {!isSmallDisplay && toggleButton}
     </div>
   );
@@ -219,8 +234,9 @@ OverlaySettings.propTypes = {
   windowTextOverlayOptions: PropTypes.object.isRequired,
   pageColors: PropTypes.arrayOf(
     PropTypes.shape({
-      textColor: PropTypes.string, bgColor: PropTypes.string,
-    }),
+      textColor: PropTypes.string,
+      bgColor: PropTypes.string,
+    })
   ).isRequired,
 };
 

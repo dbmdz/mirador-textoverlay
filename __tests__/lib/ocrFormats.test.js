@@ -1,11 +1,7 @@
 import fs from 'fs';
-import {
-  describe, it, jest, expect,
-} from '@jest/globals';
+import { describe, it, jest, expect } from '@jest/globals';
 
-import {
-  parseOcr, parseAlto, parseHocr, parseIiifAnnotations,
-} from '../../src/lib/ocrFormats';
+import { parseOcr, parseAlto, parseHocr, parseIiifAnnotations } from '../../src/lib/ocrFormats';
 
 import contentAsTextAnnos from '../../__fixtures__/anno_iifv2.json';
 
@@ -23,8 +19,7 @@ describe('parsing ALTO', () => {
   const parsed = parseAlto(altoMarkup, { height: 1925, width: 1248 });
 
   it('should work from the generic parser function', () => {
-    expect(parseOcr(altoMarkup, { height: 1925, width: 1248 }).lines)
-      .toHaveLength(402);
+    expect(parseOcr(altoMarkup, { height: 1925, width: 1248 }).lines).toHaveLength(402);
   });
 
   it('should work for non-pixel based measurement units', () => {
@@ -32,7 +27,7 @@ describe('parsing ALTO', () => {
     expect(parsed.lines[32].text).toEqual('par les agents de police à leur disposition,\n');
     expect(parsed.lines[64]).toMatchObject({
       height: closeTo(12.59),
-      text: 'seiller d\'Etat en mission extraordinaire.\n',
+      text: "seiller d'Etat en mission extraordinaire.\n",
       width: closeTo(244.48),
       x: closeTo(82.28),
       y: closeTo(1236.09),
@@ -53,8 +48,9 @@ describe('parsing ALTO', () => {
   });
 
   it('should convert style nodes to proper CSS', () => {
-    expect(parsed.lines[96].spans[16].style)
-      .toBe('font-family: Times New Roman;font-style: italic');
+    expect(parsed.lines[96].spans[16].style).toBe(
+      'font-family: Times New Roman;font-style: italic'
+    );
   });
 });
 
@@ -62,8 +58,7 @@ describe('parsing hOCR', () => {
   const hocrMarkup = fs.readFileSync('__fixtures__/hocr.html', 'utf8');
 
   it('should work from the generic parser function', () => {
-    expect(parseOcr(hocrMarkup, { height: 2389, width: 1600 }).lines)
-      .toHaveLength(32);
+    expect(parseOcr(hocrMarkup, { height: 2389, width: 1600 }).lines).toHaveLength(32);
   });
 
   it('should correctly parse the lines from the page', () => {
@@ -131,10 +126,10 @@ describe('parsing hOCR', () => {
 
 describe('parsing text from IIIF annotations', () => {
   it('should be able to parse IIIFv2 contentAsText annotations', () => {
-    const parsed = parseIiifAnnotations(
-      contentAsTextAnnos.resources,
-      { height: 3372, width: 2411 },
-    );
+    const parsed = parseIiifAnnotations(contentAsTextAnnos.resources, {
+      height: 3372,
+      width: 2411,
+    });
     expect(parsed.lines).toHaveLength(29);
     expect(parsed.lines[2]).toMatchObject({
       height: 64,

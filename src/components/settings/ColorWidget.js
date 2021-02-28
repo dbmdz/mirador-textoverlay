@@ -58,35 +58,38 @@ const useStyles = makeStyles(({ palette, breakpoints }) => {
 
 /** Widget to update text and background color */
 const ColorWidget = ({
-  textColor, bgColor, onChange, t, pageColors, useAutoColors, containerId,
+  textColor,
+  bgColor,
+  onChange,
+  t,
+  pageColors,
+  useAutoColors,
+  containerId,
 }) => {
-  const showResetButton = (
-    !useAutoColors
-    && pageColors
-    && pageColors.some((c) => c && (c.textColor || c.bgColor))
-  );
+  const showResetButton =
+    !useAutoColors && pageColors && pageColors.some((c) => c && (c.textColor || c.bgColor));
   const classes = useStyles({ showResetButton });
 
   return (
     <div className={`MuiPaper-elevation4 ${classes.root}`}>
       {showResetButton && (
-      <MiradorMenuButton
-        containerId={containerId}
-        aria-label={t('resetTextColors')}
-        onClick={() => onChange({
-          useAutoColors: true,
-          textColor: pageColors.map((cs) => cs.textColor).filter((x) => x)[0] ?? textColor,
-          bgColor: pageColors.map((cs) => cs.bgColor).filter((x) => x)[0] ?? bgColor,
-        })}
-      >
-        <ResetColorsIcon />
-      </MiradorMenuButton>
+        <MiradorMenuButton
+          containerId={containerId}
+          aria-label={t('resetTextColors')}
+          onClick={() =>
+            onChange({
+              useAutoColors: true,
+              textColor: pageColors.map((cs) => cs.textColor).filter((x) => x)[0] ?? textColor,
+              bgColor: pageColors.map((cs) => cs.bgColor).filter((x) => x)[0] ?? bgColor,
+            })
+          }
+        >
+          <ResetColorsIcon />
+        </MiradorMenuButton>
       )}
       <ColorInput
         title={t('textColor')}
-        autoColors={useAutoColors
-          ? pageColors.map((colors) => colors.textColor)
-          : undefined}
+        autoColors={useAutoColors ? pageColors.map((colors) => colors.textColor) : undefined}
         color={textColor}
         onChange={(color) => {
           // Lackluster way to check if selection was canceled: The chance of users picking
@@ -103,9 +106,7 @@ const ColorWidget = ({
       <ColorInput
         title={t('backgroundColor')}
         color={bgColor}
-        autoColors={useAutoColors
-          ? pageColors.map((colors) => colors.bgColor)
-          : undefined}
+        autoColors={useAutoColors ? pageColors.map((colors) => colors.bgColor) : undefined}
         onChange={(color) => {
           // See comment on previous ColorInput onChange callback
           if (useAutoColors && color === toHexRgb(pageColors?.[0]?.bgColor)) {
@@ -127,8 +128,9 @@ ColorWidget.propTypes = {
   useAutoColors: PropTypes.bool.isRequired,
   pageColors: PropTypes.arrayOf(
     PropTypes.shape({
-      textColor: PropTypes.string, bgColor: PropTypes.string,
-    }),
+      textColor: PropTypes.string,
+      bgColor: PropTypes.string,
+    })
   ).isRequired,
 };
 

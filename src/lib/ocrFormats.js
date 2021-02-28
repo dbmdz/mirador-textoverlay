@@ -28,15 +28,17 @@ function parseHocrNode(node, endOfLine = false, scaleFactor = 1) {
   if (style) {
     style = style.replace(/font-size:.+;/, '');
   }
-  const spans = [{
-    height: lry - uly,
-    style,
-    text: node.textContent,
-    width: lrx - ulx,
-    x: ulx,
-    y: uly,
-    isExtra: false,
-  }];
+  const spans = [
+    {
+      height: lry - uly,
+      style,
+      text: node.textContent,
+      width: lrx - ulx,
+      x: ulx,
+      y: uly,
+      isExtra: false,
+    },
+  ];
 
   // Add an extra space span if the following text node contains something
   if (node.nextSibling instanceof Text) {
@@ -77,16 +79,16 @@ export function parseHocr(hocrText, referenceSize) {
     const scaledWidth = Math.round(scaleFactorY * pageSize[2]);
     const scaledHeight = Math.round(scaleFactorX * pageSize[3]);
     if (scaledWidth !== referenceSize.width || scaledHeight !== referenceSize.height) {
-      console.warn(`Differing scale factors for x and y axis: x=${scaleFactorX}, y=${scaleFactorY}`);
+      console.warn(
+        `Differing scale factors for x and y axis: x=${scaleFactorX}, y=${scaleFactorY}`
+      );
     }
     scaleFactor = scaleFactorX;
   }
   const lines = [];
   // FIXME: Seems to be an eslint bug: https://github.com/eslint/eslint/issues/12117
   // eslint-disable-next-line no-unused-vars
-  for (const lineNode of pageNode.querySelectorAll(
-    'span.ocr_line, span.ocrx_line',
-  )) {
+  for (const lineNode of pageNode.querySelectorAll('span.ocr_line, span.ocrx_line')) {
     const wordNodes = lineNode.querySelectorAll('span.ocrx_word');
     if (wordNodes.length === 0) {
       lines.push(parseHocrNode(lineNode, true, scaleFactor));
@@ -113,7 +115,7 @@ export function parseHocr(hocrText, referenceSize) {
       // Update with of extra span at end of line
       const endExtraSpan = spans.slice(-1).filter((s) => s.isExtra)?.[0];
       if (endExtraSpan) {
-        let extraWidth = (line.x + line.width) - endExtraSpan.x;
+        let extraWidth = line.x + line.width - endExtraSpan.x;
         if (extraWidth === 0) {
           extraWidth = 0.0001;
           endExtraSpan.x -= extraWidth;
@@ -122,7 +124,10 @@ export function parseHocr(hocrText, referenceSize) {
       }
 
       line.spans = spans;
-      line.text = spans.map((w) => w.text).join('').trim();
+      line.text = spans
+        .map((w) => w.text)
+        .join('')
+        .trim();
       lines.push(line);
     }
   }
@@ -171,12 +176,8 @@ export function parseAlto(altoText, imgSize) {
   const doc = parser.parseFromString(altoText, 'text/xml');
   // We assume ALTO is set as the default namespace
   /** Namespace resolver that forrces the ALTO namespace */
-  const measurementUnit = doc.querySelector(
-    'alto > Description > MeasurementUnit',
-  )?.textContent;
-  const pageElem = doc.querySelector(
-    'alto > Layout > Page, alto > Layout > Page > PrintSpace',
-  );
+  const measurementUnit = doc.querySelector('alto > Description > MeasurementUnit')?.textContent;
+  const pageElem = doc.querySelector('alto > Layout > Page, alto > Layout > Page > PrintSpace');
   let pageWidth = Number.parseInt(pageElem.getAttribute('WIDTH'), 10);
   let pageHeight = Number.parseInt(pageElem.getAttribute('HEIGHT'), 10);
   let scaleFactorX = 1.0;
@@ -209,7 +210,7 @@ export function parseAlto(altoText, imgSize) {
     };
     const textNodes = lineNode.querySelectorAll('String, SP, HYP');
     for (const [textIdx, textNode] of textNodes.entries()) {
-      const endOfLine = textIdx === (textNodes.length - 1);
+      const endOfLine = textIdx === textNodes.length - 1;
       const styleRefs = textNode.getAttribute('STYLEREFS');
       let style = null;
       if (styleRefs !== null) {
@@ -248,13 +249,23 @@ export function parseAlto(altoText, imgSize) {
         }
 
         line.spans.push({
-          isExtra: false, x, y, width, height, text, style,
+          isExtra: false,
+          x,
+          y,
+          width,
+          height,
+          text,
+          style,
         });
 
         // Add extra space span if ALTO does not encode spaces itself
         if (!hasSpaces && !endOfLine) {
           line.spans.push({
-            isExtra: true, x: x + width, y, height, text: ' ',
+            isExtra: true,
+            x: x + width,
+            y,
+            height,
+            text: ' ',
             // NOTE: Does not have width initially, will be set when we encounter
             //       the next proper word span
           });
@@ -267,7 +278,12 @@ export function parseAlto(altoText, imgSize) {
           x -= width;
         }
         line.spans.push({
-          isExtra: false, x, y, width, height, text: ' ',
+          isExtra: false,
+          x,
+          y,
+          width,
+          height,
+          text: ' ',
         });
       }
     }
@@ -332,8 +348,9 @@ export function parseIiifAnnotations(annos, imgSize) {
   // TODO: Handle word-level annotations
   // See if we can tell from the annotations themselves if it targets a line
   const lineAnnos = annos.filter(
-    (anno) => anno.textGranularity === 'line' // IIIF Text Granularity
-    || anno.dcType === 'Line', // Europeana
+    (anno) =>
+      anno.textGranularity === 'line' || // IIIF Text Granularity
+      anno.dcType === 'Line' // Europeana
   );
   const targetAnnos = lineAnnos.length > 0 ? lineAnnos : annos;
   const boxes = targetAnnos.map((anno) => {

@@ -11,18 +11,17 @@ export default [
   {
     component: MiradorTextOverlay,
     mapStateToProps: (state, { windowId }) => ({
-      pageTexts: getTextsForVisibleCanvases(state, { windowId })
-        .map((canvasText) => {
-          if (canvasText === undefined || canvasText.isFetching) {
-            return undefined;
-          }
-          return {
-            ...canvasText.text,
-            source: canvasText.source,
-            textColor: canvasText.textColor,
-            bgColor: canvasText.bgColor,
-          };
-        }),
+      pageTexts: getTextsForVisibleCanvases(state, { windowId }).map((canvasText) => {
+        if (canvasText === undefined || canvasText.isFetching) {
+          return undefined;
+        }
+        return {
+          ...canvasText.text,
+          source: canvasText.source,
+          textColor: canvasText.textColor,
+          bgColor: canvasText.bgColor,
+        };
+      }),
       windowId,
       ...getWindowTextOverlayOptions(state, { windowId }),
     }),
@@ -36,9 +35,8 @@ export default [
   {
     component: OverlaySettings,
     mapDispatchToProps: (dispatch, { windowId }) => ({
-      updateWindowTextOverlayOptions: (options) => dispatch(
-        updateWindow(windowId, { textOverlay: options }),
-      ),
+      updateWindowTextOverlayOptions: (options) =>
+        dispatch(updateWindow(windowId, { textOverlay: options })),
     }),
     mapStateToProps: (state, { windowId }) => {
       const { imageToolsEnabled = false } = getWindowConfig(state, { windowId });

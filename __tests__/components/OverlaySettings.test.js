@@ -1,11 +1,7 @@
 /* eslint-disable react/prop-types */
 import React from 'react';
-import {
-  describe, it, jest, expect,
-} from '@jest/globals';
-import {
-  fireEvent, render, screen, queryByRole,
-} from '@testing-library/react';
+import { describe, it, jest, expect } from '@jest/globals';
+import { fireEvent, render, screen, queryByRole } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import { ThemeProvider } from '@material-ui/core/styles';
 import MuiDefaultTheme from '@material-ui/core/styles/defaultTheme';
@@ -27,9 +23,7 @@ const mockTheme = {
 // Mocked MUI slider for easier testing, taken from
 // https://stackoverflow.com/a/61628815 (CC BY-SA 4.0)
 jest.mock('@material-ui/core/Slider', () => (props) => {
-  const {
-    id, name, min, max, onChange,
-  } = props;
+  const { id, name, min, max, onChange } = props;
   return (
     <input
       data-testid="opacity-slider"
@@ -73,7 +67,7 @@ function renderSettings(props = {}, renderFn = render) {
         {...props}
         windowTextOverlayOptions={options}
       />
-    </ThemeProvider>,
+    </ThemeProvider>
   );
   return { rerender, options, updateOptionsMock };
 }
@@ -176,7 +170,6 @@ describe('TextOverlaySettingsBubble', () => {
   it('should handle opacity changes correctly', () => {
     const { updateOptionsMock, options: initialOpts } = renderSettings({
       windowTextOverlayOptions: { opacity: 0.5, visible: true },
-
     });
     const opacityToggle = screen.getByLabelText('textOpacity');
 
@@ -215,8 +208,9 @@ describe('TextOverlaySettingsBubble', () => {
 
   it('should be positioned lower if mirador-image-tools is enabled', () => {
     renderSettings({ imageToolsEnabled: true });
-    expect(screen.getByLabelText('expandTextOverlayOptions').parentElement.parentElement)
-      .toHaveStyle('top: 66px');
+    expect(
+      screen.getByLabelText('expandTextOverlayOptions').parentElement.parentElement
+    ).toHaveStyle('top: 66px');
   });
 
   it('should be closed, disabled and surrounded by a progress spinner when texts are fetching', () => {
@@ -230,9 +224,9 @@ describe('TextOverlaySettingsBubble', () => {
   });
 
   it('should allow manually setting the foreground and background colors', () => {
-    const { options, updateOptionsMock } = renderSettings(
-      { windowTextOverlayOptions: { visible: true, textColor: '#bbbbbb', bgColor: '#444444' } },
-    );
+    const { options, updateOptionsMock } = renderSettings({
+      windowTextOverlayOptions: { visible: true, textColor: '#bbbbbb', bgColor: '#444444' },
+    });
     fireEvent.click(screen.getByLabelText('colorPicker'));
 
     expect(screen.queryByLabelText('resetTextColors')).not.toBeDisabled();
@@ -279,9 +273,9 @@ describe('TextOverlaySettingsBubble', () => {
   });
 
   it('should disable auto-colors if colors are manually selected', () => {
-    const { updateOptionsMock, options } = renderSettings(
-      { windowTextOverlayOptions: { visible: true, useAutoColors: true } },
-    );
+    const { updateOptionsMock, options } = renderSettings({
+      windowTextOverlayOptions: { visible: true, useAutoColors: true },
+    });
     fireEvent.click(screen.getByLabelText('colorPicker'));
     const textLabel = screen.getByTitle('backgroundColor');
     const textInput = textLabel.nextElementSibling;
@@ -295,9 +289,9 @@ describe('TextOverlaySettingsBubble', () => {
   });
 
   it('should not disable auto-colors if manual color selection is canceled', () => {
-    const { updateOptionsMock } = renderSettings(
-      { windowTextOverlayOptions: { visible: true, useAutoColors: true } },
-    );
+    const { updateOptionsMock } = renderSettings({
+      windowTextOverlayOptions: { visible: true, useAutoColors: true },
+    });
     fireEvent.click(screen.getByLabelText('colorPicker'));
     const textLabel = screen.getByTitle('backgroundColor');
     const textInput = textLabel.nextElementSibling;
@@ -307,9 +301,9 @@ describe('TextOverlaySettingsBubble', () => {
   });
 
   it('should reset the colors to auto if the colors were manipulated and the reset button is clicked', () => {
-    const { updateOptionsMock, options } = renderSettings(
-      { windowTextOverlayOptions: { visible: true } },
-    );
+    const { updateOptionsMock, options } = renderSettings({
+      windowTextOverlayOptions: { visible: true },
+    });
     fireEvent.click(screen.getByLabelText('colorPicker'));
     fireEvent.click(screen.getByLabelText('resetTextColors'));
     expect(updateOptionsMock).toHaveBeenCalledWith({

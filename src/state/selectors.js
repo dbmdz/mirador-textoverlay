@@ -1,8 +1,6 @@
 import { createSelector } from 'reselect';
 
-import {
-  getWindowConfig, getVisibleCanvases, getTheme,
-} from 'mirador/dist/es/src/state/selectors';
+import { getWindowConfig, getVisibleCanvases, getTheme } from 'mirador/dist/es/src/state/selectors';
 import { miradorSlice } from 'mirador/dist/es/src/state/selectors/utils';
 
 const defaultConfig = {
@@ -29,7 +27,7 @@ export const getWindowTextOverlayOptions = createSelector(
     fontFamily,
     ...defaultConfig,
     ...(textOverlay ?? {}),
-  }),
+  })
 );
 
 /** Selector to get all loaded texts */
@@ -37,13 +35,9 @@ export const getTexts = (state) => miradorSlice(state).texts;
 
 /** Selector for text on all visible canvases */
 export const getTextsForVisibleCanvases = createSelector(
-  [
-    getVisibleCanvases,
-    getTexts,
-  ],
+  [getVisibleCanvases, getTexts],
   (canvases, texts) => {
     if (!texts || !canvases) return null;
-    return canvases.map((c) => c.id)
-      .map((targetId) => texts[targetId]);
-  },
+    return canvases.map((c) => c.id).map((targetId) => texts[targetId]);
+  }
 );

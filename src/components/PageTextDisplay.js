@@ -13,7 +13,7 @@ function runningInGecko() {
  *       hacking shouldComponentUpdate to not-rerender on every prop change,
  *       setting styles manually via DOM refs, etc. This was all done to reach
  *       higher frame rates.
-*/
+ */
 class PageTextDisplay extends React.Component {
   /** Set up refs for direct transforms and pointer callback registration */
   constructor(props) {
@@ -55,7 +55,7 @@ class PageTextDisplay extends React.Component {
    *
    * Intended to be called by the parent component. We use direct DOM access for this instead
    * of props since it is *significantly* faster (30fps vs 60fps on my machine).
-  */
+   */
   updateTransforms(scaleFactor, x, y) {
     if (!this.containerRef.current) {
       return;
@@ -63,8 +63,8 @@ class PageTextDisplay extends React.Component {
     const { width, height } = this.props;
     // Scaling is done from the center of the container, so we have to update the
     // horizontal and vertical offsets we got from OSD.
-    const translateX = ((scaleFactor - 1) * width / 2) + (x * scaleFactor * -1);
-    const translateY = ((scaleFactor - 1) * height / 2) + (y * scaleFactor * -1);
+    const translateX = ((scaleFactor - 1) * width) / 2 + x * scaleFactor * -1;
+    const translateY = ((scaleFactor - 1) * height) / 2 + y * scaleFactor * -1;
     const containerTransforms = [
       `translate(${translateX}px, ${translateY}px)`,
       `scale(${scaleFactor})`,
@@ -106,8 +106,17 @@ class PageTextDisplay extends React.Component {
   /** Render the page overlay */
   render() {
     const {
-      selectable, visible, lines, width: pageWidth, height: pageHeight, opacity, textColor, bgColor,
-      useAutoColors, pageColors, fontFamily,
+      selectable,
+      visible,
+      lines,
+      width: pageWidth,
+      height: pageHeight,
+      opacity,
+      textColor,
+      bgColor,
+      useAutoColors,
+      pageColors,
+      fontFamily,
     } = this.props;
 
     const containerStyle = {
@@ -132,7 +141,7 @@ class PageTextDisplay extends React.Component {
       bg = pageColors.bgColor;
     }
 
-    const renderOpacity = (!visible && selectable) ? 0 : opacity;
+    const renderOpacity = !visible && selectable ? 0 : opacity;
     const boxStyle = { fill: fade(bg, renderOpacity) };
     const textStyle = {
       fill: fade(fg, renderOpacity),
@@ -163,10 +172,7 @@ class PageTextDisplay extends React.Component {
       SpanElem = (props) => <text style={textStyle} {...props} />;
     }
     return (
-      <div
-        ref={this.containerRef}
-        style={containerStyle}
-      >
+      <div ref={this.containerRef} style={containerStyle}>
         {/**
          * NOTE: We have to render the line background rectangles in a separate SVG and can't
          * include them in the same one as the text. Why? Because doing so breaks text selection in
@@ -196,13 +202,12 @@ class PageTextDisplay extends React.Component {
         </svg>
         <svg style={{ ...svgStyle, position: 'absolute' }}>
           <g ref={this.textContainerRef}>
-            {renderLines.map((line) => (
-              line.spans
-                ? (
-                  <LineWrapper key={`line-${line.x}-${line.y}`}>
-                    {line.spans.filter((w) => w.width > 0 && w.height > 0).map(({
-                      x, y, width, text,
-                    }) => (
+            {renderLines.map((line) =>
+              line.spans ? (
+                <LineWrapper key={`line-${line.x}-${line.y}`}>
+                  {line.spans
+                    .filter((w) => w.width > 0 && w.height > 0)
+                    .map(({ x, y, width, text }) => (
                       <SpanElem
                         key={`text-${x}-${y}`}
                         x={x}
@@ -214,21 +219,21 @@ class PageTextDisplay extends React.Component {
                         {text}
                       </SpanElem>
                     ))}
-                  </LineWrapper>
-                )
-                : (
-                  <text
-                    key={`line-${line.x}-${line.y}`}
-                    x={line.x}
-                    y={line.y + line.height * 0.75}
-                    textLength={line.width}
-                    fontSize={`${line.height}px`}
-                    lengthAdjust="spacingAndGlyphs"
-                    style={textStyle}
-                  >
-                    {line.text}
-                  </text>
-                )))}
+                </LineWrapper>
+              ) : (
+                <text
+                  key={`line-${line.x}-${line.y}`}
+                  x={line.x}
+                  y={line.y + line.height * 0.75}
+                  textLength={line.width}
+                  fontSize={`${line.height}px`}
+                  lengthAdjust="spacingAndGlyphs"
+                  style={textStyle}
+                >
+                  {line.text}
+                </text>
+              )
+            )}
           </g>
         </svg>
       </div>

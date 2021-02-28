@@ -29,15 +29,15 @@ const useStyles = makeStyles({
       if (validColors.length !== 2) {
         return 'none';
       }
-      return `linear-gradient(90deg, ${validColors[0] ?? color} 50%, ${validColors[1] ?? color} 50%)`;
+      return `linear-gradient(90deg, ${validColors[0] ?? color} 50%, ${
+        validColors[1] ?? color
+      } 50%)`;
     },
   },
 });
 
 /** Input to select a color */
-const ColorInput = ({
-  color, onChange, title, autoColors, className,
-}) => {
+const ColorInput = ({ color, onChange, title, autoColors, className }) => {
   const classes = useStyles({ color, autoColors });
   // We rely on the browser behavior that clicking on an input's label is equivalent
   // to clicking the input to show a custom color picker button.
@@ -45,13 +45,10 @@ const ColorInput = ({
   // so we use some CSS voodoo (Tailwind's `sr-only` utility) to visually hide it...
   return (
     <label className={`${classes.container} ${className}`}>
-      <div
-        title={title}
-        className={`MuiPaper-elevation2 ${classes.input}`}
-      />
+      <div title={title} className={`MuiPaper-elevation2 ${classes.input}`} />
       <input
         type="color"
-        value={toHexRgb((autoColors && autoColors[0]) ? autoColors[0] : color)}
+        value={toHexRgb(autoColors && autoColors[0] ? autoColors[0] : color)}
         style={{
           position: 'absolute',
           width: 1,

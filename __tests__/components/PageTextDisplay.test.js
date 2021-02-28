@@ -1,8 +1,6 @@
 import React from 'react';
 
-import {
-  describe, it, jest, expect,
-} from '@jest/globals';
+import { describe, it, jest, expect } from '@jest/globals';
 import { fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 
@@ -36,9 +34,9 @@ function renderPage(props = {}, renderFn = render) {
 describe('PageTextDisplay', () => {
   it('should render lines with individual spans accurately', () => {
     const { container } = renderPage();
-    container.querySelectorAll('rect').forEach(
-      (rect) => expect(rect).toHaveAttribute('style', 'fill: rgba(255, 255, 255, 0.75);'),
-    );
+    container
+      .querySelectorAll('rect')
+      .forEach((rect) => expect(rect).toHaveAttribute('style', 'fill: rgba(255, 255, 255, 0.75);'));
     const firstLine = screen.getByText(svgTextMatcher('a firstWord on a line'));
     expect(firstLine).not.toBeNull();
     expect(firstLine).toHaveAttribute('style', 'fill: rgba(0, 0, 0, 0.75);');
@@ -53,9 +51,9 @@ describe('PageTextDisplay', () => {
 
   it('should render lines without individual spans accurately', () => {
     const { container } = renderPage({ lines: lineFixtures.withoutSpans });
-    container.querySelectorAll('rect').forEach(
-      (rect) => expect(rect).toHaveAttribute('style', 'fill: rgba(255, 255, 255, 0.75);'),
-    );
+    container
+      .querySelectorAll('rect')
+      .forEach((rect) => expect(rect).toHaveAttribute('style', 'fill: rgba(255, 255, 255, 0.75);'));
     const firstLine = screen.getByText('a word on a line');
     expect(firstLine).not.toBeNull();
     expect(firstLine).toHaveAttribute('style', 'fill: rgba(0, 0, 0, 0.75);');
@@ -66,27 +64,40 @@ describe('PageTextDisplay', () => {
 
   it('should render invisible lines correctly', () => {
     renderPage({ visible: false });
-    expect(screen.getByText(svgTextMatcher('a firstWord on a line')))
-      .toHaveAttribute('style', 'fill: rgba(0, 0, 0, 0);');
-    expect(screen.getByText(svgTextMatcher('another secondWord on another line')))
-      .toHaveAttribute('style', 'fill: rgba(0, 0, 0, 0);');
+    expect(screen.getByText(svgTextMatcher('a firstWord on a line'))).toHaveAttribute(
+      'style',
+      'fill: rgba(0, 0, 0, 0);'
+    );
+    expect(screen.getByText(svgTextMatcher('another secondWord on another line'))).toHaveAttribute(
+      'style',
+      'fill: rgba(0, 0, 0, 0);'
+    );
   });
 
   it('should not re-render by itself when the opacity changes', () => {
     const { rerender } = renderPage();
-    expect(screen.getByText(svgTextMatcher('a firstWord on a line')))
-      .toHaveAttribute('style', 'fill: rgba(0, 0, 0, 0.75);');
+    expect(screen.getByText(svgTextMatcher('a firstWord on a line'))).toHaveAttribute(
+      'style',
+      'fill: rgba(0, 0, 0, 0.75);'
+    );
     renderPage({ opacity: 0.25 }, rerender);
-    expect(screen.getByText(svgTextMatcher('a firstWord on a line')))
-      .toHaveAttribute('style', 'fill: rgba(0, 0, 0, 0.75);');
+    expect(screen.getByText(svgTextMatcher('a firstWord on a line'))).toHaveAttribute(
+      'style',
+      'fill: rgba(0, 0, 0, 0.75);'
+    );
   });
 
   it('should re-render when the source changes', () => {
     const { rerender } = renderPage();
     expect(screen.getByText(svgTextMatcher('a firstWord on a line'))).not.toBeNull();
-    renderPage({ source: 'http://example.com/pages/2', lines: lineFixtures.withoutSpans, opacity: 0.25 }, rerender);
-    expect(screen.getByText('a word on a line'))
-      .toHaveAttribute('style', 'fill: rgba(0, 0, 0, 0.25);');
+    renderPage(
+      { source: 'http://example.com/pages/2', lines: lineFixtures.withoutSpans, opacity: 0.25 },
+      rerender
+    );
+    expect(screen.getByText('a word on a line')).toHaveAttribute(
+      'style',
+      'fill: rgba(0, 0, 0, 0.25);'
+    );
   });
 
   it('should correctly apply transformations to svg container', () => {
@@ -102,23 +113,23 @@ describe('PageTextDisplay', () => {
 
   it('should correctly set opacity to all rect and text elements', () => {
     const { container, ref } = renderPage();
-    container.querySelectorAll('rect').forEach(
-      (rect) => expect(rect).toHaveAttribute('style', 'fill: rgba(255, 255, 255, 0.75);'),
-    );
+    container
+      .querySelectorAll('rect')
+      .forEach((rect) => expect(rect).toHaveAttribute('style', 'fill: rgba(255, 255, 255, 0.75);'));
     const firstLine = screen.getByText(svgTextMatcher('a firstWord on a line'));
     expect(firstLine).toHaveAttribute('style', 'fill: rgba(0, 0, 0, 0.75);');
     ref.current.updateColors('#000000', '#ffffff', 0.25);
-    container.querySelectorAll('rect').forEach(
-      (rect) => expect(rect).toHaveAttribute('style', 'fill: rgba(255, 255, 255, 0.25);'),
-    );
+    container
+      .querySelectorAll('rect')
+      .forEach((rect) => expect(rect).toHaveAttribute('style', 'fill: rgba(255, 255, 255, 0.25);'));
     expect(firstLine).toHaveAttribute('style', 'fill: rgba(0, 0, 0, 0.25);');
   });
 
   it('should render text invisible if visibility is disabled', () => {
     const { container } = renderPage({ visible: false });
-    container.querySelectorAll('rect').forEach(
-      (rect) => expect(rect).toHaveAttribute('style', 'fill: rgba(255, 255, 255, 0);'),
-    );
+    container
+      .querySelectorAll('rect')
+      .forEach((rect) => expect(rect).toHaveAttribute('style', 'fill: rgba(255, 255, 255, 0);'));
     const firstLine = screen.getByText(svgTextMatcher('a firstWord on a line'));
     expect(firstLine).toHaveAttribute('style', 'fill: rgba(0, 0, 0, 0);');
   });
@@ -145,7 +156,8 @@ describe('PageTextDisplay', () => {
 
   it('should render spans as <text> elements when running under Gecko', () => {
     const prevAgent = global.navigator.userAgent;
-    global.navigator.userAgent = 'Mozilla/5.0 (X11; Linux x86_64; rv:10.0) Gecko/20100101 Firefox/10.0';
+    global.navigator.userAgent =
+      'Mozilla/5.0 (X11; Linux x86_64; rv:10.0) Gecko/20100101 Firefox/10.0';
     renderPage();
     global.navigator.userAgent = prevAgent;
     const word = screen.getByText('firstWord');
@@ -158,17 +170,17 @@ describe('PageTextDisplay', () => {
     const { container } = renderPage({ useAutoColors: true, pageColors });
     const firstLine = screen.getByText(svgTextMatcher('a firstWord on a line'));
     expect(firstLine).toHaveAttribute('style', 'fill: rgba(17, 17, 17, 0.75);');
-    container.querySelectorAll('rect').forEach(
-      (rect) => expect(rect).toHaveAttribute('style', 'fill: rgba(238, 238, 238, 0.75);'),
-    );
+    container
+      .querySelectorAll('rect')
+      .forEach((rect) => expect(rect).toHaveAttribute('style', 'fill: rgba(238, 238, 238, 0.75);'));
   });
 
   it('should use hardcoded colors for the initial render if enabled, but not available', () => {
     const { container } = renderPage({ useAutoColors: true, pageColors: undefined });
     const firstLine = screen.getByText(svgTextMatcher('a firstWord on a line'));
     expect(firstLine).toHaveAttribute('style', 'fill: rgba(0, 0, 0, 0.75);');
-    container.querySelectorAll('rect').forEach(
-      (rect) => expect(rect).toHaveAttribute('style', 'fill: rgba(255, 255, 255, 0.75);'),
-    );
+    container
+      .querySelectorAll('rect')
+      .forEach((rect) => expect(rect).toHaveAttribute('style', 'fill: rgba(255, 255, 255, 0.75);'));
   });
 });

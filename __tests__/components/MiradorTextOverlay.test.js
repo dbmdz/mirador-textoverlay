@@ -1,8 +1,6 @@
 /* eslint-disable require-jsdoc */
 import React from 'react';
-import {
-  describe, it, jest, expect,
-} from '@jest/globals';
+import { describe, it, jest, expect } from '@jest/globals';
 import { render, queryByText, getByText } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 
@@ -26,44 +24,46 @@ const pageTexts = [
     height: 200,
     textColor: '#222333',
     bgColor: '#444555',
-  }];
+  },
+];
 
 class MockOpenSeadragon {
   canvas = (() => {
     const canv = document.createElement('div');
     canv.className = 'openseadragon-canvas';
     // Mocked Annotation overlay
-    canv.innerHTML = '<div style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%;"><canvas width="500" height="500"></div>';
+    canv.innerHTML =
+      '<div style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%;"><canvas width="500" height="500"></div>';
     return canv;
-  })()
+  })();
 
-  handlers = {}
+  handlers = {};
 
-  image ={
+  image = {
     source: { dimensions: { x: 300, y: 300 } },
     viewportToImageZoom: (x) => x,
-  }
+  };
 
   addHandler = (evt, handler) => {
     this.handlers[evt] = handler;
-  }
+  };
 
   viewport = {
     getBounds: jest.fn(() => ({ x: -10, y: -20 })),
     getFlip: jest.fn(() => false),
     getZoom: jest.fn(() => 1.33),
     getRotation: jest.fn(() => 0),
-  }
+  };
 
   world = {
     getItemAt: jest.fn(() => this.image),
     getItemCount: jest.fn(() => 2),
-  }
+  };
 
   container = {
     clientWidth: 444,
     clientHeight: 555,
-  }
+  };
 }
 
 const mockCanvasWorld = {
@@ -87,22 +87,26 @@ function renderOverlay(props = {}, renderFn = render) {
     viewer,
     ...props,
   };
-  const res = renderFn(
-    <MiradorTextOverlay ref={ref} {...renderProps} />,
-  );
+  const res = renderFn(<MiradorTextOverlay ref={ref} {...renderProps} />);
   return {
-    ref, props: renderProps, ...res,
+    ref,
+    props: renderProps,
+    ...res,
   };
 }
 
 describe('MiradorTextOverlay', () => {
   it('should not render when it is disabled', () => {
-    const { props: { viewer } } = renderOverlay({ enabled: false });
+    const {
+      props: { viewer },
+    } = renderOverlay({ enabled: false });
     expect(viewer.canvas.querySelector('svg')).toBeNull();
   });
 
-  it('should render a page overlay for every page next to the viewer\'s canvas', () => {
-    const { props: { viewer } } = renderOverlay({ pageTexts });
+  it("should render a page overlay for every page next to the viewer's canvas", () => {
+    const {
+      props: { viewer },
+    } = renderOverlay({ pageTexts });
     expect(viewer.handlers['update-viewport']).not.toBeUndefined();
     expect(viewer.canvas).not.toBeEmptyDOMElement();
     const firstLine = queryByText(viewer.canvas, 'a word on a line');
@@ -116,10 +120,13 @@ describe('MiradorTextOverlay', () => {
   });
 
   it('should correctly update the scale and positions of the overlay container when OSD updates', () => {
-    const { props: { viewer } } = renderOverlay({ pageTexts });
+    const {
+      props: { viewer },
+    } = renderOverlay({ pageTexts });
     viewer.handlers['update-viewport']();
-    const overlays = Array.of(...viewer.canvas.querySelectorAll('div > svg:first-of-type'))
-      .map((e) => e.parentElement);
+    const overlays = Array.of(...viewer.canvas.querySelectorAll('div > svg:first-of-type')).map(
+      (e) => e.parentElement
+    );
     expect(overlays[0]).toHaveStyle({
       transform: 'translate(52.95000000000001px, 72.9px) scale(1.33)',
     });
@@ -129,25 +136,28 @@ describe('MiradorTextOverlay', () => {
     expect(overlays[0].parentElement.style.transform).toHaveLength(0);
   });
 
-  it('should correctly patch the annotation overlay\'s style if present', () => {
+  it("should correctly patch the annotation overlay's style if present", () => {
     // eslint-disable-next-line prefer-const
-    let { rerender, props: { viewer } } = renderOverlay({ pageTexts });
+    const { rerender, props } = renderOverlay({ pageTexts });
+    let { viewer } = props;
     let annoOverlay = viewer.canvas.querySelector('canvas').parentElement;
     // NOTE: It would be better to test this from more of a user's perspective instead
     //       of simply asserting on the CSS styles, but I couldn't get this to work with
     //       jsdom :-/
-    expect(annoOverlay)
-      .toHaveStyle({
-        zIndex: 100,
-        pointerEvents: 'none',
-      });
+    expect(annoOverlay).toHaveStyle({
+      zIndex: 100,
+      pointerEvents: 'none',
+    });
     viewer = renderOverlay({ pageTexts, selectable: false }, rerender).props.viewer;
     annoOverlay = viewer.canvas.querySelector('canvas').parentElement;
     expect(annoOverlay).not.toHaveStyle({ pointerEvents: 'none' });
   });
 
   it('should correctly track and mirror flips and rotations on OSD', () => {
-    const { ref, props: { viewer } } = renderOverlay({ pageTexts });
+    const {
+      ref,
+      props: { viewer },
+    } = renderOverlay({ pageTexts });
     viewer.viewport.getFlip.mockReturnValue(true);
     viewer.viewport.getRotation.mockReturnValue(90);
     viewer.handlers['update-viewport']();
@@ -177,14 +187,18 @@ describe('MiradorTextOverlay', () => {
     };
     const { rerender, props: renderProps } = renderOverlay(props);
     props = renderProps;
-    expect(getByText(props.viewer.canvas, 'a word on a line'))
-      .toHaveStyle({ fill: 'rgba(17, 18, 34, 0)' });
-    expect(getByText(props.viewer.canvas, 'firstWord').parentElement)
-      .toHaveStyle({ fill: 'rgba(34, 35, 51, 0)' });
+    expect(getByText(props.viewer.canvas, 'a word on a line')).toHaveStyle({
+      fill: 'rgba(17, 18, 34, 0)',
+    });
+    expect(getByText(props.viewer.canvas, 'firstWord').parentElement).toHaveStyle({
+      fill: 'rgba(34, 35, 51, 0)',
+    });
     renderOverlay({ ...props, visible: true }, rerender);
-    expect(getByText(props.viewer.canvas, 'a word on a line'))
-      .toHaveStyle({ fill: 'rgba(17, 18, 34, 0.75)' });
-    expect(getByText(props.viewer.canvas, 'firstWord').parentElement)
-      .toHaveStyle({ fill: 'rgba(34, 35, 51, 0.75)' });
+    expect(getByText(props.viewer.canvas, 'a word on a line')).toHaveStyle({
+      fill: 'rgba(17, 18, 34, 0.75)',
+    });
+    expect(getByText(props.viewer.canvas, 'firstWord').parentElement).toHaveStyle({
+      fill: 'rgba(34, 35, 51, 0.75)',
+    });
   });
 });

@@ -3,7 +3,7 @@ import SvgIcon from '@material-ui/core/SvgIcon';
 
 /**
  * TextSelectIcon ~
-*/
+ */
 export default function TextSelectIcon(props) {
   return (
     // eslint-disable-next-line react/jsx-props-no-spreading

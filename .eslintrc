@@ -2,16 +2,17 @@
   "env": {
     "jest/globals": true
   },
-  "extends": ["airbnb","react-app"],
+  "extends": ["airbnb","react-app","prettier"],
   "globals": {
     "page": true,
     "document": true
   },
   "parser": "babel-eslint",
-  "plugins": ["jest"],
+  "plugins": ["jest","prettier"],
   "rules": {
     "import/prefer-default-export": "off",
     "no-console": "off",
+    "prettier/prettier": ["error"],
     "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
     "require-jsdoc": ["error", {
       "require": {

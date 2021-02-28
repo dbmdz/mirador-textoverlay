@@ -1,19 +1,25 @@
 /* eslint-disable no-underscore-dangle */
 import uniq from 'lodash/uniq';
-import {
-  all, call, put, select, take, takeEvery, race,
-} from 'redux-saga/effects';
+import { all, call, put, select, take, takeEvery, race } from 'redux-saga/effects';
 import fetch from 'isomorphic-unfetch';
 
 import ActionTypes from 'mirador/dist/es/src/state/actions/action-types';
 import { receiveAnnotation, updateConfig } from 'mirador/dist/es/src/state/actions';
 import {
-  getCanvases, getWindowConfig, getVisibleCanvases, selectInfoResponse,
+  getCanvases,
+  getWindowConfig,
+  getVisibleCanvases,
+  selectInfoResponse,
 } from 'mirador/dist/es/src/state/selectors';
 import MiradorCanvas from 'mirador/dist/es/src/lib/MiradorCanvas';
 
 import {
-  PluginActionTypes, requestText, receiveText, receiveTextFailure, discoveredText, requestColors,
+  PluginActionTypes,
+  requestText,
+  receiveText,
+  receiveTextFailure,
+  discoveredText,
+  requestColors,
   receiveColors,
 } from './actions';
 import { getTexts, getTextsForVisibleCanvases } from './selectors';
@@ -25,23 +31,28 @@ const charFragmentPattern = /^(.+)#char=(\d+),(\d+)$/;
 
 /** Check if an annotation has external resources that need to be loaded */
 function hasExternalResource(anno) {
-  return anno.resource?.chars === undefined
-      && anno.body?.value === undefined
-      && Object.keys(anno.resource).length === 1 && anno.resource['@id'] !== undefined;
+  return (
+    anno.resource?.chars === undefined &&
+    anno.body?.value === undefined &&
+    Object.keys(anno.resource).length === 1 &&
+    anno.resource['@id'] !== undefined
+  );
 }
 
 /** Checks if a given resource points to an ALTO OCR document */
-const isAlto = (resource) => resource && (
-  resource.format === 'application/xml+alto'
-    || (resource.profile && resource.profile.startsWith('http://www.loc.gov/standards/alto/')));
+const isAlto = (resource) =>
+  resource &&
+  (resource.format === 'application/xml+alto' ||
+    (resource.profile && resource.profile.startsWith('http://www.loc.gov/standards/alto/')));
 
 /** Checks if a given resource points to an hOCR document */
-const isHocr = (resource) => resource && (
-  resource.format === 'text/vnd.hocr+html'
-    || (resource.profile && (
-      resource.profile === 'https://github.com/kba/hocr-spec/blob/master/hocr-spec.md'
-      || resource.profile.startsWith('http://kba.cloud/hocr-spec/')
-      || resource.profile.startsWith('http://kba.github.io/hocr-spec/'))));
+const isHocr = (resource) =>
+  resource &&
+  (resource.format === 'text/vnd.hocr+html' ||
+    (resource.profile &&
+      (resource.profile === 'https://github.com/kba/hocr-spec/blob/master/hocr-spec.md' ||
+        resource.profile.startsWith('http://kba.cloud/hocr-spec/') ||
+        resource.profile.startsWith('http://kba.github.io/hocr-spec/'))));
 
 /** Wrapper around fetch() that returns the content as text */
 export async function fetchOcrMarkup(url) {
@@ -51,9 +62,8 @@ export async function fetchOcrMarkup(url) {
 
 /** Saga for discovering external OCR on visible canvases and requesting it if not yet loaded */
 export function* discoverExternalOcr({ visibleCanvases: visibleCanvasIds, windowId }) {
-  const { enabled, selectable, visible } = (
-    yield select(getWindowConfig, { windowId })
-  ).textOverlay ?? { enabled: false };
+  const { enabled, selectable, visible } = (yield select(getWindowConfig, { windowId }))
+    .textOverlay ?? { enabled: false };
   if (!enabled) {
     return;
   }
@@ -65,9 +75,10 @@ export function* discoverExternalOcr({ visibleCanvases: visibleCanvasIds, window
   // seem to do anything :-/
   for (const canvas of visibleCanvases) {
     const { width, height } = canvas.__jsonld;
-    const seeAlso = (
-      Array.isArray(canvas.__jsonld.seeAlso) ? canvas.__jsonld.seeAlso : [canvas.__jsonld.seeAlso])
-      .filter((res) => isAlto(res) || isHocr(res))[0];
+    const seeAlso = (Array.isArray(canvas.__jsonld.seeAlso)
+      ? canvas.__jsonld.seeAlso
+      : [canvas.__jsonld.seeAlso]
+    ).filter((res) => isAlto(res) || isHocr(res))[0];
     if (seeAlso !== undefined) {
       const ocrSource = seeAlso['@id'];
       const alreadyHasText = texts[canvas.id]?.source === ocrSource;
@@ -75,10 +86,8 @@ export function* discoverExternalOcr({ visibleCanvases: visibleCanvasIds, window
         // eslint-disable-next-line no-continue
         continue;
       }
-      if ((selectable || visible)) {
-        yield put(requestText(
-          canvas.id, ocrSource, { height, width },
-        ));
+      if (selectable || visible) {
+        yield put(requestText(canvas.id, ocrSource, { height, width }));
       } else {
         yield put(discoveredText(canvas.id, ocrSource));
       }
@@ -118,10 +127,10 @@ export function* fetchExternalAnnotationResources({ targetId, annotationId, anno
   if (!annotationJson.resources.some(hasExternalResource)) {
     return;
   }
-  const resourceUris = uniq(annotationJson.resources.map((anno) => anno.resource['@id'].split('#')[0]));
-  const contents = yield all(
-    resourceUris.map((uri) => call(fetchAnnotationResource, uri)),
+  const resourceUris = uniq(
+    annotationJson.resources.map((anno) => anno.resource['@id'].split('#')[0])
   );
+  const contents = yield all(resourceUris.map((uri) => call(fetchAnnotationResource, uri)));
   const contentMap = Object.fromEntries(contents.map((c) => [c.id ?? c['@id'], c]));
   const completedAnnos = annotationJson.resources.map((anno) => {
     if (!hasExternalResource(anno)) {
@@ -138,7 +147,7 @@ export function* fetchExternalAnnotationResources({ targetId, annotationId, anno
     return { ...anno, resource: { ...anno.resource, value: partialContent } };
   });
   yield put(
-    receiveAnnotation(targetId, annotationId, { ...annotationJson, resources: completedAnnos }),
+    receiveAnnotation(targetId, annotationId, { ...annotationJson, resources: completedAnnos })
   );
 }
 
@@ -147,9 +156,10 @@ export function* processTextsFromAnnotations({ targetId, annotationId, annotatio
   // Check if the annotation contains "content as text" resources that
   // we can extract text with coordinates from
   const contentAsTextAnnos = annotationJson.resources.filter(
-    (anno) => anno.motivation === 'supplementing' // IIIF 3.0
-  || anno.resource['@type']?.toLowerCase() === 'cnt:contentastext' // IIIF 2.0
-  || ['Line', 'Word'].indexOf(anno.dcType) >= 0, // Europeana IIIF 2.0
+    (anno) =>
+      anno.motivation === 'supplementing' || // IIIF 3.0
+      anno.resource['@type']?.toLowerCase() === 'cnt:contentastext' || // IIIF 2.0
+      ['Line', 'Word'].indexOf(anno.dcType) >= 0 // Europeana IIIF 2.0
   );
 
   if (contentAsTextAnnos.length > 0) {
@@ -166,22 +176,22 @@ export function* onConfigChange({ payload, id: windowId }) {
   }
   const texts = yield select(getTextsForVisibleCanvases, { windowId });
   // Check if any of the texts need fetching
-  const needFetching = texts.filter(({ sourceType, text }) => sourceType === 'ocr' && text === undefined);
-  // Check if we need to discover external OCR
-  const needsDiscovery = (
-    texts.length === 0
-    || texts.filter(({ sourceType } = {}) => sourceType === 'annos').length > 0
+  const needFetching = texts.filter(
+    ({ sourceType, text }) => sourceType === 'ocr' && text === undefined
   );
+  // Check if we need to discover external OCR
+  const needsDiscovery =
+    texts.length === 0 || texts.filter(({ sourceType } = {}) => sourceType === 'annos').length > 0;
   if (needFetching.length === 0 && !needsDiscovery) {
     return;
   }
   const visibleCanvases = yield select(getVisibleCanvases, { windowId });
-  yield all(needFetching.map(({ canvasId, source }) => {
-    const { width, height } = visibleCanvases.find((c) => c.id === canvasId).__jsonld;
-    return put(requestText(
-      canvasId, source, { height, width },
-    ));
-  }));
+  yield all(
+    needFetching.map(({ canvasId, source }) => {
+      const { width, height } = visibleCanvases.find((c) => c.id === canvasId).__jsonld;
+      return put(requestText(canvasId, source, { height, width }));
+    })
+  );
   if (needsDiscovery) {
     const canvasIds = visibleCanvases.map((c) => c.id);
     yield call(discoverExternalOcr, { visibleCanvases: canvasIds, windowId });
@@ -190,9 +200,11 @@ export function* onConfigChange({ payload, id: windowId }) {
 
 /** Inject translation keys for this plugin into thte config */
 export function* injectTranslations() {
-  yield put(updateConfig({
-    translations,
-  }));
+  yield put(
+    updateConfig({
+      translations,
+    })
+  );
 }
 
 /** Load image data for image */
@@ -217,12 +229,10 @@ export function* fetchColors({ targetId, infoId }) {
   let serviceId = infoResp?.id;
   if (!serviceId) {
     const { success: infoSuccess, failure: infoFailure } = yield race({
-      success: take((a) => (
-        a.type === ActionTypes.RECEIVE_INFO_RESPONSE
-            && a.infoId === infoId)),
-      failure: take((a) => (
-        a.type === ActionTypes.RECEIVE_INFO_RESPONSE_FAILURE
-            && a.infoId === infoId)),
+      success: take((a) => a.type === ActionTypes.RECEIVE_INFO_RESPONSE && a.infoId === infoId),
+      failure: take(
+        (a) => a.type === ActionTypes.RECEIVE_INFO_RESPONSE_FAILURE && a.infoId === infoId
+      ),
     });
     if (infoFailure) {
       return;

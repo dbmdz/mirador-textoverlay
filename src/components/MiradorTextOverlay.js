@@ -14,10 +14,7 @@ class MiradorTextOverlay extends Component {
   constructor(props) {
     super(props);
 
-    this.renderRefs = [
-      React.createRef(),
-      React.createRef(),
-    ];
+    this.renderRefs = [React.createRef(), React.createRef()];
     this.containerRef = React.createRef();
   }
 
@@ -33,7 +30,14 @@ class MiradorTextOverlay extends Component {
   /** Register OpenSeadragon callback when viewport changes */
   componentDidUpdate(prevProps) {
     const {
-      enabled, viewer, pageTexts, textColor, bgColor, useAutoColors, visible, selectable,
+      enabled,
+      viewer,
+      pageTexts,
+      textColor,
+      bgColor,
+      useAutoColors,
+      visible,
+      selectable,
     } = this.props;
     let { opacity } = this.props;
 
@@ -44,10 +48,10 @@ class MiradorTextOverlay extends Component {
       this.registerOsdCallback();
     }
     // Newly enabled, force initial setting of state from OSD
-    const newlyEnabled = (
-      (this.shouldRender() && !this.shouldRender(prevProps))
-      || (pageTexts.filter(this.shouldRenderPage).length
-          !== prevProps.pageTexts.filter(this.shouldRenderPage).length));
+    const newlyEnabled =
+      (this.shouldRender() && !this.shouldRender(prevProps)) ||
+      pageTexts.filter(this.shouldRenderPage).length !==
+        prevProps.pageTexts.filter(this.shouldRenderPage).length;
 
     if (newlyEnabled) {
       this.onUpdateViewport();
@@ -62,13 +66,14 @@ class MiradorTextOverlay extends Component {
     // Manually update SVG colors for performance reasons
     // eslint-disable-next-line require-jsdoc
     const hasPageColors = (text = {}) => text.textColor !== undefined;
-    if (visible !== prevProps.visible
-        || opacity !== prevProps.opacity
-        || bgColor !== prevProps.bgColor
-        || textColor !== prevProps.textColor
-        || useAutoColors !== prevProps.useAutoColors
-        || (pageTexts.filter(hasPageColors).length
-            !== prevProps.pageTexts.filter(hasPageColors).length)) {
+    if (
+      visible !== prevProps.visible ||
+      opacity !== prevProps.opacity ||
+      bgColor !== prevProps.bgColor ||
+      textColor !== prevProps.textColor ||
+      useAutoColors !== prevProps.useAutoColors ||
+      pageTexts.filter(hasPageColors).length !== prevProps.pageTexts.filter(hasPageColors).length
+    ) {
       if (!visible) {
         opacity = 0;
       }
@@ -137,29 +142,31 @@ class MiradorTextOverlay extends Component {
       }
       const img = viewer.world.getItemAt(itemNo);
       const canvasDims = canvasWorld.canvasDimensions[itemNo];
-      const canvasWorldOffset = itemNo > 0
-        ? (img.source.dimensions.x - canvasDims.width)
-          + canvasWorld.canvasDimensions[itemNo - 1].width
-        : 0;
-      const canvasWorldScale = (img.source.dimensions.x / canvasDims.width);
+      const canvasWorldOffset =
+        itemNo > 0
+          ? img.source.dimensions.x -
+            canvasDims.width +
+            canvasWorld.canvasDimensions[itemNo - 1].width
+          : 0;
+      const canvasWorldScale = img.source.dimensions.x / canvasDims.width;
       this.renderRefs[itemNo].current.updateTransforms(
         img.viewportToImageZoom(viewportZoom),
         vpBounds.x * canvasWorldScale - canvasWorldOffset,
-        vpBounds.y * canvasWorldScale,
+        vpBounds.y * canvasWorldScale
       );
     }
   }
 
   /** If the page should be rendered */
-  shouldRenderPage = ({ lines } = {}) => (
-    lines
-    && lines.length > 0
-    && lines.some(({ text, spans }) => text || (spans && spans.length > 0)))
+  shouldRenderPage = ({ lines } = {}) =>
+    lines &&
+    lines.length > 0 &&
+    lines.some(({ text, spans }) => text || (spans && spans.length > 0));
 
   /** If the overlay should be rendered at all */
   shouldRender(props) {
     const { enabled, pageTexts } = props ?? this.props;
-    return (enabled && pageTexts.length > 0);
+    return enabled && pageTexts.length > 0;
   }
 
   /** Update container dimensions and page scale/offset every time the OSD viewport changes. */
@@ -200,11 +207,9 @@ class MiradorTextOverlay extends Component {
     if (!enabled) {
       return;
     }
-    const annoCanvasContainer = this.containerRef.current
-      ?.parentElement
+    const annoCanvasContainer = this.containerRef.current?.parentElement
       // This selector will currently only match the AnnotationOverlay's `canvas` node
-      .querySelector('div.openseadragon-canvas > div > canvas')
-      ?.parentElement;
+      .querySelector('div.openseadragon-canvas > div > canvas')?.parentElement;
     if (annoCanvasContainer) {
       annoCanvasContainer.style.zIndex = 100;
       annoCanvasContainer.style.pointerEvents = selectable ? 'none' : null;
@@ -214,7 +219,14 @@ class MiradorTextOverlay extends Component {
   /** Render the text overlay SVG */
   render() {
     const {
-      pageTexts, selectable, visible, viewer, opacity, textColor, bgColor, useAutoColors,
+      pageTexts,
+      selectable,
+      visible,
+      viewer,
+      opacity,
+      textColor,
+      bgColor,
+      useAutoColors,
       fontFamily,
     } = this.props;
     if (!this.shouldRender() || !viewer || !pageTexts) {
@@ -225,39 +237,42 @@ class MiradorTextOverlay extends Component {
         ref={this.containerRef}
         style={{
           position: 'absolute',
-          display: (selectable || visible) ? null : 'none',
+          display: selectable || visible ? null : 'none',
         }}
       >
-        {pageTexts
-          .map((page, idx) => {
-            if (!page || !this.shouldRenderPage(page)) {
-              return null;
-            }
-            const {
-              lines, source, width: pageWidth, height: pageHeight,
-              textColor: pageFg, bgColor: pageBg,
-            } = page;
-            return (
-              <PageTextDisplay
-                ref={this.renderRefs[idx]}
-                key={source}
-                lines={lines}
-                source={source}
-                selectable={selectable}
-                visible={visible}
-                opacity={opacity}
-                width={pageWidth}
-                height={pageHeight}
-                textColor={textColor}
-                fontFamily={fontFamily}
-                bgColor={bgColor}
-                useAutoColors={useAutoColors}
-                pageColors={pageFg ? { textColor: pageFg, bgColor: pageBg } : undefined}
-              />
-            );
-          })}
+        {pageTexts.map((page, idx) => {
+          if (!page || !this.shouldRenderPage(page)) {
+            return null;
+          }
+          const {
+            lines,
+            source,
+            width: pageWidth,
+            height: pageHeight,
+            textColor: pageFg,
+            bgColor: pageBg,
+          } = page;
+          return (
+            <PageTextDisplay
+              ref={this.renderRefs[idx]}
+              key={source}
+              lines={lines}
+              source={source}
+              selectable={selectable}
+              visible={visible}
+              opacity={opacity}
+              width={pageWidth}
+              height={pageHeight}
+              textColor={textColor}
+              fontFamily={fontFamily}
+              bgColor={bgColor}
+              useAutoColors={useAutoColors}
+              pageColors={pageFg ? { textColor: pageFg, bgColor: pageBg } : undefined}
+            />
+          );
+        })}
       </div>,
-      viewer.canvas,
+      viewer.canvas
     );
   }
 }
