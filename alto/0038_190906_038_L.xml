@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<alto xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns="http://www.loc.gov/standards/alto/ns-v2#"
+      xmlns:page="http://schema.primaresearch.org/PAGE/gts/pagecontent/2013-07-15"
+      xsi:schemaLocation="http://www.loc.gov/standards/alto/ns-v2# http://www.loc.gov/standards/alto/alto.xsd">
+   <Description>
+      <MeasurementUnit>pixel</MeasurementUnit>
+      <OCRProcessing ID="IdOcr">
+         <ocrProcessingStep>
+            <processingDateTime>2021-02-21T23:23:18.813+01:00</processingDateTime>
+            <processingSoftware>
+               <softwareCreator>READ COOP</softwareCreator>
+               <softwareName>Transkribus</softwareName>
+            </processingSoftware>
+         </ocrProcessingStep>
+      </OCRProcessing>
+   </Description>
+   <Tags/>
+   <Layout>
+      <Page ID="Page1" PHYSICAL_IMG_NR="1" HEIGHT="1499" WIDTH="1000">
+         <TopMargin HEIGHT="0" WIDTH="1000" VPOS="0" HPOS="0"/>
+         <LeftMargin HEIGHT="1499" WIDTH="0" VPOS="0" HPOS="0"/>
+         <RightMargin HEIGHT="1499" WIDTH="0" VPOS="0" HPOS="1000"/>
+         <BottomMargin HEIGHT="0" WIDTH="1000" VPOS="1499" HPOS="0"/>
+         <PrintSpace HEIGHT="1499" WIDTH="1000" VPOS="0" HPOS="0"/>
+      </Page>
+   </Layout>
+</alto>

@@ -1,0 +1,2048 @@
+{
+  "@context": "http://iiif.io/api/presentation/2/context.json",
+  "@id": "https://dbmdz.github.io/mirador-textoverlay/manifests/EAP119-1-8-1_issue1.json",
+  "@type": "sc:Manifest",
+  "label": "\u0627\u0644\u062d\u0633\u0646\u0627\u0621 al-\u1e24asn\u0101\u02be Volume 1, Issue 1 (June 1909)\u0627\u0644\u062d\u0633\u0646\u0627\u0621 al-\u1e24asn\u0101\u02be Volume 1, Issue 1 (June 1909)",
+  "description": "Digital images of the first issue of al-Hasna, the period 20 June 1909 - 19 July 1909. The volume cover has not been digitised.",
+  "logo": "https://www.bl.uk/images/bl_logo_100.gif",
+  "attribution": "Except as otherwise permitted under your national copyright law this material may not be copied or distributed further",
+  "license": "",
+  "viewingHint": "individuals",
+  "viewingDirection": "right-to-left",
+  "metadata": [
+    {
+      "label": "Identifier",
+      "value": "EAP119/1/8/1"
+    },
+    {
+      "label": "Title",
+      "value": "\u0627\u0644\u062d\u0633\u0646\u0627\u0621 al-\u1e24asn\u0101\u02be Volume 1, Issue 1 (June 1909)\u0627\u0644\u062d\u0633\u0646\u0627\u0621 al-\u1e24asn\u0101\u02be Volume 1, Issue 1 (June 1909)"
+    },
+    {
+      "label": "Place",
+      "value": "Jerusalem, Israel"
+    },
+    {
+      "label": "Link to catalogue record",
+      "value": "<a href=\"https://eap.bl.uk/archive-file/EAP119-1-8-1\">View the catalogue record</a>"
+    },
+    {
+      "label": "Citation",
+      "value": "\u0627\u0644\u062d\u0633\u0646\u0627\u0621 al-\u1e24asn\u0101\u02be Volume 1, Issue 1 (June 1909)\u0627\u0644\u062d\u0633\u0646\u0627\u0621 al-\u1e24asn\u0101\u02be Volume 1, Issue 1 (June 1909), British Library, EAP119/1/8/1, https://eap.bl.uk/archive-file/EAP119-1-8-1"
+    },
+    {
+      "label": "Digitised by",
+      "value": "Council for British Research in the Levant"
+    },
+    {
+      "label": "Digitisation funded by",
+      "value": "Endangered Archives Programme supported by Arcadia"
+    },
+    {
+      "label": "Language",
+      "value": "Arabic, French"
+    },
+    {
+      "label": "Scripts",
+      "value": "Arabic, Latin"
+    }
+  ],
+  "sequences": [
+    {
+      "@id": "https://dbmdz.github.io/mirador-textoverlay/manifests/EAP119-1-8-1_issue1/sequence",
+      "@type": "sc:Sequence",
+      "label": "Current Page Order",
+      "viewingHint": "individuals",
+      "startCanvas": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/6",
+      "canvases": [
+        {
+          "@id": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/6",
+          "@type": "sc:Canvas",
+          "label": "6",
+          "width": 1713,
+          "height": 2613,
+          "images": [
+            {
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/6.jp2/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "format": "image/jpg",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/6.jp2",
+                  "protocol": "http://iiif.io/api/image",
+                  "width": 1534,
+                  "height": 2468,
+                  "tiles": [
+                    {
+                      "scaleFactors": [
+                        1,
+                        2,
+                        4,
+                        8,
+                        16,
+                        32
+                      ],
+                      "width": 256
+                    }
+                  ],
+                  "profile": [
+                    "http://iiif.io/api/image/2/level2.json",
+                    {
+                      "qualities": [
+                        "gray",
+                        "color",
+                        "bitonal"
+                      ],
+                      "supports": [
+                        "profileLinkHeader",
+                        "rotationArbitrary",
+                        "regionSquare",
+                        "mirroring"
+                      ]
+                    }
+                  ]
+                }
+              },
+              "on": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/6"
+            }
+          ],
+          "seeAlso": {
+            "profile": "http://www.loc.gov/standards/alto/ns-v2#",
+            "format": "application/xml+alto",
+            "id": "https://dbmdz.github.io/mirador-textoverlay/alto/0006_190906_006_L.xml"
+          }
+        },
+        {
+          "@id": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/7",
+          "@type": "sc:Canvas",
+          "label": "7",
+          "width": 1234,
+          "height": 1864,
+          "images": [
+            {
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/7.jp2/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "format": "image/jpg",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/7.jp2",
+                  "protocol": "http://iiif.io/api/image",
+                  "width": 1534,
+                  "height": 2468,
+                  "tiles": [
+                    {
+                      "scaleFactors": [
+                        1,
+                        2,
+                        4,
+                        8,
+                        16,
+                        32
+                      ],
+                      "width": 256
+                    }
+                  ],
+                  "profile": [
+                    "http://iiif.io/api/image/2/level2.json",
+                    {
+                      "qualities": [
+                        "gray",
+                        "color",
+                        "bitonal"
+                      ],
+                      "supports": [
+                        "profileLinkHeader",
+                        "rotationArbitrary",
+                        "regionSquare",
+                        "mirroring"
+                      ]
+                    }
+                  ]
+                }
+              },
+              "on": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/7"
+            }
+          ],
+          "seeAlso": {
+            "profile": "http://www.loc.gov/standards/alto/ns-v2#",
+            "format": "application/xml+alto",
+            "id": "https://dbmdz.github.io/mirador-textoverlay/alto/0007_190906_007_L.xml"
+          }
+        },
+        {
+          "@id": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/8",
+          "@type": "sc:Canvas",
+          "label": "8",
+          "width": 1691,
+          "height": 2628,
+          "images": [
+            {
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/8.jp2/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "format": "image/jpg",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/8.jp2",
+                  "protocol": "http://iiif.io/api/image",
+                  "width": 1534,
+                  "height": 2468,
+                  "tiles": [
+                    {
+                      "scaleFactors": [
+                        1,
+                        2,
+                        4,
+                        8,
+                        16,
+                        32
+                      ],
+                      "width": 256
+                    }
+                  ],
+                  "profile": [
+                    "http://iiif.io/api/image/2/level2.json",
+                    {
+                      "qualities": [
+                        "gray",
+                        "color",
+                        "bitonal"
+                      ],
+                      "supports": [
+                        "profileLinkHeader",
+                        "rotationArbitrary",
+                        "regionSquare",
+                        "mirroring"
+                      ]
+                    }
+                  ]
+                }
+              },
+              "on": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/8"
+            }
+          ],
+          "seeAlso": {
+            "profile": "http://www.loc.gov/standards/alto/ns-v2#",
+            "format": "application/xml+alto",
+            "id": "https://dbmdz.github.io/mirador-textoverlay/alto/0008_190906_008_L.xml"
+          }
+        },
+        {
+          "@id": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/9",
+          "@type": "sc:Canvas",
+          "label": "9",
+          "width": 1219,
+          "height": 1879,
+          "images": [
+            {
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/9.jp2/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "format": "image/jpg",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/9.jp2",
+                  "protocol": "http://iiif.io/api/image",
+                  "width": 1534,
+                  "height": 2468,
+                  "tiles": [
+                    {
+                      "scaleFactors": [
+                        1,
+                        2,
+                        4,
+                        8,
+                        16,
+                        32
+                      ],
+                      "width": 256
+                    }
+                  ],
+                  "profile": [
+                    "http://iiif.io/api/image/2/level2.json",
+                    {
+                      "qualities": [
+                        "gray",
+                        "color",
+                        "bitonal"
+                      ],
+                      "supports": [
+                        "profileLinkHeader",
+                        "rotationArbitrary",
+                        "regionSquare",
+                        "mirroring"
+                      ]
+                    }
+                  ]
+                }
+              },
+              "on": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/9"
+            }
+          ],
+          "seeAlso": {
+            "profile": "http://www.loc.gov/standards/alto/ns-v2#",
+            "format": "application/xml+alto",
+            "id": "https://dbmdz.github.io/mirador-textoverlay/alto/0009_190906_009_L.xml"
+          }
+        },
+        {
+          "@id": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/10",
+          "@type": "sc:Canvas",
+          "label": "10",
+          "width": 1693,
+          "height": 2541,
+          "images": [
+            {
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/10.jp2/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "format": "image/jpg",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/10.jp2",
+                  "protocol": "http://iiif.io/api/image",
+                  "width": 1534,
+                  "height": 2468,
+                  "tiles": [
+                    {
+                      "scaleFactors": [
+                        1,
+                        2,
+                        4,
+                        8,
+                        16,
+                        32
+                      ],
+                      "width": 256
+                    }
+                  ],
+                  "profile": [
+                    "http://iiif.io/api/image/2/level2.json",
+                    {
+                      "qualities": [
+                        "gray",
+                        "color",
+                        "bitonal"
+                      ],
+                      "supports": [
+                        "profileLinkHeader",
+                        "rotationArbitrary",
+                        "regionSquare",
+                        "mirroring"
+                      ]
+                    }
+                  ]
+                }
+              },
+              "on": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/10"
+            }
+          ],
+          "seeAlso": {
+            "profile": "http://www.loc.gov/standards/alto/ns-v2#",
+            "format": "application/xml+alto",
+            "id": "https://dbmdz.github.io/mirador-textoverlay/alto/0010_190906_010_L.xml"
+          }
+        },
+        {
+          "@id": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/11",
+          "@type": "sc:Canvas",
+          "label": "11",
+          "width": 1213,
+          "height": 1873,
+          "images": [
+            {
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/11.jp2/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "format": "image/jpg",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/11.jp2",
+                  "protocol": "http://iiif.io/api/image",
+                  "width": 1534,
+                  "height": 2468,
+                  "tiles": [
+                    {
+                      "scaleFactors": [
+                        1,
+                        2,
+                        4,
+                        8,
+                        16,
+                        32
+                      ],
+                      "width": 256
+                    }
+                  ],
+                  "profile": [
+                    "http://iiif.io/api/image/2/level2.json",
+                    {
+                      "qualities": [
+                        "gray",
+                        "color",
+                        "bitonal"
+                      ],
+                      "supports": [
+                        "profileLinkHeader",
+                        "rotationArbitrary",
+                        "regionSquare",
+                        "mirroring"
+                      ]
+                    }
+                  ]
+                }
+              },
+              "on": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/11"
+            }
+          ],
+          "seeAlso": {
+            "profile": "http://www.loc.gov/standards/alto/ns-v2#",
+            "format": "application/xml+alto",
+            "id": "https://dbmdz.github.io/mirador-textoverlay/alto/0011_190906_011_L.xml"
+          }
+        },
+        {
+          "@id": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/12",
+          "@type": "sc:Canvas",
+          "label": "12",
+          "width": 1588,
+          "height": 2559,
+          "images": [
+            {
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/12.jp2/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "format": "image/jpg",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/12.jp2",
+                  "protocol": "http://iiif.io/api/image",
+                  "width": 1534,
+                  "height": 2468,
+                  "tiles": [
+                    {
+                      "scaleFactors": [
+                        1,
+                        2,
+                        4,
+                        8,
+                        16,
+                        32
+                      ],
+                      "width": 256
+                    }
+                  ],
+                  "profile": [
+                    "http://iiif.io/api/image/2/level2.json",
+                    {
+                      "qualities": [
+                        "gray",
+                        "color",
+                        "bitonal"
+                      ],
+                      "supports": [
+                        "profileLinkHeader",
+                        "rotationArbitrary",
+                        "regionSquare",
+                        "mirroring"
+                      ]
+                    }
+                  ]
+                }
+              },
+              "on": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/12"
+            }
+          ],
+          "seeAlso": {
+            "profile": "http://www.loc.gov/standards/alto/ns-v2#",
+            "format": "application/xml+alto",
+            "id": "https://dbmdz.github.io/mirador-textoverlay/alto/0012_190906_012_L.xml"
+          }
+        },
+        {
+          "@id": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/13",
+          "@type": "sc:Canvas",
+          "label": "13",
+          "width": 1177,
+          "height": 1873,
+          "images": [
+            {
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/13.jp2/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "format": "image/jpg",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/13.jp2",
+                  "protocol": "http://iiif.io/api/image",
+                  "width": 1534,
+                  "height": 2468,
+                  "tiles": [
+                    {
+                      "scaleFactors": [
+                        1,
+                        2,
+                        4,
+                        8,
+                        16,
+                        32
+                      ],
+                      "width": 256
+                    }
+                  ],
+                  "profile": [
+                    "http://iiif.io/api/image/2/level2.json",
+                    {
+                      "qualities": [
+                        "gray",
+                        "color",
+                        "bitonal"
+                      ],
+                      "supports": [
+                        "profileLinkHeader",
+                        "rotationArbitrary",
+                        "regionSquare",
+                        "mirroring"
+                      ]
+                    }
+                  ]
+                }
+              },
+              "on": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/13"
+            }
+          ],
+          "seeAlso": {
+            "profile": "http://www.loc.gov/standards/alto/ns-v2#",
+            "format": "application/xml+alto",
+            "id": "https://dbmdz.github.io/mirador-textoverlay/alto/0013_190906_013_L.xml"
+          }
+        },
+        {
+          "@id": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/14",
+          "@type": "sc:Canvas",
+          "label": "14",
+          "width": 1641,
+          "height": 2539,
+          "images": [
+            {
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/14.jp2/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "format": "image/jpg",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/14.jp2",
+                  "protocol": "http://iiif.io/api/image",
+                  "width": 1534,
+                  "height": 2468,
+                  "tiles": [
+                    {
+                      "scaleFactors": [
+                        1,
+                        2,
+                        4,
+                        8,
+                        16,
+                        32
+                      ],
+                      "width": 256
+                    }
+                  ],
+                  "profile": [
+                    "http://iiif.io/api/image/2/level2.json",
+                    {
+                      "qualities": [
+                        "gray",
+                        "color",
+                        "bitonal"
+                      ],
+                      "supports": [
+                        "profileLinkHeader",
+                        "rotationArbitrary",
+                        "regionSquare",
+                        "mirroring"
+                      ]
+                    }
+                  ]
+                }
+              },
+              "on": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/14"
+            }
+          ],
+          "seeAlso": {
+            "profile": "http://www.loc.gov/standards/alto/ns-v2#",
+            "format": "application/xml+alto",
+            "id": "https://dbmdz.github.io/mirador-textoverlay/alto/0014_190906_014_L.xml"
+          }
+        },
+        {
+          "@id": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/15",
+          "@type": "sc:Canvas",
+          "label": "15",
+          "width": 1216,
+          "height": 1864,
+          "images": [
+            {
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/15.jp2/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "format": "image/jpg",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/15.jp2",
+                  "protocol": "http://iiif.io/api/image",
+                  "width": 1534,
+                  "height": 2468,
+                  "tiles": [
+                    {
+                      "scaleFactors": [
+                        1,
+                        2,
+                        4,
+                        8,
+                        16,
+                        32
+                      ],
+                      "width": 256
+                    }
+                  ],
+                  "profile": [
+                    "http://iiif.io/api/image/2/level2.json",
+                    {
+                      "qualities": [
+                        "gray",
+                        "color",
+                        "bitonal"
+                      ],
+                      "supports": [
+                        "profileLinkHeader",
+                        "rotationArbitrary",
+                        "regionSquare",
+                        "mirroring"
+                      ]
+                    }
+                  ]
+                }
+              },
+              "on": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/15"
+            }
+          ],
+          "seeAlso": {
+            "profile": "http://www.loc.gov/standards/alto/ns-v2#",
+            "format": "application/xml+alto",
+            "id": "https://dbmdz.github.io/mirador-textoverlay/alto/0015_190906_015_L.xml"
+          }
+        },
+        {
+          "@id": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/16",
+          "@type": "sc:Canvas",
+          "label": "16",
+          "width": 1669,
+          "height": 2563,
+          "images": [
+            {
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/16.jp2/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "format": "image/jpg",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/16.jp2",
+                  "protocol": "http://iiif.io/api/image",
+                  "width": 1534,
+                  "height": 2468,
+                  "tiles": [
+                    {
+                      "scaleFactors": [
+                        1,
+                        2,
+                        4,
+                        8,
+                        16,
+                        32
+                      ],
+                      "width": 256
+                    }
+                  ],
+                  "profile": [
+                    "http://iiif.io/api/image/2/level2.json",
+                    {
+                      "qualities": [
+                        "gray",
+                        "color",
+                        "bitonal"
+                      ],
+                      "supports": [
+                        "profileLinkHeader",
+                        "rotationArbitrary",
+                        "regionSquare",
+                        "mirroring"
+                      ]
+                    }
+                  ]
+                }
+              },
+              "on": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/16"
+            }
+          ],
+          "seeAlso": {
+            "profile": "http://www.loc.gov/standards/alto/ns-v2#",
+            "format": "application/xml+alto",
+            "id": "https://dbmdz.github.io/mirador-textoverlay/alto/0016_190906_016_L.xml"
+          }
+        },
+        {
+          "@id": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/17",
+          "@type": "sc:Canvas",
+          "label": "17",
+          "width": 1263,
+          "height": 1873,
+          "images": [
+            {
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/17.jp2/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "format": "image/jpg",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/17.jp2",
+                  "protocol": "http://iiif.io/api/image",
+                  "width": 1534,
+                  "height": 2468,
+                  "tiles": [
+                    {
+                      "scaleFactors": [
+                        1,
+                        2,
+                        4,
+                        8,
+                        16,
+                        32
+                      ],
+                      "width": 256
+                    }
+                  ],
+                  "profile": [
+                    "http://iiif.io/api/image/2/level2.json",
+                    {
+                      "qualities": [
+                        "gray",
+                        "color",
+                        "bitonal"
+                      ],
+                      "supports": [
+                        "profileLinkHeader",
+                        "rotationArbitrary",
+                        "regionSquare",
+                        "mirroring"
+                      ]
+                    }
+                  ]
+                }
+              },
+              "on": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/17"
+            }
+          ],
+          "seeAlso": {
+            "profile": "http://www.loc.gov/standards/alto/ns-v2#",
+            "format": "application/xml+alto",
+            "id": "https://dbmdz.github.io/mirador-textoverlay/alto/0017_190906_017_L.xml"
+          }
+        },
+        {
+          "@id": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/18",
+          "@type": "sc:Canvas",
+          "label": "18",
+          "width": 1755,
+          "height": 2532,
+          "images": [
+            {
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/18.jp2/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "format": "image/jpg",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/18.jp2",
+                  "protocol": "http://iiif.io/api/image",
+                  "width": 1534,
+                  "height": 2468,
+                  "tiles": [
+                    {
+                      "scaleFactors": [
+                        1,
+                        2,
+                        4,
+                        8,
+                        16,
+                        32
+                      ],
+                      "width": 256
+                    }
+                  ],
+                  "profile": [
+                    "http://iiif.io/api/image/2/level2.json",
+                    {
+                      "qualities": [
+                        "gray",
+                        "color",
+                        "bitonal"
+                      ],
+                      "supports": [
+                        "profileLinkHeader",
+                        "rotationArbitrary",
+                        "regionSquare",
+                        "mirroring"
+                      ]
+                    }
+                  ]
+                }
+              },
+              "on": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/18"
+            }
+          ],
+          "seeAlso": {
+            "profile": "http://www.loc.gov/standards/alto/ns-v2#",
+            "format": "application/xml+alto",
+            "id": "https://dbmdz.github.io/mirador-textoverlay/alto/0018_190906_018_L.xml"
+          }
+        },
+        {
+          "@id": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/19",
+          "@type": "sc:Canvas",
+          "label": "19",
+          "width": 1204,
+          "height": 1882,
+          "images": [
+            {
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/19.jp2/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "format": "image/jpg",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/19.jp2",
+                  "protocol": "http://iiif.io/api/image",
+                  "width": 1534,
+                  "height": 2468,
+                  "tiles": [
+                    {
+                      "scaleFactors": [
+                        1,
+                        2,
+                        4,
+                        8,
+                        16,
+                        32
+                      ],
+                      "width": 256
+                    }
+                  ],
+                  "profile": [
+                    "http://iiif.io/api/image/2/level2.json",
+                    {
+                      "qualities": [
+                        "gray",
+                        "color",
+                        "bitonal"
+                      ],
+                      "supports": [
+                        "profileLinkHeader",
+                        "rotationArbitrary",
+                        "regionSquare",
+                        "mirroring"
+                      ]
+                    }
+                  ]
+                }
+              },
+              "on": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/19"
+            }
+          ],
+          "seeAlso": {
+            "profile": "http://www.loc.gov/standards/alto/ns-v2#",
+            "format": "application/xml+alto",
+            "id": "https://dbmdz.github.io/mirador-textoverlay/alto/0019_190906_019_L.xml"
+          }
+        },
+        {
+          "@id": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/20",
+          "@type": "sc:Canvas",
+          "label": "20",
+          "width": 1689,
+          "height": 2571,
+          "images": [
+            {
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/20.jp2/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "format": "image/jpg",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/20.jp2",
+                  "protocol": "http://iiif.io/api/image",
+                  "width": 1534,
+                  "height": 2468,
+                  "tiles": [
+                    {
+                      "scaleFactors": [
+                        1,
+                        2,
+                        4,
+                        8,
+                        16,
+                        32
+                      ],
+                      "width": 256
+                    }
+                  ],
+                  "profile": [
+                    "http://iiif.io/api/image/2/level2.json",
+                    {
+                      "qualities": [
+                        "gray",
+                        "color",
+                        "bitonal"
+                      ],
+                      "supports": [
+                        "profileLinkHeader",
+                        "rotationArbitrary",
+                        "regionSquare",
+                        "mirroring"
+                      ]
+                    }
+                  ]
+                }
+              },
+              "on": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/20"
+            }
+          ],
+          "seeAlso": {
+            "profile": "http://www.loc.gov/standards/alto/ns-v2#",
+            "format": "application/xml+alto",
+            "id": "https://dbmdz.github.io/mirador-textoverlay/alto/0020_190906_020_L.xml"
+          }
+        },
+        {
+          "@id": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/21",
+          "@type": "sc:Canvas",
+          "label": "21",
+          "width": 1174,
+          "height": 1885,
+          "images": [
+            {
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/21.jp2/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "format": "image/jpg",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/21.jp2",
+                  "protocol": "http://iiif.io/api/image",
+                  "width": 1534,
+                  "height": 2468,
+                  "tiles": [
+                    {
+                      "scaleFactors": [
+                        1,
+                        2,
+                        4,
+                        8,
+                        16,
+                        32
+                      ],
+                      "width": 256
+                    }
+                  ],
+                  "profile": [
+                    "http://iiif.io/api/image/2/level2.json",
+                    {
+                      "qualities": [
+                        "gray",
+                        "color",
+                        "bitonal"
+                      ],
+                      "supports": [
+                        "profileLinkHeader",
+                        "rotationArbitrary",
+                        "regionSquare",
+                        "mirroring"
+                      ]
+                    }
+                  ]
+                }
+              },
+              "on": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/21"
+            }
+          ],
+          "seeAlso": {
+            "profile": "http://www.loc.gov/standards/alto/ns-v2#",
+            "format": "application/xml+alto",
+            "id": "https://dbmdz.github.io/mirador-textoverlay/alto/0021_190906_021_L.xml"
+          }
+        },
+        {
+          "@id": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/22",
+          "@type": "sc:Canvas",
+          "label": "22",
+          "width": 1680,
+          "height": 2579,
+          "images": [
+            {
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/22.jp2/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "format": "image/jpg",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/22.jp2",
+                  "protocol": "http://iiif.io/api/image",
+                  "width": 1534,
+                  "height": 2468,
+                  "tiles": [
+                    {
+                      "scaleFactors": [
+                        1,
+                        2,
+                        4,
+                        8,
+                        16,
+                        32
+                      ],
+                      "width": 256
+                    }
+                  ],
+                  "profile": [
+                    "http://iiif.io/api/image/2/level2.json",
+                    {
+                      "qualities": [
+                        "gray",
+                        "color",
+                        "bitonal"
+                      ],
+                      "supports": [
+                        "profileLinkHeader",
+                        "rotationArbitrary",
+                        "regionSquare",
+                        "mirroring"
+                      ]
+                    }
+                  ]
+                }
+              },
+              "on": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/22"
+            }
+          ],
+          "seeAlso": {
+            "profile": "http://www.loc.gov/standards/alto/ns-v2#",
+            "format": "application/xml+alto",
+            "id": "https://dbmdz.github.io/mirador-textoverlay/alto/0022_190906_022_L.xml"
+          }
+        },
+        {
+          "@id": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/23",
+          "@type": "sc:Canvas",
+          "label": "23",
+          "width": 1152,
+          "height": 1855,
+          "images": [
+            {
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/23.jp2/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "format": "image/jpg",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/23.jp2",
+                  "protocol": "http://iiif.io/api/image",
+                  "width": 1534,
+                  "height": 2468,
+                  "tiles": [
+                    {
+                      "scaleFactors": [
+                        1,
+                        2,
+                        4,
+                        8,
+                        16,
+                        32
+                      ],
+                      "width": 256
+                    }
+                  ],
+                  "profile": [
+                    "http://iiif.io/api/image/2/level2.json",
+                    {
+                      "qualities": [
+                        "gray",
+                        "color",
+                        "bitonal"
+                      ],
+                      "supports": [
+                        "profileLinkHeader",
+                        "rotationArbitrary",
+                        "regionSquare",
+                        "mirroring"
+                      ]
+                    }
+                  ]
+                }
+              },
+              "on": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/23"
+            }
+          ],
+          "seeAlso": {
+            "profile": "http://www.loc.gov/standards/alto/ns-v2#",
+            "format": "application/xml+alto",
+            "id": "https://dbmdz.github.io/mirador-textoverlay/alto/0023_190906_023_L.xml"
+          }
+        },
+        {
+          "@id": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/24",
+          "@type": "sc:Canvas",
+          "label": "24",
+          "width": 1676,
+          "height": 2564,
+          "images": [
+            {
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/24.jp2/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "format": "image/jpg",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/24.jp2",
+                  "protocol": "http://iiif.io/api/image",
+                  "width": 1534,
+                  "height": 2468,
+                  "tiles": [
+                    {
+                      "scaleFactors": [
+                        1,
+                        2,
+                        4,
+                        8,
+                        16,
+                        32
+                      ],
+                      "width": 256
+                    }
+                  ],
+                  "profile": [
+                    "http://iiif.io/api/image/2/level2.json",
+                    {
+                      "qualities": [
+                        "gray",
+                        "color",
+                        "bitonal"
+                      ],
+                      "supports": [
+                        "profileLinkHeader",
+                        "rotationArbitrary",
+                        "regionSquare",
+                        "mirroring"
+                      ]
+                    }
+                  ]
+                }
+              },
+              "on": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/24"
+            }
+          ],
+          "seeAlso": {
+            "profile": "http://www.loc.gov/standards/alto/ns-v2#",
+            "format": "application/xml+alto",
+            "id": "https://dbmdz.github.io/mirador-textoverlay/alto/0024_190906_024_L.xml"
+          }
+        },
+        {
+          "@id": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/25",
+          "@type": "sc:Canvas",
+          "label": "25",
+          "width": 1161,
+          "height": 1876,
+          "images": [
+            {
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/25.jp2/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "format": "image/jpg",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/25.jp2",
+                  "protocol": "http://iiif.io/api/image",
+                  "width": 1534,
+                  "height": 2468,
+                  "tiles": [
+                    {
+                      "scaleFactors": [
+                        1,
+                        2,
+                        4,
+                        8,
+                        16,
+                        32
+                      ],
+                      "width": 256
+                    }
+                  ],
+                  "profile": [
+                    "http://iiif.io/api/image/2/level2.json",
+                    {
+                      "qualities": [
+                        "gray",
+                        "color",
+                        "bitonal"
+                      ],
+                      "supports": [
+                        "profileLinkHeader",
+                        "rotationArbitrary",
+                        "regionSquare",
+                        "mirroring"
+                      ]
+                    }
+                  ]
+                }
+              },
+              "on": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/25"
+            }
+          ],
+          "seeAlso": {
+            "profile": "http://www.loc.gov/standards/alto/ns-v2#",
+            "format": "application/xml+alto",
+            "id": "https://dbmdz.github.io/mirador-textoverlay/alto/0025_190906_025_L.xml"
+          }
+        },
+        {
+          "@id": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/26",
+          "@type": "sc:Canvas",
+          "label": "26",
+          "width": 1668,
+          "height": 2555,
+          "images": [
+            {
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/26.jp2/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "format": "image/jpg",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/26.jp2",
+                  "protocol": "http://iiif.io/api/image",
+                  "width": 1534,
+                  "height": 2468,
+                  "tiles": [
+                    {
+                      "scaleFactors": [
+                        1,
+                        2,
+                        4,
+                        8,
+                        16,
+                        32
+                      ],
+                      "width": 256
+                    }
+                  ],
+                  "profile": [
+                    "http://iiif.io/api/image/2/level2.json",
+                    {
+                      "qualities": [
+                        "gray",
+                        "color",
+                        "bitonal"
+                      ],
+                      "supports": [
+                        "profileLinkHeader",
+                        "rotationArbitrary",
+                        "regionSquare",
+                        "mirroring"
+                      ]
+                    }
+                  ]
+                }
+              },
+              "on": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/26"
+            }
+          ],
+          "seeAlso": {
+            "profile": "http://www.loc.gov/standards/alto/ns-v2#",
+            "format": "application/xml+alto",
+            "id": "https://dbmdz.github.io/mirador-textoverlay/alto/0026_190906_026_L.xml"
+          }
+        },
+        {
+          "@id": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/27",
+          "@type": "sc:Canvas",
+          "label": "27",
+          "width": 1143,
+          "height": 1915,
+          "images": [
+            {
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/27.jp2/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "format": "image/jpg",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/27.jp2",
+                  "protocol": "http://iiif.io/api/image",
+                  "width": 1534,
+                  "height": 2468,
+                  "tiles": [
+                    {
+                      "scaleFactors": [
+                        1,
+                        2,
+                        4,
+                        8,
+                        16,
+                        32
+                      ],
+                      "width": 256
+                    }
+                  ],
+                  "profile": [
+                    "http://iiif.io/api/image/2/level2.json",
+                    {
+                      "qualities": [
+                        "gray",
+                        "color",
+                        "bitonal"
+                      ],
+                      "supports": [
+                        "profileLinkHeader",
+                        "rotationArbitrary",
+                        "regionSquare",
+                        "mirroring"
+                      ]
+                    }
+                  ]
+                }
+              },
+              "on": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/27"
+            }
+          ],
+          "seeAlso": {
+            "profile": "http://www.loc.gov/standards/alto/ns-v2#",
+            "format": "application/xml+alto",
+            "id": "https://dbmdz.github.io/mirador-textoverlay/alto/0027_190906_027_L.xml"
+          }
+        },
+        {
+          "@id": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/28",
+          "@type": "sc:Canvas",
+          "label": "28",
+          "width": 1665,
+          "height": 2631,
+          "images": [
+            {
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/28.jp2/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "format": "image/jpg",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/28.jp2",
+                  "protocol": "http://iiif.io/api/image",
+                  "width": 1534,
+                  "height": 2468,
+                  "tiles": [
+                    {
+                      "scaleFactors": [
+                        1,
+                        2,
+                        4,
+                        8,
+                        16,
+                        32
+                      ],
+                      "width": 256
+                    }
+                  ],
+                  "profile": [
+                    "http://iiif.io/api/image/2/level2.json",
+                    {
+                      "qualities": [
+                        "gray",
+                        "color",
+                        "bitonal"
+                      ],
+                      "supports": [
+                        "profileLinkHeader",
+                        "rotationArbitrary",
+                        "regionSquare",
+                        "mirroring"
+                      ]
+                    }
+                  ]
+                }
+              },
+              "on": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/28"
+            }
+          ],
+          "seeAlso": {
+            "profile": "http://www.loc.gov/standards/alto/ns-v2#",
+            "format": "application/xml+alto",
+            "id": "https://dbmdz.github.io/mirador-textoverlay/alto/0028_190906_028_L.xml"
+          }
+        },
+        {
+          "@id": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/29",
+          "@type": "sc:Canvas",
+          "label": "29",
+          "width": 1125,
+          "height": 1882,
+          "images": [
+            {
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/29.jp2/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "format": "image/jpg",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/29.jp2",
+                  "protocol": "http://iiif.io/api/image",
+                  "width": 1534,
+                  "height": 2468,
+                  "tiles": [
+                    {
+                      "scaleFactors": [
+                        1,
+                        2,
+                        4,
+                        8,
+                        16,
+                        32
+                      ],
+                      "width": 256
+                    }
+                  ],
+                  "profile": [
+                    "http://iiif.io/api/image/2/level2.json",
+                    {
+                      "qualities": [
+                        "gray",
+                        "color",
+                        "bitonal"
+                      ],
+                      "supports": [
+                        "profileLinkHeader",
+                        "rotationArbitrary",
+                        "regionSquare",
+                        "mirroring"
+                      ]
+                    }
+                  ]
+                }
+              },
+              "on": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/29"
+            }
+          ],
+          "seeAlso": {
+            "profile": "http://www.loc.gov/standards/alto/ns-v2#",
+            "format": "application/xml+alto",
+            "id": "https://dbmdz.github.io/mirador-textoverlay/alto/0029_190906_029_L.xml"
+          }
+        },
+        {
+          "@id": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/30",
+          "@type": "sc:Canvas",
+          "label": "30",
+          "width": 1773,
+          "height": 2551,
+          "images": [
+            {
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/30.jp2/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "format": "image/jpg",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/30.jp2",
+                  "protocol": "http://iiif.io/api/image",
+                  "width": 1534,
+                  "height": 2468,
+                  "tiles": [
+                    {
+                      "scaleFactors": [
+                        1,
+                        2,
+                        4,
+                        8,
+                        16,
+                        32
+                      ],
+                      "width": 256
+                    }
+                  ],
+                  "profile": [
+                    "http://iiif.io/api/image/2/level2.json",
+                    {
+                      "qualities": [
+                        "gray",
+                        "color",
+                        "bitonal"
+                      ],
+                      "supports": [
+                        "profileLinkHeader",
+                        "rotationArbitrary",
+                        "regionSquare",
+                        "mirroring"
+                      ]
+                    }
+                  ]
+                }
+              },
+              "on": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/30"
+            }
+          ],
+          "seeAlso": {
+            "profile": "http://www.loc.gov/standards/alto/ns-v2#",
+            "format": "application/xml+alto",
+            "id": "https://dbmdz.github.io/mirador-textoverlay/alto/0030_190906_030_L.xml"
+          }
+        },
+        {
+          "@id": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/31",
+          "@type": "sc:Canvas",
+          "label": "31",
+          "width": 1206,
+          "height": 1861,
+          "images": [
+            {
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/31.jp2/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "format": "image/jpg",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/31.jp2",
+                  "protocol": "http://iiif.io/api/image",
+                  "width": 1534,
+                  "height": 2468,
+                  "tiles": [
+                    {
+                      "scaleFactors": [
+                        1,
+                        2,
+                        4,
+                        8,
+                        16,
+                        32
+                      ],
+                      "width": 256
+                    }
+                  ],
+                  "profile": [
+                    "http://iiif.io/api/image/2/level2.json",
+                    {
+                      "qualities": [
+                        "gray",
+                        "color",
+                        "bitonal"
+                      ],
+                      "supports": [
+                        "profileLinkHeader",
+                        "rotationArbitrary",
+                        "regionSquare",
+                        "mirroring"
+                      ]
+                    }
+                  ]
+                }
+              },
+              "on": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/31"
+            }
+          ],
+          "seeAlso": {
+            "profile": "http://www.loc.gov/standards/alto/ns-v2#",
+            "format": "application/xml+alto",
+            "id": "https://dbmdz.github.io/mirador-textoverlay/alto/0031_190906_031_L.xml"
+          }
+        },
+        {
+          "@id": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/32",
+          "@type": "sc:Canvas",
+          "label": "32",
+          "width": 1721,
+          "height": 2569,
+          "images": [
+            {
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/32.jp2/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "format": "image/jpg",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/32.jp2",
+                  "protocol": "http://iiif.io/api/image",
+                  "width": 1534,
+                  "height": 2468,
+                  "tiles": [
+                    {
+                      "scaleFactors": [
+                        1,
+                        2,
+                        4,
+                        8,
+                        16,
+                        32
+                      ],
+                      "width": 256
+                    }
+                  ],
+                  "profile": [
+                    "http://iiif.io/api/image/2/level2.json",
+                    {
+                      "qualities": [
+                        "gray",
+                        "color",
+                        "bitonal"
+                      ],
+                      "supports": [
+                        "profileLinkHeader",
+                        "rotationArbitrary",
+                        "regionSquare",
+                        "mirroring"
+                      ]
+                    }
+                  ]
+                }
+              },
+              "on": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/32"
+            }
+          ],
+          "seeAlso": {
+            "profile": "http://www.loc.gov/standards/alto/ns-v2#",
+            "format": "application/xml+alto",
+            "id": "https://dbmdz.github.io/mirador-textoverlay/alto/0032_190906_032_L.xml"
+          }
+        },
+        {
+          "@id": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/33",
+          "@type": "sc:Canvas",
+          "label": "33",
+          "width": 1213,
+          "height": 1939,
+          "images": [
+            {
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/33.jp2/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "format": "image/jpg",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/33.jp2",
+                  "protocol": "http://iiif.io/api/image",
+                  "width": 1534,
+                  "height": 2468,
+                  "tiles": [
+                    {
+                      "scaleFactors": [
+                        1,
+                        2,
+                        4,
+                        8,
+                        16,
+                        32
+                      ],
+                      "width": 256
+                    }
+                  ],
+                  "profile": [
+                    "http://iiif.io/api/image/2/level2.json",
+                    {
+                      "qualities": [
+                        "gray",
+                        "color",
+                        "bitonal"
+                      ],
+                      "supports": [
+                        "profileLinkHeader",
+                        "rotationArbitrary",
+                        "regionSquare",
+                        "mirroring"
+                      ]
+                    }
+                  ]
+                }
+              },
+              "on": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/33"
+            }
+          ],
+          "seeAlso": {
+            "profile": "http://www.loc.gov/standards/alto/ns-v2#",
+            "format": "application/xml+alto",
+            "id": "https://dbmdz.github.io/mirador-textoverlay/alto/0033_190906_033_L.xml"
+          }
+        },
+        {
+          "@id": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/34",
+          "@type": "sc:Canvas",
+          "label": "34",
+          "width": 1608,
+          "height": 2609,
+          "images": [
+            {
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/34.jp2/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "format": "image/jpg",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/34.jp2",
+                  "protocol": "http://iiif.io/api/image",
+                  "width": 1534,
+                  "height": 2468,
+                  "tiles": [
+                    {
+                      "scaleFactors": [
+                        1,
+                        2,
+                        4,
+                        8,
+                        16,
+                        32
+                      ],
+                      "width": 256
+                    }
+                  ],
+                  "profile": [
+                    "http://iiif.io/api/image/2/level2.json",
+                    {
+                      "qualities": [
+                        "gray",
+                        "color",
+                        "bitonal"
+                      ],
+                      "supports": [
+                        "profileLinkHeader",
+                        "rotationArbitrary",
+                        "regionSquare",
+                        "mirroring"
+                      ]
+                    }
+                  ]
+                }
+              },
+              "on": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/34"
+            }
+          ],
+          "seeAlso": {
+            "profile": "http://www.loc.gov/standards/alto/ns-v2#",
+            "format": "application/xml+alto",
+            "id": "https://dbmdz.github.io/mirador-textoverlay/alto/0034_190906_034_L.xml"
+          }
+        },
+        {
+          "@id": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/35",
+          "@type": "sc:Canvas",
+          "label": "35",
+          "width": 1243,
+          "height": 1900,
+          "images": [
+            {
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/35.jp2/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "format": "image/jpg",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/35.jp2",
+                  "protocol": "http://iiif.io/api/image",
+                  "width": 1534,
+                  "height": 2468,
+                  "tiles": [
+                    {
+                      "scaleFactors": [
+                        1,
+                        2,
+                        4,
+                        8,
+                        16,
+                        32
+                      ],
+                      "width": 256
+                    }
+                  ],
+                  "profile": [
+                    "http://iiif.io/api/image/2/level2.json",
+                    {
+                      "qualities": [
+                        "gray",
+                        "color",
+                        "bitonal"
+                      ],
+                      "supports": [
+                        "profileLinkHeader",
+                        "rotationArbitrary",
+                        "regionSquare",
+                        "mirroring"
+                      ]
+                    }
+                  ]
+                }
+              },
+              "on": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/35"
+            }
+          ],
+          "seeAlso": {
+            "profile": "http://www.loc.gov/standards/alto/ns-v2#",
+            "format": "application/xml+alto",
+            "id": "https://dbmdz.github.io/mirador-textoverlay/alto/0035_190906_035_L.xml"
+          }
+        },
+        {
+          "@id": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/36",
+          "@type": "sc:Canvas",
+          "label": "36",
+          "width": 1835,
+          "height": 2692,
+          "images": [
+            {
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/36.jp2/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "format": "image/jpg",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/36.jp2",
+                  "protocol": "http://iiif.io/api/image",
+                  "width": 1534,
+                  "height": 2468,
+                  "tiles": [
+                    {
+                      "scaleFactors": [
+                        1,
+                        2,
+                        4,
+                        8,
+                        16,
+                        32
+                      ],
+                      "width": 256
+                    }
+                  ],
+                  "profile": [
+                    "http://iiif.io/api/image/2/level2.json",
+                    {
+                      "qualities": [
+                        "gray",
+                        "color",
+                        "bitonal"
+                      ],
+                      "supports": [
+                        "profileLinkHeader",
+                        "rotationArbitrary",
+                        "regionSquare",
+                        "mirroring"
+                      ]
+                    }
+                  ]
+                }
+              },
+              "on": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/36"
+            }
+          ],
+          "seeAlso": {
+            "profile": "http://www.loc.gov/standards/alto/ns-v2#",
+            "format": "application/xml+alto",
+            "id": "https://dbmdz.github.io/mirador-textoverlay/alto/0036_190906_036_L.xml"
+          }
+        },
+        {
+          "@id": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/37",
+          "@type": "sc:Canvas",
+          "label": "37",
+          "width": 1231,
+          "height": 1885,
+          "images": [
+            {
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/37.jp2/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "format": "image/jpg",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/37.jp2",
+                  "protocol": "http://iiif.io/api/image",
+                  "width": 1534,
+                  "height": 2468,
+                  "tiles": [
+                    {
+                      "scaleFactors": [
+                        1,
+                        2,
+                        4,
+                        8,
+                        16,
+                        32
+                      ],
+                      "width": 256
+                    }
+                  ],
+                  "profile": [
+                    "http://iiif.io/api/image/2/level2.json",
+                    {
+                      "qualities": [
+                        "gray",
+                        "color",
+                        "bitonal"
+                      ],
+                      "supports": [
+                        "profileLinkHeader",
+                        "rotationArbitrary",
+                        "regionSquare",
+                        "mirroring"
+                      ]
+                    }
+                  ]
+                }
+              },
+              "on": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/37"
+            }
+          ],
+          "seeAlso": {
+            "profile": "http://www.loc.gov/standards/alto/ns-v2#",
+            "format": "application/xml+alto",
+            "id": "https://dbmdz.github.io/mirador-textoverlay/alto/0037_190906_037_L.xml"
+          }
+        },
+        {
+          "@id": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/38",
+          "@type": "sc:Canvas",
+          "label": "38",
+          "width": 1721,
+          "height": 2580,
+          "images": [
+            {
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/38.jp2/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "format": "image/jpg",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://images.eap.bl.uk/EAP119/EAP119_1_8_1/38.jp2",
+                  "protocol": "http://iiif.io/api/image",
+                  "width": 1534,
+                  "height": 2468,
+                  "tiles": [
+                    {
+                      "scaleFactors": [
+                        1,
+                        2,
+                        4,
+                        8,
+                        16,
+                        32
+                      ],
+                      "width": 256
+                    }
+                  ],
+                  "profile": [
+                    "http://iiif.io/api/image/2/level2.json",
+                    {
+                      "qualities": [
+                        "gray",
+                        "color",
+                        "bitonal"
+                      ],
+                      "supports": [
+                        "profileLinkHeader",
+                        "rotationArbitrary",
+                        "regionSquare",
+                        "mirroring"
+                      ]
+                    }
+                  ]
+                }
+              },
+              "on": "https://eap.bl.uk/archive-file/EAP119-1-8-1/canvas/38"
+            }
+          ],
+          "seeAlso": {
+            "profile": "http://www.loc.gov/standards/alto/ns-v2#",
+            "format": "application/xml+alto",
+            "id": "https://dbmdz.github.io/mirador-textoverlay/alto/0038_190906_038_L.xml"
+          }
+        }
+      ]
+    }
+  ],
+  "related": [
+    {
+      "@id": "https://eap.bl.uk/project/EAP119",
+      "format": "text/html",
+      "label": "View the related Endangered Archives Project"
+    }
+  ]
+}
