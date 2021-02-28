@@ -1,10 +1,58 @@
 /** Functions to parse OCR boxes from various formats and render them as SVG. */
 import max from 'lodash/max';
+import sortBy from 'lodash/sortBy';
+import { determineScriptParams } from './langs';
+
+export interface Dimensions {
+  width: number;
+  height: number;
+}
+
+export interface Coordinates extends Dimensions {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+export interface OcrSpan extends Coordinates {
+  style?: string;
+  text: string;
+  isExtra: boolean;
+}
+
+export interface OcrLine extends Coordinates {
+  spans: OcrSpan[];
+  style?: string;
+  text: string;
+  baseline?: Baseline;
+  polygon?: Polyline;
+}
+
+export interface OcrPage extends Dimensions {
+  width: number;
+  height: number;
+  lines: OcrLine[];
+}
+
+export interface LineFunction {
+  slope: number;
+  constant: number;
+}
+
+export type Polyline = { x: number; y: number }[];
+
+export type Baseline = LineFunction | Polyline;
+
+interface HocrAttribs {
+  bbox?: [number, number, number, number];
+  [key: string]: string | [number, number, number, number];
+}
 
 const parser = new DOMParser();
 
 /** Parse hOCR attributes from a node's title attribute */
-function parseHocrAttribs(titleAttrib) {
+function parseHocrAttribs(titleAttrib: string): HocrAttribs {
   const vals = titleAttrib.split(';').map((x) => x.trim());
   return vals.reduce((acc, val) => {
     const key = val.split(' ')[0];
@@ -22,13 +70,29 @@ function parseHocrAttribs(titleAttrib) {
 }
 
 /** Parse an hOCR node */
-function parseHocrNode(node, endOfLine = false, scaleFactor = 1) {
-  const [ulx, uly, lrx, lry] = parseHocrAttribs(node.title).bbox.map((dim) => dim * scaleFactor);
+function parseHocrNode(
+  node: HTMLElement,
+  endOfLine: boolean = false,
+  scaleFactor: number = 1
+): (OcrSpan | OcrLine)[] {
+  const attribs = parseHocrAttribs(node.title);
+  const [ulx, uly, lrx, lry] = attribs.bbox.map((dim) => dim * scaleFactor);
   let style = node.getAttribute('style');
   if (style) {
     style = style.replace(/font-size:.+;/, '');
   }
-  const spans = [
+  let baseline;
+  if (attribs.baseline) {
+    const parts = (attribs.baseline as string).split(' ');
+    baseline = {
+      slope: parseFloat(parts[0]),
+      constant: parseInt(parts[1], 10) * scaleFactor,
+    };
+  } else if (node.className.indexOf('ocr_line') >= 0) {
+    const { baselineFactor } = determineScriptParams(node.textContent);
+    baseline = [1, baselineFactor * (lry - uly) * scaleFactor];
+  }
+  const spans: (OcrSpan | OcrLine)[] = [
     {
       height: lry - uly,
       style,
@@ -37,6 +101,7 @@ function parseHocrNode(node, endOfLine = false, scaleFactor = 1) {
       x: ulx,
       y: uly,
       isExtra: false,
+      baseline,
     },
   ];
 
@@ -49,12 +114,13 @@ function parseHocrNode(node, endOfLine = false, scaleFactor = 1) {
     }
     if (extraText.length > 0) {
       spans.push({
+        // NOTE: This span has no width initially, will be set when we encounter
+        //       the next word. (extra spans always fill the area between two words)
+        width: 0,
         height: lry - uly,
         text: extraText,
         x: lrx,
         y: uly,
-        // NOTE: This span has no width initially, will be set when we encounter
-        //       the next word. (extra spans always fill the area between two words)
         isExtra: true,
       });
     }
@@ -68,9 +134,9 @@ function parseHocrNode(node, endOfLine = false, scaleFactor = 1) {
 }
 
 /** Parse an hOCR document */
-export function parseHocr(hocrText, referenceSize) {
+export function parseHocr(hocrText: string, referenceSize: Dimensions): OcrPage {
   const doc = parser.parseFromString(hocrText, 'text/html');
-  const pageNode = doc.querySelector('div.ocr_page');
+  const pageNode = doc.querySelector('div.ocr_page') as HTMLDivElement;
   const pageSize = parseHocrAttribs(pageNode.title).bbox;
   let scaleFactor = 1;
   if (pageSize[2] !== referenceSize.width || pageSize[3] !== referenceSize.height) {
@@ -91,13 +157,17 @@ export function parseHocr(hocrText, referenceSize) {
   for (const lineNode of pageNode.querySelectorAll('span.ocr_line, span.ocrx_line')) {
     const wordNodes = lineNode.querySelectorAll('span.ocrx_word');
     if (wordNodes.length === 0) {
-      lines.push(parseHocrNode(lineNode, true, scaleFactor));
+      lines.push(parseHocrNode(lineNode as HTMLElement, true, scaleFactor));
     } else {
-      const line = parseHocrNode(lineNode, true, scaleFactor)[0];
-      const spans = [];
+      const line = parseHocrNode(lineNode as HTMLElement, true, scaleFactor)[0] as OcrLine;
+      const spans: OcrSpan[] = [];
       // eslint-disable-next-line no-unused-vars
       for (const [i, wordNode] of wordNodes.entries()) {
-        const textSpans = parseHocrNode(wordNode, i === wordNodes.length - 1, scaleFactor);
+        const textSpans = parseHocrNode(
+          wordNode as HTMLElement,
+          i === wordNodes.length - 1,
+          scaleFactor
+        ) as OcrSpan[];
 
         // Calculate width of previous extra span
         const previousExtraSpan = spans.slice(-1).filter((s) => s.isExtra)?.[0];
@@ -139,7 +209,7 @@ export function parseHocr(hocrText, referenceSize) {
 }
 
 /** Create CSS directives from an ALTO TextStyle node */
-function altoStyleNodeToCSS(styleNode) {
+function altoStyleNodeToCSS(styleNode: Element): string {
   // NOTE: We don't map super/subscript, since it would change the font size
   const fontStyleMap = {
     bold: 'font-weight: bold',
@@ -172,23 +242,17 @@ function altoStyleNodeToCSS(styleNode) {
  * Needs access to the (unscaled) target image size since it ALTO uses 10ths of
  * millimeters for units by default and we need pixels.
  */
-export function parseAlto(altoText, imgSize) {
+export function parseAlto(altoText: string, imgSize: Dimensions): OcrPage {
   const doc = parser.parseFromString(altoText, 'text/xml');
   // We assume ALTO is set as the default namespace
   /** Namespace resolver that forrces the ALTO namespace */
-  const measurementUnit = doc.querySelector('alto > Description > MeasurementUnit')?.textContent;
   const pageElem = doc.querySelector('alto > Layout > Page, alto > Layout > Page > PrintSpace');
   let pageWidth = Number.parseInt(pageElem.getAttribute('WIDTH'), 10);
   let pageHeight = Number.parseInt(pageElem.getAttribute('HEIGHT'), 10);
-  let scaleFactorX = 1.0;
-  let scaleFactorY = 1.0;
-
-  if (measurementUnit !== 'pixel') {
-    scaleFactorX = imgSize.width / pageWidth;
-    scaleFactorY = imgSize.height / pageHeight;
-    pageWidth *= scaleFactorX;
-    pageHeight *= scaleFactorY;
-  }
+  const scaleFactorX = imgSize.width / pageWidth;
+  const scaleFactorY = imgSize.height / pageHeight;
+  pageWidth *= scaleFactorX;
+  pageHeight *= scaleFactorY;
 
   const styles = {};
   const styleElems = doc.querySelectorAll('alto > Styles > TextStyle');
@@ -200,7 +264,7 @@ export function parseAlto(altoText, imgSize) {
   const lines = [];
   let lineEndsHyphenated = false;
   for (const lineNode of doc.querySelectorAll('TextLine')) {
-    const line = {
+    const line: OcrLine = {
       height: Number.parseInt(lineNode.getAttribute('HEIGHT'), 10) * scaleFactorY,
       text: '',
       width: Number.parseInt(lineNode.getAttribute('WIDTH'), 10) * scaleFactorX,
@@ -208,6 +272,42 @@ export function parseAlto(altoText, imgSize) {
       x: Number.parseInt(lineNode.getAttribute('HPOS'), 10) * scaleFactorX,
       y: Number.parseInt(lineNode.getAttribute('VPOS'), 10) * scaleFactorY,
     };
+    if (lineNode.hasAttribute('BASELINE')) {
+      const baselineParts = lineNode.getAttribute('BASELINE').split(' ');
+      if (baselineParts.length > 1) {
+        line.baseline = baselineParts
+          .map((x) => parseInt(x, 10))
+          .reduce((out, x, idx, arr) => {
+            if (idx % 2 === 0) {
+              out.push({ x: x * scaleFactorX, y: arr[idx + 1] * scaleFactorY });
+            }
+            return out;
+          }, []);
+      } else {
+        const baselineY = parseInt(baselineParts[0].trim(), 10) * scaleFactorY;
+        // Only set this simple baseline if it's different from the lower edge
+        // of the line box
+        if (Math.abs(baselineY - line.y - line.height) > 0.001) {
+          line.baseline = [
+            { x: line.x, y: baselineY },
+            { x: line.x + line.width, y: baselineY },
+          ];
+        }
+      }
+    }
+    const linePoly = lineNode.querySelector('Shape > Polygon');
+    if (linePoly) {
+      line.polygon = linePoly
+        .getAttribute('POINTS')
+        .split(' ')
+        .map((x) => parseInt(x, 10))
+        .reduce((out, x, idx, arr) => {
+          if (idx % 2 === 0) {
+            out.push({ x, y: arr[idx + 1] });
+          }
+          return out;
+        }, []);
+    }
     const textNodes = lineNode.querySelectorAll('String, SP, HYP');
     for (const [textIdx, textNode] of textNodes.entries()) {
       const endOfLine = textIdx === textNodes.length - 1;
@@ -268,6 +368,7 @@ export function parseAlto(altoText, imgSize) {
             text: ' ',
             // NOTE: Does not have width initially, will be set when we encounter
             //       the next proper word span
+            width: 0,
           });
         }
         lineEndsHyphenated = textNode.tagName === 'HYP';
@@ -287,6 +388,19 @@ export function parseAlto(altoText, imgSize) {
         });
       }
     }
+    /*
+    console.log(
+      `====> x=${line.x.toFixed(2)} y=${line.y.toFixed(2)} ${line.width.toFixed(
+        2
+      )}x${line.height.toFixed(2)}`
+    );
+    */
+    line.spans = sortBy(line.spans, (s) => s.x);
+    /*
+    for (const span of line.spans) {
+      console.log(`${span.x.toFixed(2)}→${(span.x + span.width).toFixed(2)}: '${span.text}'`);
+    }
+    */
     if (line.spans.length === 0) {
       continue;
     }
@@ -304,8 +418,13 @@ export function parseAlto(altoText, imgSize) {
   };
 }
 
+/**
+ * Parse a PAGE-XML document.
+ */
+export function parsePrimaPage(ocrText: string, imgSize: Dimensions) {}
+
 /** Helper to calculate a rough fallback image size from the line coordinates */
-function getFallbackImageSize(lines) {
+function getFallbackImageSize(lines: OcrLine[]): Dimensions {
   return {
     width: max(lines.map(({ x, width }) => x + width)),
     height: max(lines.map(({ y, height }) => y + height)),
@@ -318,10 +437,12 @@ function getFallbackImageSize(lines) {
  * @param {string} ocrText  ALTO or hOCR markup
  * @param {object} referenceSize Reference size to scale coordinates to
  */
-export function parseOcr(ocrText, referenceSize) {
+export function parseOcr(ocrText: string, referenceSize: Dimensions): OcrPage {
   let parse;
   if (ocrText.indexOf('<alto') >= 0) {
     parse = parseAlto(ocrText, referenceSize);
+  } else if (ocrText.indexOf('<PcGts') >= 0) {
+    parse = parsePrimaPage(ocrText, referenceSize);
   } else {
     parse = parseHocr(ocrText, referenceSize);
   }
@@ -342,7 +463,7 @@ export function parseOcr(ocrText, referenceSize) {
  * @param scaleFactor Factor to apply to coordinates to convert from canvas size to rendered size
  * @returns parsed OCR boxes
  */
-export function parseIiifAnnotations(annos, imgSize) {
+export function parseIiifAnnotations(annos: any, imgSize: Dimensions): OcrPage {
   const fragmentPat = /.+#xywh=(\d+),(\d+),(\d+),(\d+)/g;
 
   // TODO: Handle word-level annotations

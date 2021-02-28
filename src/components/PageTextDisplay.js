@@ -1,11 +1,42 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { fade } from '@material-ui/core/styles/colorManipulator';
+import { determineScriptParams } from '../lib/langs';
 
-/** Check if we're running in Gecko */
-function runningInGecko() {
-  return navigator.userAgent.indexOf('Gecko/') >= 0;
-}
+/** Check if we're running in Gecko
+ * Firefox/Gecko does not currently support the lengthAdjust parameter on
+ * <tspan> Elements, only on <text> (https://bugzilla.mozilla.org/show_bug.cgi?id=890692).
+ *
+ * Using <text> elements for spans (and skipping the line-grouping) works fine
+ * in Firefox, but breaks selection behavior in Chrome (the selected text contains
+ * a newline after every word).
+ *
+ * So we have to go against best practices and use user agent sniffing to determine dynamically
+ * how to render lines and spans, sorry :-/ */
+const runningInGecko = navigator.userAgent.indexOf('Gecko/') >= 0;
+
+/** A text line rendered as SVG. */
+const RenderedLine = ({ direction, baseline, children, textStyle }) =>
+  runningInGecko ? (
+    <>{children}</>
+  ) : (
+    <text dir={direction} dominantBaseline={baseline} style={textStyle}>
+      {children}
+    </text>
+  );
+
+/** A text span (usually a word) rendered as SVG. */
+const RenderedSpan = ({ direction, baseline, children, textStyle, ...props }) =>
+  // NOTE: Gecko really works best with a flattened bunch of text nodes. Wrapping the
+  //       lines in a <g>, e.g. breaks text selection in similar ways to the below
+  //       WebKit-specific note, for some reason ¯\_(ツ)_/¯
+  runningInGecko ? (
+    <text style={textStyle} dir={direction} dominantBaseline={baseline} {...props}>
+      {children}
+    </text>
+  ) : (
+    <tspan>{children}</tspan>
+  );
 
 /** Page Text Display component that is optimized for fast panning/zooming
  *
@@ -87,6 +118,9 @@ class PageTextDisplay extends React.Component {
     for (const rect of this.boxContainerRef.current.querySelectorAll('rect')) {
       rect.style.fill = fade(bgColor, opacity);
     }
+    for (const rect of this.boxContainerRef.current.querySelectorAll('polyline')) {
+      rect.style.fill = fade(bgColor, opacity);
+    }
     for (const text of this.textContainerRef.current.querySelectorAll('text')) {
       text.style.fill = fade(textColor, opacity);
     }
@@ -149,28 +183,6 @@ class PageTextDisplay extends React.Component {
     };
     const renderLines = lines.filter((l) => l.width > 0 && l.height > 0);
 
-    /* Firefox/Gecko does not currently support the lengthAdjust parameter on
-     * <tspan> Elements, only on <text> (https://bugzilla.mozilla.org/show_bug.cgi?id=890692).
-     *
-     * Using <text> elements for spans (and skipping the line-grouping) works fine
-     * in Firefox, but breaks selection behavior in Chrome (the selected text contains
-     * a newline after every word).
-     *
-     * So we have to go against best practices and use user agent sniffing to determine dynamically
-     * how to render lines and spans, sorry :-/ */
-    const isGecko = runningInGecko();
-    // eslint-disable-next-line require-jsdoc
-    let LineWrapper = ({ children }) => <text style={textStyle}>{children}</text>;
-    // eslint-disable-next-line react/jsx-props-no-spreading, require-jsdoc
-    let SpanElem = (props) => <tspan {...props} />;
-    if (isGecko) {
-      // NOTE: Gecko really works best with a flattened bunch of text nodes. Wrapping the
-      //       lines in a <g>, e.g. breaks text selection in similar ways to the below
-      //       WebKit-specific note, for some reason ¯\_(ツ)_/¯
-      LineWrapper = React.Fragment;
-      // eslint-disable-next-line react/jsx-props-no-spreading, require-jsdoc
-      SpanElem = (props) => <text style={textStyle} {...props} />;
-    }
     return (
       <div ref={this.containerRef} style={containerStyle}>
         {/**
@@ -188,52 +200,98 @@ class PageTextDisplay extends React.Component {
          */}
         <svg style={{ ...svgStyle, userSelect: 'none' }}>
           <g ref={this.boxContainerRef}>
-            {renderLines.map((line) => (
-              <rect
-                key={`rect-${line.x}.${line.y}`}
-                x={line.x}
-                y={line.y}
-                width={line.width}
-                height={line.height}
-                style={boxStyle}
-              />
-            ))}
+            {renderLines.map((line) => {
+              if (line.polygon) {
+                return (
+                  <polyline
+                    key={`linepolygon-${line.x}.${line.y}`}
+                    points={line.polygon.map(({ x, y }) => `${x},${y}`).join(' ')}
+                    style={boxStyle}
+                  />
+                );
+              }
+              return (
+                <rect
+                  key={`rect-${line.x}.${line.y}`}
+                  x={line.x}
+                  y={line.y}
+                  width={line.width}
+                  height={line.height}
+                  style={boxStyle}
+                />
+              );
+            })}
+            {renderLines
+              .filter((l) => l.baseline)
+              .map(({ x: lineX, y: lineY, baseline }) => (
+                <polyline
+                  id={`baseline-${lineX}.${lineY}`}
+                  key={`baseline-${lineX}.${lineY}`}
+                  points={baseline.map(({ x, y }) => `${x},${y}`).join(' ')}
+                  stroke="none"
+                  strokeWidth="2"
+                  fill="none"
+                />
+              ))}
           </g>
         </svg>
         <svg style={{ ...svgStyle, position: 'absolute' }}>
           <g ref={this.textContainerRef}>
-            {renderLines.map((line) =>
-              line.spans ? (
-                <LineWrapper key={`line-${line.x}-${line.y}`}>
-                  {line.spans
-                    .filter((w) => w.width > 0 && w.height > 0)
-                    .map(({ x, y, width, text }) => (
-                      <SpanElem
-                        key={`text-${x}-${y}`}
-                        x={x}
-                        y={line.y + line.height * 0.75}
-                        textLength={width}
-                        fontSize={`${line.height * 0.75}px`}
-                        lengthAdjust="spacingAndGlyphs"
-                      >
-                        {text}
-                      </SpanElem>
-                    ))}
-                </LineWrapper>
-              ) : (
+            {renderLines.map((line) => {
+              const { fontSizeFactor, direction, baseline, name } = determineScriptParams(
+                line.text
+              );
+              // console.log(`Detected script: ${name}`);
+              if (line.spans) {
+                return (
+                  <RenderedLine
+                    key={`line-${line.x}-${line.y}`}
+                    direction={direction}
+                    baseline={baseline}
+                  >
+                    {line.spans
+                      .filter((w) => w.width > 0 && w.height > 0)
+                      .map(({ x, y, width, text }) => (
+                        <RenderedSpan
+                          key={`text-${x}-${y}`}
+                          x={line.baseline ? undefined : x}
+                          y={line.baseline ? undefined : line.y + line.height * 0.75}
+                          textLength={width}
+                          fontSize={`${line.height * fontSizeFactor}px`}
+                          lengthAdjust="spacingAndGlyphs"
+                          direction={direction}
+                          baseline={baseline}
+                        >
+                          {line.baseline ? (
+                            <textPath href={`#baseline-${x}.${line.y}`}>{text}</textPath>
+                          ) : (
+                            text
+                          )}
+                        </RenderedSpan>
+                      ))}
+                  </RenderedLine>
+                );
+              }
+              return (
                 <text
                   key={`line-${line.x}-${line.y}`}
-                  x={line.x}
-                  y={line.y + line.height * 0.75}
+                  x={line.baseline ? undefined : line.x}
+                  y={line.baseline ? undefined : line.y + line.height * 0.75}
                   textLength={line.width}
                   fontSize={`${line.height}px`}
                   lengthAdjust="spacingAndGlyphs"
                   style={textStyle}
+                  dir={direction}
+                  dominantBaseline={baseline}
                 >
-                  {line.text}
+                  {line.baseline ? (
+                    <textPath href={`#baseline-${line.x}.${line.y}`}>{line.text}</textPath>
+                  ) : (
+                    line.text
+                  )}
                 </text>
-              )
-            )}
+              );
+            })}
           </g>
         </svg>
       </div>

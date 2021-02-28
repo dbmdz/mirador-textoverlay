@@ -13,8 +13,8 @@
   "scripts": {
     "build": "nwb build-react-component",
     "clean": "nwb clean-module && nwb clean-demo",
-    "lint": "eslint ./src ./__tests__",
-    "format": "eslint --fix ./src ./__tests__",
+    "lint": "eslint ./src ./__tests__ demo/src",
+    "format": "eslint --fix ./src ./__tests__ demo/src",
     "prepublishOnly": "npm run build",
     "start": "nwb serve-react-demo",
     "test": "npm run lint && jest",
@@ -39,6 +39,7 @@
     "@babel/core": "^7.11.0",
     "@babel/preset-env": "^7.11.0",
     "@babel/preset-react": "^7.10.4",
+    "@babel/preset-typescript": "^7.10.4",
     "@jest/globals": "^26.2.0",
     "@material-ui/core": "^4.11.0",
     "@material-ui/icons": "^4.9.1",
@@ -46,6 +47,7 @@
     "@testing-library/jest-dom": "^5.11.2",
     "@testing-library/react": "^11.2.5",
     "@types/jest": "^26.0.8",
+    "@typescript-eslint/eslint-plugin": "^4.29.0",
     "babel-eslint": "^10.1.0",
     "canvas": "^2.6.1",
     "eslint": "^6.8.0",
@@ -67,6 +69,7 @@
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "redux-saga-test-plan": "^4.0.0-rc.3",
+    "typescript": "^4.3.5",
     "uuid": "^8.3.0"
   },
   "author": "Johannes Baiter <johannes.baiter@bsb-muenchen.de>",
@@ -81,5 +84,6 @@
     "ocr",
     "transcription",
     "iiif"
-  ]
+  ],
+  "browserslist": "> 0.25%, not dead"
 }
