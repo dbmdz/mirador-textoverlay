@@ -36,8 +36,12 @@ export const getTexts = (state) => miradorSlice(state).texts;
 /** Selector for text on all visible canvases */
 export const getTextsForVisibleCanvases = createSelector(
   [getVisibleCanvases, getTexts],
-  (canvases, texts) => {
-    if (!texts || !canvases) return null;
-    return canvases.map((c) => c.id).map((targetId) => texts[targetId]);
+  (canvases, allTexts) => {
+    if (!allTexts || !canvases) return [];
+    const texts = canvases.map((canvas) => allTexts[canvas.id]);
+    if (texts.every((t) => t === undefined)) {
+      return [];
+    }
+    return texts;
   }
 );
