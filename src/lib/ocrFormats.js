@@ -132,9 +132,9 @@ export function parseHocr(hocrText, referenceSize) {
     }
   }
   return {
-    height: pageSize[3],
+    height: pageSize[3] * scaleFactor,
     lines,
-    width: pageSize[2],
+    width: pageSize[2] * scaleFactor,
   };
 }
 
