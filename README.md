@@ -90,8 +90,15 @@ changed through the UI, except for `enabled` and `fontFamily`) are:
   `#000000` (black)
 - `bgColor`: Set default text background color. RGB color string, defaults to
   `#ffffff` (white)
-- `fontFamily`: Font to use for rendering text. String or array of strings,
-  defaults to the theme's font
+
+The plugin also supports theming for a few things, these can be set under the
+`textOverlay` section for the light and/or dark theme (see
+[Mirador 3 Theming](https://github.com/ProjectMirador/mirador/wiki/M3-Theming-Mirador)
+on how to set these values):
+
+- `overlayFont`: Font(s) to use for rendering text. Any valid `font-family` CSS value
+- `selectionTextColor`: Color to use for rendering text when part of a selection. Any legal CSS color value.
+- `selectionBackgroundColor`: Color to use for text background when part of a selection. Any legal CSS color value.
 
 ## How it works
 The OCR or annotations boxes are rendered page-by-page and word-by-word into

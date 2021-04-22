@@ -1,6 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { fade } from '@material-ui/core/styles/colorManipulator';
+import withStyles from '@material-ui/core/styles/withStyles';
+
+/** Styles for the overlay SVG */
+const styles = (theme) => ({
+  textOverlay: {
+    'font-family': theme?.textOverlay?.overlayFont ?? 'sans-serif',
+    '& ::selection': {
+      fill: theme?.textOverlay?.selectionTextColor ?? 'rgba(255, 255, 255, 1)', // For Chrome
+      color: theme?.textOverlay?.selectionTextColor ?? 'rgba(255, 255, 255, 1)', // For Firefox
+      'background-color': theme?.textOverlay?.selectionBackgroundColor ?? 'rgba(0, 55, 255, 1)',
+    },
+  },
+});
 
 /** Check if we're running in Gecko */
 function runningInGecko() {
@@ -116,7 +129,7 @@ class PageTextDisplay extends React.Component {
       bgColor,
       useAutoColors,
       pageColors,
-      fontFamily,
+      classes,
     } = this.props;
 
     const containerStyle = {
@@ -145,7 +158,6 @@ class PageTextDisplay extends React.Component {
     const boxStyle = { fill: fade(bg, renderOpacity) };
     const textStyle = {
       fill: fade(fg, renderOpacity),
-      fontFamily,
     };
     const renderLines = lines.filter((l) => l.width > 0 && l.height > 0);
 
@@ -200,7 +212,7 @@ class PageTextDisplay extends React.Component {
             ))}
           </g>
         </svg>
-        <svg style={{ ...svgStyle, position: 'absolute' }}>
+        <svg style={{ ...svgStyle, position: 'absolute' }} className={classes.textOverlay}>
           <g ref={this.textContainerRef}>
             {renderLines.map((line) =>
               line.spans ? (
@@ -242,11 +254,11 @@ class PageTextDisplay extends React.Component {
 }
 
 PageTextDisplay.propTypes = {
+  classes: PropTypes.objectOf(PropTypes.string),
   selectable: PropTypes.bool.isRequired,
   visible: PropTypes.bool.isRequired,
   opacity: PropTypes.number.isRequired,
   textColor: PropTypes.string.isRequired,
-  fontFamily: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
   bgColor: PropTypes.string.isRequired,
   useAutoColors: PropTypes.bool.isRequired,
   width: PropTypes.number.isRequired,
@@ -258,10 +270,8 @@ PageTextDisplay.propTypes = {
   pageColors: PropTypes.object,
 };
 PageTextDisplay.defaultProps = {
+  classes: {},
   pageColors: undefined,
 };
-PageTextDisplay.defaultProps = {
-  fontFamily: undefined,
-};
 
-export default PageTextDisplay;
+export default withStyles(styles)(PageTextDisplay);
