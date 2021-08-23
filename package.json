@@ -70,9 +70,9 @@
     "uuid": "^8.3.0"
   },
   "author": "Johannes Baiter <johannes.baiter@bsb-muenchen.de>",
-  "homepage": "https://dbmdz.github.io/mirador-textoverlay",
-  "license": "Apache-2.0",
-  "repository": "https://github.com/dbmdz/mirador-text-overlay",
+  "homepage": "https://mirador-textoverlay.netlify.app",
+  "license": "MIT",
+  "repository": "https://github.com/dbmdz/mirador-textoverlay",
   "keywords": [
     "react-component",
     "mirador-plugin",
