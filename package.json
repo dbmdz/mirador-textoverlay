@@ -44,7 +44,7 @@
     "@material-ui/icons": "^4.9.1",
     "@material-ui/lab": "^4.0.0-alpha.53",
     "@testing-library/jest-dom": "^5.11.2",
-    "@testing-library/react": "^11.2.5",
+    "@testing-library/react": "^12.1.0",
     "@types/jest": "^26.0.8",
     "babel-eslint": "^10.1.0",
     "canvas": "^2.6.1",
