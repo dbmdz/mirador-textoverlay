@@ -43,6 +43,7 @@ function hasExternalResource(anno) {
 const isAlto = (resource) =>
   resource &&
   (resource.format === 'application/xml+alto' ||
+    resource.format === 'application/alto+xml' ||
     (resource.profile && resource.profile.startsWith('http://www.loc.gov/standards/alto/')));
 
 /** Checks if a given resource points to an hOCR document */
