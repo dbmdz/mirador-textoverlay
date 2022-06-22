@@ -30,7 +30,7 @@ describe('parsing ALTO', () => {
       text: "seiller d'Etat en mission extraordinaire.\n",
       width: closeTo(244.48),
       x: closeTo(82.28),
-      y: closeTo(1236.09),
+      y: closeTo(1236.18),
     });
     expect(parsed.lines[54].spans).toHaveLength(9);
     expect(parsed.lines[64].spans[6]).toMatchObject({
@@ -38,7 +38,7 @@ describe('parsing ALTO', () => {
       text: 'mission',
       width: closeTo(42.91),
       x: closeTo(189.36),
-      y: closeTo(1237.27),
+      y: closeTo(1237.37),
     });
   });
 

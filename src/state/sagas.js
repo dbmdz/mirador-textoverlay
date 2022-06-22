@@ -6,6 +6,7 @@ import fetch from 'isomorphic-unfetch';
 import ActionTypes from 'mirador/dist/es/src/state/actions/action-types';
 import { receiveAnnotation, updateConfig } from 'mirador/dist/es/src/state/actions';
 import {
+  getCanvas,
   getCanvases,
   getWindowConfig,
   getVisibleCanvases,
@@ -31,12 +32,10 @@ const charFragmentPattern = /^(.+)#char=(\d+),(\d+)$/;
 
 /** Check if an annotation has external resources that need to be loaded */
 function hasExternalResource(anno) {
-  return (
-    anno.resource?.chars === undefined &&
-    anno.body?.value === undefined &&
-    Object.keys(anno.resource).length === 1 &&
-    anno.resource['@id'] !== undefined
-  );
+  const body = anno.body ?? anno.resource;
+  const value = body?.chars ?? body?.value;
+  const id = body['@id'] ?? body.id;
+  return value === undefined && Object.keys(body).length === 1 && id !== undefined;
 }
 
 /** Checks if a given resource points to an ALTO OCR document */
@@ -81,7 +80,7 @@ export function* discoverExternalOcr({ visibleCanvases: visibleCanvasIds, window
       : [canvas.__jsonld.seeAlso]
     ).filter((res) => isAlto(res) || isHocr(res))[0];
     if (seeAlso !== undefined) {
-      const ocrSource = seeAlso['@id'];
+      const ocrSource = seeAlso['@id'] ?? seeAlso.id;
       const alreadyHasText = texts[canvas.id]?.source === ocrSource;
       if (alreadyHasText) {
         // eslint-disable-next-line no-continue
@@ -125,47 +124,65 @@ export async function fetchAnnotationResource(url) {
 
 /** Saga for fetching external annotation resources */
 export function* fetchExternalAnnotationResources({ targetId, annotationId, annotationJson }) {
-  if (!annotationJson.resources.some(hasExternalResource)) {
+  // FIXME: Make IIIFv2/v3 handling more elegant, all those ternaries really make
+  //        the code a bit embarassing.
+  const resourceKey = annotationJson.items ? 'items' /* IIIFv3 */ : 'resources'; /* IIIFV2 */
+  const resources = annotationJson[resourceKey];
+  if (!resources.some(hasExternalResource)) {
     return;
   }
   const resourceUris = uniq(
-    annotationJson.resources.map((anno) => anno.resource['@id'].split('#')[0])
+    resources.map((anno) => {
+      const id = anno.body?.id /* IIIFv3 */ ?? anno.resource?.['@id']; /* IIIFV2 */
+      return id.split('#')[0];
+    })
   );
   const contents = yield all(resourceUris.map((uri) => call(fetchAnnotationResource, uri)));
-  const contentMap = Object.fromEntries(contents.map((c) => [c.id ?? c['@id'], c]));
-  const completedAnnos = annotationJson.resources.map((anno) => {
+  const contentMap = Object.fromEntries(
+    contents.map((c) => [c.id /* IIIFv3 */ ?? c['@id'] /* IIIFv2 */, c])
+  );
+  const completedAnnos = resources.map((anno) => {
     if (!hasExternalResource(anno)) {
       return anno;
     }
-    const match = anno.resource['@id'].match(charFragmentPattern);
+    const id = anno.body?.id /* IIIFv3 */ ?? anno.resource?.['@id']; /* IIIFV2 */
+    const match = id.match(charFragmentPattern);
+    const bodyKey = anno.body ? 'body' /* IIIFv3 */ : 'resource'; /* IIIFv2 */
     if (!match) {
-      return { ...anno, resource: contentMap[anno.resource['@id']] ?? anno.resource };
+      return { ...anno, [bodyKey]: contentMap[id] ?? anno[bodyKey] };
     }
     const wholeResource = contentMap[match[1]];
     const startIdx = Number.parseInt(match[2], 10);
     const endIdx = Number.parseInt(match[3], 10);
     const partialContent = wholeResource.value.substring(startIdx, endIdx);
-    return { ...anno, resource: { ...anno.resource, value: partialContent } };
+    return { ...anno, [bodyKey]: { ...anno[bodyKey], value: partialContent } };
   });
   yield put(
-    receiveAnnotation(targetId, annotationId, { ...annotationJson, resources: completedAnnos })
+    receiveAnnotation(targetId, annotationId, { ...annotationJson, [resourceKey]: completedAnnos })
   );
 }
 
 /** Saga for processing texts from IIIF annotations */
-export function* processTextsFromAnnotations({ targetId, annotationId, annotationJson }) {
+export function* processTextsFromAnnotations({ windowId, canvasId }) {
+  // Wait for annotations to be loaded
+  const { annotationId, annotationJson } = yield take(ActionTypes.RECEIVE_ANNOTATION);
   // Check if the annotation contains "content as text" resources that
   // we can extract text with coordinates from
-  const contentAsTextAnnos = annotationJson.resources.filter(
+  const annos = annotationJson.items /** IIIFV3 */ ?? annotationJson.resources; /** IIIFV2 */
+  const contentAsTextAnnos = annos.filter(
     (anno) =>
       anno.motivation === 'supplementing' || // IIIF 3.0
       anno.resource['@type']?.toLowerCase() === 'cnt:contentastext' || // IIIF 2.0
       ['Line', 'Word'].indexOf(anno.dcType) >= 0 // Europeana IIIF 2.0
   );
+  const canvas = yield select(getCanvas, { canvasId, windowId });
 
   if (contentAsTextAnnos.length > 0) {
-    const parsed = yield call(parseIiifAnnotations, contentAsTextAnnos);
-    yield put(receiveText(targetId, annotationId, 'annos', parsed));
+    const parsed = yield call(parseIiifAnnotations, contentAsTextAnnos, {
+      width: canvas.getWidth(),
+      height: canvas.getHeight(),
+    });
+    yield put(receiveText(canvasId, annotationId, 'annos', parsed));
   }
 }
 
@@ -258,7 +275,7 @@ export default function* textSaga() {
   yield all([
     takeEvery(ActionTypes.IMPORT_CONFIG, injectTranslations),
     takeEvery(ActionTypes.RECEIVE_ANNOTATION, fetchExternalAnnotationResources),
-    takeEvery(ActionTypes.RECEIVE_ANNOTATION, processTextsFromAnnotations),
+    takeEvery(ActionTypes.REQUEST_CANVAS_ANNOTATIONS, processTextsFromAnnotations),
     takeEvery(ActionTypes.SET_CANVAS, discoverExternalOcr),
     takeEvery(ActionTypes.UPDATE_WINDOW, onConfigChange),
     takeEvery(PluginActionTypes.REQUEST_TEXT, fetchAndProcessOcr),

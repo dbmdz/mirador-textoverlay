@@ -4,6 +4,7 @@ import textOverlayPlugin from '../../src';
 const config = {
   catalog: [
     { manifestId: 'https://iiif.europeana.eu/presentation/9200396/BibliographicResource_3000118436165/manifest', provider: 'Europeana (Annotations)' },
+    { manifestId: 'https://iiif.io/api/cookbook/recipe/0068-newspaper/newspaper_issue_1-manifest.json', provider: 'Cookbook (ALTO)' },
     { manifestId: 'https://wellcomelibrary.org/iiif/b19956435/manifest', provider: 'Wellcome Library (ALTO)' },
     { manifestId: 'https://wellcomelibrary.org/iiif/b18035723/manifest', provider: 'Wellcome Library (ALTO)' },
     { manifestId: 'https://scta.info/iiif/graciliscommentary/lon/manifest', provider: 'SCTA (Annotations)' },

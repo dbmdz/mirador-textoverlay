@@ -14,4 +14,5 @@ module.exports = {
   ],
   setupFiles: ['<rootDir>/jest.setup.js'],
   testRegex: '/__tests__/.*\\.(test|spec)\\.[jt]sx?$',
+  testEnvironment: 'jsdom',
 };

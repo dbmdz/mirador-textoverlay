@@ -1,8 +1,10 @@
+/* eslint-disable require-jsdoc */
 import { select, call } from 'redux-saga/effects';
 import { expectSaga } from 'redux-saga-test-plan';
 import { throwError } from 'redux-saga-test-plan/providers';
 import {
   getWindowConfig,
+  getCanvas,
   getCanvases,
   getVisibleCanvases,
   selectInfoResponse,
@@ -266,21 +268,53 @@ describe('Fetching external annotation sources', () => {
 describe('Processing text from regular annotations', () => {
   it('should parse text from annotations and forward it to the store', () => {
     const annos = [
-      { motivation: 'supplementing', resource: {} },
-      { resource: { '@type': 'cnt:contentAsText' } },
-      { dcType: 'Line', resource: {} },
-      { dcType: 'Word', resource: {} },
-      { motivation: 'painting', resource: {} },
+      {
+        motivation: 'supplementing',
+        resource: { chars: 'supplementing' },
+        on: 'canvasA#xywh=10,20,30,40',
+      },
+      {
+        resource: { '@type': 'cnt:contentAsText', chars: 'contentAsText' },
+        on: 'canvasA#xywh=10,20,30,40',
+      },
+      { dcType: 'Line', resource: { chars: 'line' }, on: 'canvasA#xywh=10,20,30,40' },
+      { dcType: 'Word', resource: { chars: 'word' }, on: 'canvasA#xywh=10,20,30,40' },
+      { motivation: 'painting', resource: { chars: 'painting' }, on: 'canvasA#xywh=10,20,30,40' },
     ];
-    const mockParse = { lines: [] };
-    return expectSaga(processTextsFromAnnotations, {
-      annotationId: 'annoList',
-      annotationJson: { resources: annos },
-      targetId: 'canvasA',
-    })
-      .provide([[call(parseIiifAnnotations, annos.slice(0, 4)), mockParse]])
-      .put(receiveText('canvasA', 'annoList', 'annos', mockParse))
-      .run();
+
+    const mockParse = {
+      width: 1000,
+      height: 2000,
+      lines: [{ height: 40, width: 30, x: 10, y: 20, text: 'line' }],
+    };
+    // FIXME: Broken
+    return (
+      expectSaga(processTextsFromAnnotations, {
+        windowId: 'windowA',
+        canvasId: 'canvasA',
+      })
+        // NOTE: Cannot use static provider due to broken equality checks for cached selectors
+        .provide({
+          take(effect, next) {
+            if (effect.pattern === ActionTypes.RECEIVE_ANNOTATION) {
+              return {
+                annotationId: 'annoList',
+                annotationJson: { resources: annos },
+                targetId: 'canvasA',
+              };
+            }
+            return next();
+          },
+          select(effect, next) {
+            if (effect.selector === getCanvas) {
+              return new Canvas({ '@id': 'canvasA', width: 1000, height: 2000 });
+            }
+            return next();
+          },
+        })
+        .put(receiveText('canvasA', 'annoList', 'annos', mockParse))
+        .run()
+    );
   });
 });
 

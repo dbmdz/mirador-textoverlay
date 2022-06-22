@@ -66,8 +66,7 @@
     "prop-types": "^15.6.2",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "redux-saga-test-plan": "^4.0.0-rc.3",
-    "uuid": "^8.3.0"
+    "redux-saga-test-plan": "^4.0.0-rc.3"
   },
   "author": "Johannes Baiter <johannes.baiter@bsb-muenchen.de>",
   "homepage": "https://mirador-textoverlay.netlify.app",

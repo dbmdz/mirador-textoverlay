@@ -175,20 +175,19 @@ function altoStyleNodeToCSS(styleNode) {
 export function parseAlto(altoText, imgSize) {
   const doc = parser.parseFromString(altoText, 'text/xml');
   // We assume ALTO is set as the default namespace
-  /** Namespace resolver that forrces the ALTO namespace */
-  const measurementUnit = doc.querySelector('alto > Description > MeasurementUnit')?.textContent;
   const pageElem = doc.querySelector('alto > Layout > Page, alto > Layout > Page > PrintSpace');
   let pageWidth = Number.parseInt(pageElem.getAttribute('WIDTH'), 10);
   let pageHeight = Number.parseInt(pageElem.getAttribute('HEIGHT'), 10);
-  let scaleFactorX = 1.0;
-  let scaleFactorY = 1.0;
-
-  if (measurementUnit !== 'pixel') {
-    scaleFactorX = imgSize.width / pageWidth;
-    scaleFactorY = imgSize.height / pageHeight;
-    pageWidth *= scaleFactorX;
-    pageHeight *= scaleFactorY;
+  // Scale the ALTO page so it matches the reference image size
+  // FIXME: Check the aspect ratio and bail out if it doesn't match?
+  const scaleFactorX = imgSize.width / pageWidth;
+  const scaleFactorY = imgSize.height / pageHeight;
+  pageWidth *= scaleFactorX;
+  pageHeight *= scaleFactorY;
+  if (pageWidth !== imgSize.width || pageHeight !== imgSize.height) {
+    console.warn(`Differing scale factors for x and y axis: x=${scaleFactorX}, y=${scaleFactorY}`);
   }
+  const scaleFactor = scaleFactorX;
 
   const styles = {};
   const styleElems = doc.querySelectorAll('alto > Styles > TextStyle');
@@ -201,12 +200,12 @@ export function parseAlto(altoText, imgSize) {
   let lineEndsHyphenated = false;
   for (const lineNode of doc.querySelectorAll('TextLine')) {
     const line = {
-      height: Number.parseInt(lineNode.getAttribute('HEIGHT'), 10) * scaleFactorY,
+      height: Number.parseInt(lineNode.getAttribute('HEIGHT'), 10) * scaleFactor,
       text: '',
-      width: Number.parseInt(lineNode.getAttribute('WIDTH'), 10) * scaleFactorX,
+      width: Number.parseInt(lineNode.getAttribute('WIDTH'), 10) * scaleFactor,
       spans: [],
-      x: Number.parseInt(lineNode.getAttribute('HPOS'), 10) * scaleFactorX,
-      y: Number.parseInt(lineNode.getAttribute('VPOS'), 10) * scaleFactorY,
+      x: Number.parseInt(lineNode.getAttribute('HPOS'), 10) * scaleFactor,
+      y: Number.parseInt(lineNode.getAttribute('VPOS'), 10) * scaleFactor,
     };
     const textNodes = lineNode.querySelectorAll('String, SP, HYP');
     for (const [textIdx, textNode] of textNodes.entries()) {
@@ -221,13 +220,13 @@ export function parseAlto(altoText, imgSize) {
           .join('');
       }
 
-      let width = Number.parseInt(textNode.getAttribute('WIDTH'), 10) * scaleFactorX;
-      let height = Number.parseInt(textNode.getAttribute('HEIGHT'), 10) * scaleFactorY;
+      let width = Number.parseInt(textNode.getAttribute('WIDTH'), 10) * scaleFactor;
+      let height = Number.parseInt(textNode.getAttribute('HEIGHT'), 10) * scaleFactor;
       if (Number.isNaN(height)) {
         height = line.height;
       }
-      let x = Number.parseInt(textNode.getAttribute('HPOS'), 10) * scaleFactorX;
-      let y = Number.parseInt(textNode.getAttribute('VPOS'), 10) * scaleFactorY;
+      let x = Number.parseInt(textNode.getAttribute('HPOS'), 10) * scaleFactor;
+      let y = Number.parseInt(textNode.getAttribute('VPOS'), 10) * scaleFactor;
       if (Number.isNaN(y)) {
         y = line.y;
       }
@@ -362,7 +361,10 @@ export function parseIiifAnnotations(annos, imgSize) {
     }
     let target = anno.target || anno.on;
     target = Array.isArray(target) ? target[0] : target;
-    const [x, y, width, height] = target.matchAll(fragmentPat).next().value.slice(1, 5);
+    // FIXME: Find a way to use .matchAll here, i.e. fix babel/preset-env...
+    const match = fragmentPat.exec(target);
+    const [x, y, width, height] = match.slice(1, 5);
+    fragmentPat.lastIndex = 0;
     return {
       height: parseInt(height, 10),
       text,
