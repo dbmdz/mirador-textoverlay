@@ -4,5 +4,9 @@ updates:
   open-pull-requests-limit: 10
   package-ecosystem: npm
   schedule:
-    interval: daily
-    time: "04:00"
+    interval: weekly
+  allow:
+    - dependency-type: "production"
+  ignore:
+    - dependency-name: '*'
+      update-types: ['version-update:semver-patch']
