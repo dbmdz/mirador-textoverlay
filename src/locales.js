@@ -25,4 +25,17 @@ export default {
     backgroundColor: 'Line background color',
     resetTextColors: 'Reset colors',
   },
+  sr: {
+    collapseTextOverlayOptions: 'Затворите опције приказа текста',
+    disableTextOverlay: 'Приказ текста онемогућен',
+    enableTextOverlay: 'Приказ текста омогућен',
+    expandTextOverlayOptions: 'Опције приказа текста отоворен',
+    textOpacity: 'Видљивост текста',
+    textSelect: 'Селекција текста',
+    textVisible: 'Видљив текст',
+    colorPicker: 'Избор боја',
+    textColor: 'Боја текста',
+    backgroundColor: 'Боја позадине реда',
+    resetTextColors: 'Ресет боја'
+  },
 };
