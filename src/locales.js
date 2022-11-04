@@ -36,6 +36,6 @@ export default {
     colorPicker: 'Избор боја',
     textColor: 'Боја текста',
     backgroundColor: 'Боја позадине реда',
-    resetTextColors: 'Ресет боја'
+    resetTextColors: 'Ресет боја',
   },
 };
