@@ -29,13 +29,21 @@ import { getPageColors } from '../lib/color';
 
 const charFragmentPattern = /^(.+)#char=(\d+),(\d+)$/;
 
-/** Check if an annotation has external resources that need to be loaded */
-function hasExternalResource(anno) {
+/** Check if an annotation v2 has external resources that need to be loaded */
+function hasExternalResourceV2(anno) {
   return (
     anno.resource?.chars === undefined &&
-    anno.body?.value === undefined &&
     Object.keys(anno.resource).length === 1 &&
     anno.resource['@id'] !== undefined
+  );
+}
+
+/** Check if an annotation v3 has external resources that need to be loaded */
+function hasExternalResourceV3(anno) {
+  return (
+    anno.body?.value === undefined &&
+    Object.keys(anno.body).length === 1 &&
+    anno.body.id !== undefined
   );
 }
 
@@ -54,6 +62,12 @@ const isHocr = (resource) =>
       (resource.profile === 'https://github.com/kba/hocr-spec/blob/master/hocr-spec.md' ||
         resource.profile.startsWith('http://kba.cloud/hocr-spec/') ||
         resource.profile.startsWith('http://kba.github.io/hocr-spec/'))));
+
+/** Checks if a given annotationJson has the type "AnnotationPage", introduced
+ * in IIIF v3 (and therefore assumes IIIF 3.0).
+ * @param annotationJson Annotation-like json sturct
+ */
+const naiveIIIFv3Check = (annotationJson) => annotationJson?.type === 'AnnotationPage';
 
 /** Wrapper around fetch() that returns the content as text */
 export async function fetchOcrMarkup(url) {
@@ -81,7 +95,7 @@ export function* discoverExternalOcr({ visibleCanvases: visibleCanvasIds, window
       : [canvas.__jsonld.seeAlso]
     ).filter((res) => isAlto(res) || isHocr(res))[0];
     if (seeAlso !== undefined) {
-      const ocrSource = seeAlso['@id'];
+      const ocrSource = seeAlso.id ?? seeAlso['@id']; // IIIF 3.0 compat (id vs @id)
       const alreadyHasText = texts[canvas.id]?.source === ocrSource;
       if (alreadyHasText) {
         // eslint-disable-next-line no-continue
@@ -125,7 +139,22 @@ export async function fetchAnnotationResource(url) {
 
 /** Saga for fetching external annotation resources */
 export function* fetchExternalAnnotationResources({ targetId, annotationId, annotationJson }) {
-  if (!annotationJson.resources.some(hasExternalResource)) {
+  if (naiveIIIFv3Check(annotationJson)) {
+    // We treat this as IIIF 3.0
+    yield fetchExternalAnnotationResourceIIIFv3({ targetId, annotationId, annotationJson });
+  } else {
+    // We treat this as IIIF 2.x
+    yield fetchExternalAnnotationResourcesIIIFv2({ targetId, annotationId, annotationJson });
+  }
+}
+
+/** Fetching external annotation resources IIIF 2.x style */
+export function* fetchExternalAnnotationResourcesIIIFv2({
+  targetId,
+  annotationId,
+  annotationJson,
+}) {
+  if (!annotationJson.resources.some(hasExternalResourceV2)) {
     return;
   }
   const resourceUris = uniq(
@@ -134,7 +163,7 @@ export function* fetchExternalAnnotationResources({ targetId, annotationId, anno
   const contents = yield all(resourceUris.map((uri) => call(fetchAnnotationResource, uri)));
   const contentMap = Object.fromEntries(contents.map((c) => [c.id ?? c['@id'], c]));
   const completedAnnos = annotationJson.resources.map((anno) => {
-    if (!hasExternalResource(anno)) {
+    if (!hasExternalResourceV2(anno)) {
       return anno;
     }
     const match = anno.resource['@id'].match(charFragmentPattern);
@@ -152,8 +181,48 @@ export function* fetchExternalAnnotationResources({ targetId, annotationId, anno
   );
 }
 
+/** Fetching external annotation resources IIIF 3.0 style */
+export function* fetchExternalAnnotationResourceIIIFv3({ targetId, annotationId, annotationJson }) {
+  if (!annotationJson.items.some(hasExternalResourceV3)) {
+    return;
+  }
+  const resourceUris = uniq(annotationJson.items.map((anno) => anno.body.id.split('#')[0]));
+
+  console.log(resourceUris);
+  const contents = yield all(resourceUris.map((uri) => call(fetchAnnotationResource, uri)));
+  const contentMap = Object.fromEntries(contents.map((c) => [c.id ?? c['@id'], c]));
+  const completedAnnos = annotationJson.items.map((anno) => {
+    if (!hasExternalResourceV3(anno)) {
+      return anno;
+    }
+    const match = anno.body.id.match(charFragmentPattern);
+    if (!match) {
+      return { ...anno, resource: contentMap[anno.body.id] ?? anno.resource };
+    }
+    const wholeResource = contentMap[match[1]];
+    const startIdx = Number.parseInt(match[2], 10);
+    const endIdx = Number.parseInt(match[3], 10);
+    const partialContent = wholeResource.value.substring(startIdx, endIdx);
+    return { ...anno, resource: { ...anno.resource, value: partialContent } };
+  });
+  yield put(
+    receiveAnnotation(targetId, annotationId, { ...annotationJson, resources: completedAnnos })
+  );
+}
+
 /** Saga for processing texts from IIIF annotations */
 export function* processTextsFromAnnotations({ targetId, annotationId, annotationJson }) {
+  if (naiveIIIFv3Check(annotationJson)) {
+    // IIIF v3
+    yield processTextsFromAnnotationsIIIFv3({ targetId, annotationId, annotationJson });
+  } else {
+    // IIIF v2 and Europeana IIIF 2.0
+    yield processTextsFromAnnotationsIIIFv2({ targetId, annotationId, annotationJson });
+  }
+}
+
+/** Saga for processing texts from IIIF annotations IIIF 2.x */
+export function* processTextsFromAnnotationsIIIFv2({ targetId, annotationId, annotationJson }) {
   // Check if the annotation contains "content as text" resources that
   // we can extract text with coordinates from
   const contentAsTextAnnos = annotationJson.resources.filter(
@@ -161,6 +230,24 @@ export function* processTextsFromAnnotations({ targetId, annotationId, annotatio
       anno.motivation === 'supplementing' || // IIIF 3.0
       anno.resource['@type']?.toLowerCase() === 'cnt:contentastext' || // IIIF 2.0
       ['Line', 'Word'].indexOf(anno.dcType) >= 0 // Europeana IIIF 2.0
+  );
+
+  if (contentAsTextAnnos.length > 0) {
+    const parsed = yield call(parseIiifAnnotations, contentAsTextAnnos);
+    yield put(receiveText(targetId, annotationId, 'annos', parsed));
+  }
+}
+
+/** Saga for processing texts from IIIF annotations IIIF 3.0 */
+export function* processTextsFromAnnotationsIIIFv3({ targetId, annotationId, annotationJson }) {
+  // Check if the annotation contains "TextualBody" resources that
+  // we can extract text with coordinates from
+  const contentAsTextAnnos = annotationJson.items.filter(
+    (anno) =>
+      anno.motivation === 'supplementing' &&
+      anno.type === 'Annotation' &&
+      anno.body &&
+      anno.body.type === 'TextualBody' // See https://www.w3.org/TR/annotation-model/#embedded-textual-body
   );
 
   if (contentAsTextAnnos.length > 0) {
