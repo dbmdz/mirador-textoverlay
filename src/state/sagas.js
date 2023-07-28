@@ -128,7 +128,7 @@ export function* fetchExternalAnnotationResources({ targetId, annotationId, anno
   //        the code a bit embarassing.
   const resourceKey = annotationJson.items ? 'items' /* IIIFv3 */ : 'resources'; /* IIIFV2 */
   const resources = annotationJson[resourceKey];
-  if (!resources.some(hasExternalResource)) {
+  if (!resources?.some(hasExternalResource)) {
     return;
   }
   const resourceUris = uniq(
@@ -169,15 +169,15 @@ export function* processTextsFromAnnotations({ windowId, canvasId }) {
   // Check if the annotation contains "content as text" resources that
   // we can extract text with coordinates from
   const annos = annotationJson.items /** IIIFV3 */ ?? annotationJson.resources; /** IIIFV2 */
-  const contentAsTextAnnos = annos.filter(
+  const contentAsTextAnnos = (annos ?? []).filter(
     (anno) =>
       anno.motivation === 'supplementing' || // IIIF 3.0
       anno.resource['@type']?.toLowerCase() === 'cnt:contentastext' || // IIIF 2.0
       ['Line', 'Word'].indexOf(anno.dcType) >= 0 // Europeana IIIF 2.0
   );
-  const canvas = yield select(getCanvas, { canvasId, windowId });
 
   if (contentAsTextAnnos.length > 0) {
+    const canvas = yield select(getCanvas, { canvasId, windowId });
     const parsed = yield call(parseIiifAnnotations, contentAsTextAnnos, {
       width: canvas.getWidth(),
       height: canvas.getHeight(),
@@ -243,9 +243,8 @@ export async function loadImageData(imgUrl) {
 
 /** Try to determine text and background color for the target */
 export function* fetchColors({ targetId, infoId }) {
-  const infoResp = yield select(selectInfoResponse, { infoId });
-  let serviceId = infoResp?.id;
-  if (!serviceId) {
+  let infoResp = yield select(selectInfoResponse, { infoId });
+  if (!infoResp) {
     const { success: infoSuccess, failure: infoFailure } = yield race({
       success: take((a) => a.type === ActionTypes.RECEIVE_INFO_RESPONSE && a.infoId === infoId),
       failure: take(
@@ -255,8 +254,9 @@ export function* fetchColors({ targetId, infoId }) {
     if (infoFailure) {
       return;
     }
-    serviceId = infoSuccess.infoJson?.['@id'];
+    infoResp = infoSuccess.infoJson;
   }
+  const serviceId = infoResp?.id;
   try {
     // FIXME: This assumes a Level 2 endpoint, we should probably use one of the sizes listed
     //        explicitely in the info response instead.
