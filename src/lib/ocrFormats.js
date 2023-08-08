@@ -342,7 +342,7 @@ export function parseOcr(ocrText, referenceSize) {
  * @returns parsed OCR boxes
  */
 export function parseIiifAnnotations(annos, imgSize) {
-  const fragmentPat = /.+#xywh=(\d+),(\d+),(\d+),(\d+)/g;
+  const fragmentPat = /.*#xywh=(\d+),(\d+),(\d+),(\d+)/g;
 
   // TODO: Handle word-level annotations
   // See if we can tell from the annotations themselves if it targets a line
@@ -360,6 +360,12 @@ export function parseIiifAnnotations(annos, imgSize) {
       text = anno.body.value;
     }
     let target = anno.target || anno.on;
+    if (Array.isArray(target)) {
+      target = target.filter((t) => typeof t === 'string' || 'selector' in t);
+    }
+    if ('selector' in target) {
+      target = target.selector.value;
+    }
     target = Array.isArray(target) ? target[0] : target;
     // FIXME: Find a way to use .matchAll here, i.e. fix babel/preset-env...
     const match = fragmentPat.exec(target);

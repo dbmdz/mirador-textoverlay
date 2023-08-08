@@ -75,12 +75,12 @@ export function* discoverExternalOcr({ visibleCanvases: visibleCanvasIds, window
   // seem to do anything :-/
   for (const canvas of visibleCanvases) {
     const { width, height } = canvas.__jsonld;
-    const seeAlso = (Array.isArray(canvas.__jsonld.seeAlso)
-      ? canvas.__jsonld.seeAlso
-      : [canvas.__jsonld.seeAlso]
-    ).filter((res) => isAlto(res) || isHocr(res))[0];
-    if (seeAlso !== undefined) {
-      const ocrSource = seeAlso['@id'] ?? seeAlso.id;
+    const potentialOcrResources = [canvas.__jsonld.seeAlso, canvas.__jsonld.rendering]
+      .filter((v) => !!v)
+      .flatMap((res) => (Array.isArray(res) ? res : [res]));
+    const ocrResource = potentialOcrResources.find((res) => isAlto(res) || isHocr(res));
+    if (ocrResource !== undefined) {
+      const ocrSource = ocrResource['@id'] ?? ocrResource.id;
       const alreadyHasText = texts[canvas.id]?.source === ocrSource;
       if (alreadyHasText) {
         // eslint-disable-next-line no-continue
@@ -256,7 +256,7 @@ export function* fetchColors({ targetId, infoId }) {
     }
     infoResp = infoSuccess.infoJson;
   }
-  const serviceId = infoResp?.id;
+  const serviceId = infoResp?.id ?? infoResp?.['@id'];
   try {
     // FIXME: This assumes a Level 2 endpoint, we should probably use one of the sizes listed
     //        explicitely in the info response instead.

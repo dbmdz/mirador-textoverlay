@@ -100,11 +100,45 @@ describe('Discovering external OCR resources', () => {
         },
       ],
     }),
+    new Canvas({
+      ...canvasSize,
+      id: 'canvasC',
+      rendering: {
+        id: 'http://example.com/ocr/canvasC',
+        format: 'text/vnd.hocr+html',
+      },
+      items: [
+        {
+          id: 'http://example.com/ap/canvasC',
+          type: 'AnnotationPage',
+          items: [
+            {
+              type: 'Annotation',
+              motivation: 'painting',
+              body: {
+                id: 'http://example.com/canvas/canvasC',
+                type: 'Image',
+                format: 'image/jpeg',
+                ...canvasSize,
+                service: {
+                  id: 'http://example.com/iiif/image/canvasC',
+                  type: 'ImageService2',
+                  profile: 'level1',
+                },
+              },
+            },
+          ],
+        },
+      ],
+    }),
   ];
   const windowId = '31337';
 
   it('should yield a discovered source for every canvas with OCR', () =>
-    expectSaga(discoverExternalOcr, { visibleCanvases: ['canvasA', 'canvasB'], windowId })
+    expectSaga(discoverExternalOcr, {
+      visibleCanvases: ['canvasA', 'canvasB', 'canvasC'],
+      windowId,
+    })
       .provide([
         [select(getWindowConfig, { windowId }), windowConfig],
         [select(getCanvases, { windowId }), canvases],
@@ -112,11 +146,15 @@ describe('Discovering external OCR resources', () => {
       ])
       .put(discoveredText('canvasA', 'http://example.com/ocr/canvasA'))
       .put(discoveredText('canvasB', 'http://example.com/ocr/canvasB'))
+      .put(discoveredText('canvasC', 'http://example.com/ocr/canvasC'))
       .run());
 
   ['selectable', 'visible'].forEach((setting) => {
     it(`should request the texts if '${setting}' is enabled`, () =>
-      expectSaga(discoverExternalOcr, { visibleCanvases: ['canvasA', 'canvasB'], windowId })
+      expectSaga(discoverExternalOcr, {
+        visibleCanvases: ['canvasA', 'canvasB', 'canvasC'],
+        windowId,
+      })
         .provide([
           [
             select(getWindowConfig, { windowId }),
@@ -127,11 +165,15 @@ describe('Discovering external OCR resources', () => {
         ])
         .put(requestText('canvasA', 'http://example.com/ocr/canvasA', canvasSize))
         .put(requestText('canvasB', 'http://example.com/ocr/canvasB', canvasSize))
+        .put(requestText('canvasC', 'http://example.com/ocr/canvasC', canvasSize))
         .run());
   });
 
   it('should not do anything when the sources are already discovered', () =>
-    expectSaga(discoverExternalOcr, { visibleCanvases: ['canvasA', 'canvasB'], windowId })
+    expectSaga(discoverExternalOcr, {
+      visibleCanvases: ['canvasA', 'canvasB', 'canvasC'],
+      windowId,
+    })
       .provide([
         [
           select(getWindowConfig, { windowId }),
@@ -143,6 +185,7 @@ describe('Discovering external OCR resources', () => {
           {
             canvasA: { source: 'http://example.com/ocr/canvasA' },
             canvasB: { source: 'http://example.com/ocr/canvasB' },
+            canvasC: { source: 'http://example.com/ocr/canvasC' },
           },
         ],
       ])
@@ -161,7 +204,10 @@ describe('Discovering external OCR resources', () => {
       }));
 
   it('should request colors for each canvas with an associated resource', () =>
-    expectSaga(discoverExternalOcr, { visibleCanvases: ['canvasA', 'canvasB'], windowId })
+    expectSaga(discoverExternalOcr, {
+      visibleCanvases: ['canvasA', 'canvasB', 'canvasC'],
+      windowId,
+    })
       .provide([
         [select(getWindowConfig, { windowId }), windowConfig],
         [select(getCanvases, { windowId }), canvases],
@@ -169,8 +215,10 @@ describe('Discovering external OCR resources', () => {
       ])
       .put(discoveredText('canvasA', 'http://example.com/ocr/canvasA'))
       .put(discoveredText('canvasB', 'http://example.com/ocr/canvasB'))
+      .put(discoveredText('canvasC', 'http://example.com/ocr/canvasC'))
       .put(requestColors('canvasA', 'http://example.com/iiif/image/canvasA'))
       .put(requestColors('canvasB', 'http://example.com/iiif/image/canvasB'))
+      .put(requestColors('canvasC', 'http://example.com/iiif/image/canvasC'))
       .run());
 });
 
