@@ -24,6 +24,15 @@ const config = {
   }],
 };
 
+// Allow to pass a manifest via query parameter, needed for IIIF Cookbook compatiblity
+const urlParams = new URLSearchParams(window.location.search);
+const iiifContent = urlParams.get('iiif-content');
+if (iiifContent) {
+  config.catalog.push({ manifestId: iiifContent, provider: 'IIIF Content' });
+  config.windows[0].manifestId = iiifContent;
+  config.windows[0].canvasIndex = 0;
+}
+
 Mirador.viewer(config, [
   ...textOverlayPlugin,
 ]);
