@@ -11,7 +11,7 @@ import contentAsTextAnnos from '../../__fixtures__/anno_iifv2.json';
  * https://stackoverflow.com/a/53464807 (CC-BY-SA)
  */
 const closeTo = (expected, precision = 1) => ({
-  asymmetricMatch: (actual) => Math.abs(expected - actual) < Math.pow(10, -precision) / 2,
+  asymmetricMatch: (actual) => Math.abs(expected - actual) < 10 ** -precision / 2,
 });
 
 describe('parsing ALTO', () => {
@@ -49,7 +49,7 @@ describe('parsing ALTO', () => {
 
   it('should convert style nodes to proper CSS', () => {
     expect(parsed.lines[96].spans[16].style).toBe(
-      'font-family: Times New Roman;font-style: italic'
+      'font-family: Times New Roman;font-style: italic',
     );
   });
 });

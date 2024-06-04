@@ -34,10 +34,10 @@ const useStyles = makeStyles(({ palette, breakpoints }) => {
 });
 
 /** Container for a settings button */
-const ButtonContainer = ({ children, withBorder, paddingPrev, paddingNext }) => {
+function ButtonContainer({ children, withBorder, paddingPrev, paddingNext }) {
   const classes = useStyles({ withBorder, paddingPrev, paddingNext });
   return <div className={classes.root}>{children}</div>;
-};
+}
 ButtonContainer.propTypes = {
   children: PropTypes.node.isRequired,
   withBorder: PropTypes.bool,
