@@ -7,7 +7,6 @@
     "page": true,
     "document": true
   },
-  "parser": "babel-eslint",
   "plugins": ["jest","prettier"],
   "rules": {
     "import/prefer-default-export": "off",
