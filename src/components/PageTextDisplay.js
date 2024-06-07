@@ -175,8 +175,9 @@ class PageTextDisplay extends React.Component {
     function LineWrapper({ children }) {
       return <text style={textStyle}>{children}</text>;
     }
-    // eslint-disable-next-line react/jsx-props-no-spreading, require-jsdoc
+    // eslint-disable-next-line require-jsdoc
     function SpanElem(props) {
+      // eslint-disable-next-line react/jsx-props-no-spreading
       return <tspan {...props} />;
     }
     if (isGecko) {
@@ -184,8 +185,9 @@ class PageTextDisplay extends React.Component {
       //       lines in a <g>, e.g. breaks text selection in similar ways to the below
       //       WebKit-specific note, for some reason ¯\_(ツ)_/¯
       LineWrapper = React.Fragment;
-      // eslint-disable-next-line react/jsx-props-no-spreading, require-jsdoc
+      // eslint-disable-next-line require-jsdoc
       SpanElem = function (props) {
+        // eslint-disable-next-line react/jsx-props-no-spreading
         return <text style={textStyle} {...props} />;
       };
     }
