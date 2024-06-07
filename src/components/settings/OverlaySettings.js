@@ -46,7 +46,7 @@ const useStyles = makeStyles(({ palette, breakpoints }) => {
 });
 
 /** Control text overlay settings  */
-const OverlaySettings = ({
+function OverlaySettings({
   windowTextOverlayOptions,
   imageToolsEnabled,
   textsAvailable,
@@ -55,7 +55,7 @@ const OverlaySettings = ({
   t,
   pageColors,
   containerId,
-}) => {
+}) {
   const {
     enabled,
     visible,
@@ -221,7 +221,7 @@ const OverlaySettings = ({
       {!isSmallDisplay && toggleButton}
     </div>
   );
-};
+}
 
 OverlaySettings.propTypes = {
   containerId: PropTypes.string.isRequired,
@@ -236,7 +236,7 @@ OverlaySettings.propTypes = {
     PropTypes.shape({
       textColor: PropTypes.string,
       bgColor: PropTypes.string,
-    })
+    }),
   ).isRequired,
 };
 

@@ -66,11 +66,11 @@ describe('PageTextDisplay', () => {
     renderPage({ visible: false });
     expect(screen.getByText(svgTextMatcher('a firstWord on a line'))).toHaveAttribute(
       'style',
-      'fill: rgba(0, 0, 0, 0);'
+      'fill: rgba(0, 0, 0, 0);',
     );
     expect(screen.getByText(svgTextMatcher('another secondWord on another line'))).toHaveAttribute(
       'style',
-      'fill: rgba(0, 0, 0, 0);'
+      'fill: rgba(0, 0, 0, 0);',
     );
   });
 
@@ -78,12 +78,12 @@ describe('PageTextDisplay', () => {
     const { rerender } = renderPage();
     expect(screen.getByText(svgTextMatcher('a firstWord on a line'))).toHaveAttribute(
       'style',
-      'fill: rgba(0, 0, 0, 0.75);'
+      'fill: rgba(0, 0, 0, 0.75);',
     );
     renderPage({ opacity: 0.25 }, rerender);
     expect(screen.getByText(svgTextMatcher('a firstWord on a line'))).toHaveAttribute(
       'style',
-      'fill: rgba(0, 0, 0, 0.75);'
+      'fill: rgba(0, 0, 0, 0.75);',
     );
   });
 
@@ -92,11 +92,11 @@ describe('PageTextDisplay', () => {
     expect(screen.getByText(svgTextMatcher('a firstWord on a line'))).not.toBeNull();
     renderPage(
       { source: 'http://example.com/pages/2', lines: lineFixtures.withoutSpans, opacity: 0.25 },
-      rerender
+      rerender,
     );
     expect(screen.getByText('a word on a line')).toHaveAttribute(
       'style',
-      'fill: rgba(0, 0, 0, 0.25);'
+      'fill: rgba(0, 0, 0, 0.25);',
     );
   });
 
