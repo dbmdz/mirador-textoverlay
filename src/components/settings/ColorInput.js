@@ -65,7 +65,7 @@ const ColorInput = ({ color, onChange, title, autoColors, className }) => {
       />
     </label>
   );
-};
+}
 ColorInput.propTypes = {
   className: PropTypes.string,
   color: PropTypes.string.isRequired,

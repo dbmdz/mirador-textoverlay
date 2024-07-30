@@ -125,7 +125,7 @@ describe('MiradorTextOverlay', () => {
     } = renderOverlay({ pageTexts });
     viewer.handlers['update-viewport']();
     const overlays = Array.of(...viewer.canvas.querySelectorAll('div > svg:first-of-type')).map(
-      (e) => e.parentElement
+      (e) => e.parentElement,
     );
     expect(overlays[0]).toHaveStyle({
       transform: 'translate(52.95000000000001px, 72.9px) scale(1.33)',

@@ -221,7 +221,7 @@ const OverlaySettings = ({
       {!isSmallDisplay && toggleButton}
     </div>
   );
-};
+}
 
 OverlaySettings.propTypes = {
   containerId: PropTypes.string.isRequired,
@@ -236,7 +236,7 @@ OverlaySettings.propTypes = {
     PropTypes.shape({
       textColor: PropTypes.string,
       bgColor: PropTypes.string,
-    })
+    }),
   ).isRequired,
 };
 
