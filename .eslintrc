@@ -1,8 +1,14 @@
 {
   "env": {
+    "browser": true,
+    "es2021": true,
     "jest/globals": true
   },
-  "extends": ["airbnb","react-app","prettier"],
+  "extends": [
+    "plugin:react/recommended",
+    "airbnb",
+    "plugin:prettier/recommended"
+  ],
   "globals": {
     "page": true,
     "document": true
@@ -29,6 +35,6 @@
     }],
     "react/prefer-stateless-function": "off",
     "sort-keys": "off",
-    "no-continue": "off",
+    "no-continue": "off"
   }
 }
