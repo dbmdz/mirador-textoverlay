@@ -34,7 +34,7 @@ const useStyles = makeStyles(({ palette, breakpoints }) => {
 });
 
 /** Container for a settings button */
-function ButtonContainer({ children, withBorder, paddingPrev, paddingNext }) {
+const ButtonContainer = ({ children, withBorder, paddingPrev, paddingNext }) => {
   const classes = useStyles({ withBorder, paddingPrev, paddingNext });
   return <div className={classes.root}>{children}</div>;
 }

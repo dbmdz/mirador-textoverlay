@@ -35,7 +35,7 @@ function luminance([r, g, b]) {
     if (vSrgb <= 0.03928) {
       return vSrgb / 12.92;
     }
-    return ((vSrgb + 0.055) / 1.055) ** 2.4;
+    return Math.pow((vSrgb + 0.055) / 1.055, 2.4);
   });
   return colors[0] * 0.2126 + colors[1] * 0.7152 + colors[2] * 0.0722;
 }

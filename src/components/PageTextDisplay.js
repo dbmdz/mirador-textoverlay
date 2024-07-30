@@ -171,25 +171,18 @@ class PageTextDisplay extends React.Component {
      * So we have to go against best practices and use user agent sniffing to determine dynamically
      * how to render lines and spans, sorry :-/ */
     const isGecko = runningInGecko();
+    // NOTE: Gecko really works best with a flattened bunch of text nodes. Wrapping the
+    //       lines in a <g>, e.g. breaks text selection in similar ways to the below
+    //       WebKit-specific note, for some reason ¯\_(ツ)_/¯
     // eslint-disable-next-line require-jsdoc
-    function LineWrapper({ children }) {
-      return <text style={textStyle}>{children}</text>;
-    }
+    const LineWrapper = isGecko ? (
+      <></>
+    ) : (
+      ({ children }) => <text style={textStyle}>{children}</text>
+    );
     // eslint-disable-next-line require-jsdoc
     function SpanElem(props) {
-      // eslint-disable-next-line react/jsx-props-no-spreading
-      return <tspan {...props} />;
-    }
-    if (isGecko) {
-      // NOTE: Gecko really works best with a flattened bunch of text nodes. Wrapping the
-      //       lines in a <g>, e.g. breaks text selection in similar ways to the below
-      //       WebKit-specific note, for some reason ¯\_(ツ)_/¯
-      LineWrapper = React.Fragment;
-      // eslint-disable-next-line require-jsdoc
-      SpanElem = function (props) {
-        // eslint-disable-next-line react/jsx-props-no-spreading
-        return <text style={textStyle} {...props} />;
-      };
+      return isGecko ? <text style={textStyle} {...props} /> : <tspan {...props} />;
     }
     return (
       <div ref={this.containerRef} style={containerStyle}>

@@ -37,7 +37,7 @@ const useStyles = makeStyles({
 });
 
 /** Input to select a color */
-function ColorInput({ color, onChange, title, autoColors, className }) {
+const ColorInput = ({ color, onChange, title, autoColors, className }) => {
   const classes = useStyles({ color, autoColors });
   // We rely on the browser behavior that clicking on an input's label is equivalent
   // to clicking the input to show a custom color picker button.

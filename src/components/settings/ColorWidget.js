@@ -57,7 +57,7 @@ const useStyles = makeStyles(({ palette, breakpoints }) => {
 });
 
 /** Widget to update text and background color */
-function ColorWidget({ textColor, bgColor, onChange, t, pageColors, useAutoColors, containerId }) {
+const ColorWidget = ({ textColor, bgColor, onChange, t, pageColors, useAutoColors, containerId }) => {
   const showResetButton =
     !useAutoColors && pageColors && pageColors.some((c) => c && (c.textColor || c.bgColor));
   const classes = useStyles({ showResetButton });

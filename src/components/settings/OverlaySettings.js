@@ -46,7 +46,7 @@ const useStyles = makeStyles(({ palette, breakpoints }) => {
 });
 
 /** Control text overlay settings  */
-function OverlaySettings({
+const OverlaySettings = ({
   windowTextOverlayOptions,
   imageToolsEnabled,
   textsAvailable,
@@ -55,7 +55,7 @@ function OverlaySettings({
   t,
   pageColors,
   containerId,
-}) {
+}) => {
   const {
     enabled,
     visible,

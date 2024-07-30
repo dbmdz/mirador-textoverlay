@@ -22,24 +22,20 @@ const mockTheme = {
 
 // Mocked MUI slider for easier testing, taken from
 // https://stackoverflow.com/a/61628815 (CC BY-SA 4.0)
-jest.mock(
-  '@material-ui/core/Slider',
-  () =>
-    function (props) {
-      const { id, name, min, max, onChange } = props;
-      return (
-        <input
-          data-testid="opacity-slider"
-          type="range"
-          id={id}
-          name={name}
-          min={min}
-          max={max}
-          onChange={(event) => onChange(event, event.target.value)}
-        />
-      );
-    },
-);
+jest.mock('@material-ui/core/Slider', () => (props) => {
+  const { id, name, min, max, onChange } = props;
+  return (
+    <input
+      data-testid="opacity-slider"
+      type="range"
+      id={id}
+      name={name}
+      min={min}
+      max={max}
+      onChange={(event) => onChange(event, event.target.value)}
+    />
+  );
+});
 
 /** Render a bubble to the testing screen */
 function renderSettings(props = {}, renderFn = render) {
