@@ -1,19 +1,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { fade } from '@material-ui/core/styles/colorManipulator';
-import withStyles from '@material-ui/core/styles/withStyles';
+import { styled } from '@mui/material';
+import { alpha } from '@mui/material/styles';
 
-/** Styles for the overlay SVG */
-const styles = (theme) => ({
-  textOverlay: {
-    'font-family': theme?.textOverlay?.overlayFont ?? 'sans-serif',
-    '& ::selection': {
-      fill: theme?.textOverlay?.selectionTextColor ?? 'rgba(255, 255, 255, 1)', // For Chrome
-      color: theme?.textOverlay?.selectionTextColor ?? 'rgba(255, 255, 255, 1)', // For Firefox
-      'background-color': theme?.textOverlay?.selectionBackgroundColor ?? 'rgba(0, 55, 255, 1)',
-    },
+const StyledSvgBox = styled('svg')(({ svgStyle }) => ({
+  ...svgStyle,
+  userSelect: 'none',
+}));
+
+const StyledSvgText = styled('svg')(({ theme, svgStyle }) => ({
+  ...svgStyle,
+  position: 'absolute',
+  fontFamily: theme.textOverlay?.overlayFont ?? 'sans-serif',
+  '& ::selection': {
+    fill: theme.textOverlay?.selectionTextColor ?? 'rgba(255, 255, 255, 1)', // For Chrome
+    color: theme.textOverlay?.selectionTextColor ?? 'rgba(255, 255, 255, 1)', // For Firefox
+    backgroundColor: theme.textOverlay?.selectionBackgroundColor ?? 'rgba(0, 55, 255, 1)',
   },
-});
+}));
 
 /** Check if we're running in Gecko */
 function runningInGecko() {
@@ -98,10 +102,10 @@ class PageTextDisplay extends React.Component {
     // one of the containers, since otherwise the user's selection highlight would
     // become transparent as well or disappear entirely.
     for (const rect of this.boxContainerRef.current.querySelectorAll('rect')) {
-      rect.style.fill = fade(bgColor, opacity);
+      rect.style.fill = alpha(bgColor, opacity);
     }
     for (const text of this.textContainerRef.current.querySelectorAll('text')) {
-      text.style.fill = fade(textColor, opacity);
+      text.style.fill = alpha(textColor, opacity);
     }
   }
 
@@ -129,7 +133,6 @@ class PageTextDisplay extends React.Component {
       bgColor,
       useAutoColors,
       pageColors,
-      classes,
     } = this.props;
 
     const containerStyle = {
@@ -155,9 +158,9 @@ class PageTextDisplay extends React.Component {
     }
 
     const renderOpacity = !visible && selectable ? 0 : opacity;
-    const boxStyle = { fill: fade(bg, renderOpacity) };
+    const boxStyle = { fill: alpha(bg, renderOpacity) };
     const textStyle = {
-      fill: fade(fg, renderOpacity),
+      fill: alpha(fg, renderOpacity),
     };
     const renderLines = lines.filter((l) => l.width > 0 && l.height > 0);
 
@@ -198,7 +201,7 @@ class PageTextDisplay extends React.Component {
          * i.e. the rectangles would have completely occluded the text.
          * So we have to resort to this, it's a hack, but it works.
          */}
-        <svg style={{ ...svgStyle, userSelect: 'none' }}>
+        <StyledSvgBox svgStyle={{ ...svgStyle, userSelect: 'none' }}>
           <g ref={this.boxContainerRef}>
             {renderLines.map((line) => (
               <rect
@@ -211,8 +214,8 @@ class PageTextDisplay extends React.Component {
               />
             ))}
           </g>
-        </svg>
-        <svg style={{ ...svgStyle, position: 'absolute' }} className={classes.textOverlay}>
+        </StyledSvgBox>
+        <StyledSvgText svgStyle={{ ...svgStyle, position: 'absolute' }}>
           <g ref={this.textContainerRef}>
             {renderLines.map((line) =>
               line.spans ? (
@@ -244,17 +247,16 @@ class PageTextDisplay extends React.Component {
                 >
                   {line.text}
                 </text>
-              )
+              ),
             )}
           </g>
-        </svg>
+        </StyledSvgText>
       </div>
     );
   }
 }
 
 PageTextDisplay.propTypes = {
-  classes: PropTypes.objectOf(PropTypes.string),
   selectable: PropTypes.bool.isRequired,
   visible: PropTypes.bool.isRequired,
   opacity: PropTypes.number.isRequired,
@@ -270,8 +272,7 @@ PageTextDisplay.propTypes = {
   pageColors: PropTypes.object,
 };
 PageTextDisplay.defaultProps = {
-  classes: {},
   pageColors: undefined,
 };
 
-export default withStyles(styles)(PageTextDisplay);
+export default PageTextDisplay;

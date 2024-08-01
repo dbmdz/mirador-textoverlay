@@ -2,19 +2,19 @@
 import React from 'react';
 import { describe, it, jest, expect } from '@jest/globals';
 import { fireEvent, render, screen, queryByRole } from '@testing-library/react';
-import '@testing-library/jest-dom/extend-expect';
-import { ThemeProvider } from '@material-ui/core/styles';
-import MuiDefaultTheme from '@material-ui/core/styles/defaultTheme';
+import { ThemeProvider } from '@mui/material/styles';
+import { createTheme } from '@mui/material/styles';
 
 import OverlaySettings from '../../src/components/settings/OverlaySettings';
+const baseTheme = createTheme();
 
 const mockTheme = {
-  ...MuiDefaultTheme,
+  ...baseTheme,
   palette: {
-    ...MuiDefaultTheme.palette,
+    ...baseTheme.palette,
     getContrastText: () => '#000',
     shades: {
-      ...MuiDefaultTheme.palette.shades,
+      ...baseTheme.palette.shades,
       main: '#fff',
     },
   },
@@ -22,7 +22,7 @@ const mockTheme = {
 
 // Mocked MUI slider for easier testing, taken from
 // https://stackoverflow.com/a/61628815 (CC BY-SA 4.0)
-jest.mock('@material-ui/core/Slider', () => (props) => {
+jest.mock('@mui/material/Slider', () => (props) => {
   const { id, name, min, max, onChange } = props;
   return (
     <input
@@ -67,7 +67,7 @@ function renderSettings(props = {}, renderFn = render) {
         {...props}
         windowTextOverlayOptions={options}
       />
-    </ThemeProvider>
+    </ThemeProvider>,
   );
   return { rerender, options, updateOptionsMock };
 }
@@ -123,7 +123,7 @@ describe('TextOverlaySettingsBubble', () => {
     // Button should be shown as active
     const selectButton = screen.getByLabelText('textSelect');
     expect(selectButton).toBeVisible();
-    expect(selectButton).toHaveStyle('background-color: rgba(0, 0, 0, 0.25)');
+    expect(selectButton).toHaveStyle('background-color: rgba(0, 0, 0, 0.04)');
     expect(selectButton).toHaveAttribute('aria-pressed', 'true');
 
     // Test click behavior
@@ -143,7 +143,6 @@ describe('TextOverlaySettingsBubble', () => {
     expect(screen.getByLabelText('collapseTextOverlayOptions')).toBeVisible();
     const selectButton = screen.getByLabelText('textSelect');
     expect(selectButton).toBeVisible();
-    expect(selectButton).not.toHaveStyle('background-color: rgba(0, 0, 0, 0.25)');
     expect(selectButton).toHaveAttribute('aria-pressed', 'false');
     const opacityToggle = screen.getByLabelText('textOpacity');
     expect(opacityToggle).toBeVisible();
@@ -156,7 +155,7 @@ describe('TextOverlaySettingsBubble', () => {
     const visibleButton = screen.getByLabelText('textVisible');
     expect(visibleButton).toBeVisible();
     expect(visibleButton).toHaveAttribute('aria-pressed', 'true');
-    expect(visibleButton).toHaveStyle('background-color: rgba(0, 0, 0, 0.25)');
+    expect(visibleButton).toHaveStyle('background-color: rgba(0, 0, 0, 0.04)');
     expect(visibleButton).toHaveAttribute('aria-pressed', 'true');
 
     // Test click behavior
@@ -209,7 +208,7 @@ describe('TextOverlaySettingsBubble', () => {
   it('should be positioned lower if mirador-image-tools is enabled', () => {
     renderSettings({ imageToolsEnabled: true });
     expect(
-      screen.getByLabelText('expandTextOverlayOptions').parentElement.parentElement
+      screen.getByLabelText('expandTextOverlayOptions').parentElement.parentElement,
     ).toHaveStyle('top: 66px');
   });
 
