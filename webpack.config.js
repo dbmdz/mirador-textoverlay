@@ -38,7 +38,7 @@ const baseConfig = (mode) => ({
   output: {
     filename: 'mirador-textoverlay.js',
     hashFunction: 'md5',
-    library: 'MiradorImageTools',
+    library: 'MiradorTextOverlay',
     libraryExport: 'default',
     libraryTarget: 'umd',
     path: path.join(__dirname, 'umd'),
