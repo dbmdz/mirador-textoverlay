@@ -50,7 +50,7 @@ const baseConfig = (mode) => ({
   ],
   resolve: {
     fallback: { url: false },
-    extensions: ['.js'],
+    extensions: ['.js', '.jsx'],
   },
 });
 
@@ -81,7 +81,7 @@ module.exports = (env, options) => {
     },
     devServer: {
       hot: true,
-      port: 4444,
+      port: 3000,
       static: ['./demo/dist/'],
     },
     devtool: 'eval-source-map',
