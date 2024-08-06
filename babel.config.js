@@ -59,7 +59,12 @@ module.exports = (api) => ({
       },
     ],
     [
-      'transform-react-remove-prop-types',
+      '@babel/plugin-transform-regenerator',
+      {
+        async: false,
+      },
+    ],
+    ['transform-react-remove-prop-types',
       {
         ignoreFilenames: ['node_modules'],
         removeImport: true,

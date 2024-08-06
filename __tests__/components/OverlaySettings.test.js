@@ -2,10 +2,9 @@
 import React from 'react';
 import { describe, it, jest, expect } from '@jest/globals';
 import { fireEvent, render, screen, queryByRole } from '@testing-library/react';
-import { ThemeProvider } from '@mui/material/styles';
-import { createTheme } from '@mui/material/styles';
-
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 import OverlaySettings from '../../src/components/settings/OverlaySettings';
+
 const baseTheme = createTheme();
 
 const mockTheme = {

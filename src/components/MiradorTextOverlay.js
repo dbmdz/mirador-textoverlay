@@ -150,6 +150,7 @@ class MiradorTextOverlay extends Component {
   }
 
   /** If the page should be rendered */
+  // eslint-disable-next-line class-methods-use-this
   shouldRenderPage = ({ lines } = {}) =>
     lines &&
     lines.length > 0 &&

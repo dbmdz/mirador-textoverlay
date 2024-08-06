@@ -45,23 +45,21 @@ const StyledInput = styled('input')({
   borderWidth: 0,
 });
 /** Input to select a color */
-const ColorInput = ({ color, onChange, title, autoColors }) => {
+const ColorInput = ({ color, onChange, title, autoColors }) => (
   // We rely on the browser behavior that clicking on an input's label is equivalent
   // to clicking the input to show a custom color picker button.
   // However, mobile Safari doesn't show the picker if we `display: none` the actual input,
   // so we use some CSS voodoo (Tailwind's `sr-only` utility) to visually hide it...
-  return (
-    <StyledLabel>
-      <StyledDiv title={title} color={color} autoColors={autoColors} />
-      <StyledInput
-        type="color"
-        value={toHexRgb(autoColors && autoColors[0] ? autoColors[0] : color)}
-        onChange={(evt) => onChange(evt.target.value)}
-        onInput={(evt) => onChange(evt.target.value)}
-      />
-    </StyledLabel>
-  );
-};
+  <StyledLabel>
+    <StyledDiv title={title} color={color} autoColors={autoColors} />
+    <StyledInput
+      type="color"
+      value={toHexRgb(autoColors && autoColors[0] ? autoColors[0] : color)}
+      onChange={(evt) => onChange(evt.target.value)}
+      onInput={(evt) => onChange(evt.target.value)}
+    />
+  </StyledLabel>
+);
 ColorInput.propTypes = {
   color: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,

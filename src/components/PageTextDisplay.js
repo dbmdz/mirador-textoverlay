@@ -1,7 +1,7 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { styled } from '@mui/material';
 import { alpha } from '@mui/material/styles';
+import PropTypes from 'prop-types';
 
 const StyledSvgBox = styled('svg')(({ svgStyle }) => ({
   ...svgStyle,
@@ -174,7 +174,7 @@ class PageTextDisplay extends React.Component {
      * So we have to go against best practices and use user agent sniffing to determine dynamically
      * how to render lines and spans, sorry :-/ */
     const isGecko = runningInGecko();
-    // eslint-disable-next-line require-jsdoc
+    // eslint-disable-next-line require-jsdoc, react/prop-types
     let LineWrapper = ({ children }) => <text style={textStyle}>{children}</text>;
     // eslint-disable-next-line react/jsx-props-no-spreading, require-jsdoc
     let SpanElem = (props) => <tspan {...props} />;

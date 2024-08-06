@@ -1,3 +1,4 @@
+/* eslint-disable jest/expect-expect */
 import { select, call } from 'redux-saga/effects';
 import { expectSaga } from 'redux-saga-test-plan';
 import { throwError } from 'redux-saga-test-plan/providers';
