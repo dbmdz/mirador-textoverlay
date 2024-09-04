@@ -19,7 +19,6 @@
     "lint": "eslint ./src ./__tests__",
     "format": "eslint --fix ./src ./__tests__",
     "prepublishOnly": "npm run build",
-    "parcel": "parcel demo/src/index.html",
     "test": "npm run lint && jest",
     "test:coverage": "jest --coverage",
     "test:watch": "jest --watch",
