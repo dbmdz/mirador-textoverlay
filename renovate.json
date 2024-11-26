@@ -1,0 +1,32 @@
+{
+    "$schema":"https://docs.renovatebot.com/renovate-schema.json",
+    "branchConcurrentLimit":0,
+    "extends":[
+        "config:base",
+        ":preserveSemverRanges",
+        ":dependencyDashboard",
+        ":rebaseStalePrs",
+        ":enableVulnerabilityAlertsWithLabel('security')",
+        "group:recommended"
+    ],
+    "groupName":"all dependencies",
+    "groupSlug":"all",
+    "labels":[
+        "dependencies"
+    ],
+    "lockFileMaintenance":{
+        "enabled":false
+    },
+    "packageRules":[
+        {
+            "groupName":"all dependencies",
+            "groupSlug":"all",
+            "matchPackageNames":[
+                "*"
+            ]
+        }
+    ],
+    "schedule":[
+        "every weekend"
+    ]
+}
