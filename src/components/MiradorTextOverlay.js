@@ -29,16 +29,8 @@ class MiradorTextOverlay extends Component {
 
   /** Register OpenSeadragon callback when viewport changes */
   componentDidUpdate(prevProps) {
-    const {
-      enabled,
-      viewer,
-      pageTexts,
-      textColor,
-      bgColor,
-      useAutoColors,
-      visible,
-      selectable,
-    } = this.props;
+    const { enabled, viewer, pageTexts, textColor, bgColor, useAutoColors, visible, selectable } =
+      this.props;
     let { opacity } = this.props;
 
     this.patchAnnotationOverlay();
@@ -152,12 +144,13 @@ class MiradorTextOverlay extends Component {
       this.renderRefs[itemNo].current.updateTransforms(
         img.viewportToImageZoom(viewportZoom),
         vpBounds.x * canvasWorldScale - canvasWorldOffset,
-        vpBounds.y * canvasWorldScale
+        vpBounds.y * canvasWorldScale,
       );
     }
   }
 
   /** If the page should be rendered */
+  // eslint-disable-next-line class-methods-use-this
   shouldRenderPage = ({ lines } = {}) =>
     lines &&
     lines.length > 0 &&
@@ -272,7 +265,7 @@ class MiradorTextOverlay extends Component {
           );
         })}
       </div>,
-      viewer.canvas
+      viewer.canvas,
     );
   }
 }
