@@ -1,60 +1,66 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { MiradorMenuButton } from 'mirador/dist/es/src/components/MiradorMenuButton';
-import ResetColorsIcon from '@material-ui/icons/SettingsBackupRestore';
-import makeStyles from '@material-ui/core/styles/makeStyles';
-import { fade } from '@material-ui/core/styles/colorManipulator';
+import ResetColorsIcon from '@mui/icons-material/SettingsBackupRestore';
+import { alpha, styled } from '@mui/material/styles';
 
 import ColorInput from './ColorInput';
 import { toHexRgb } from '../../lib/color';
 
-const useStyles = makeStyles(({ palette, breakpoints }) => {
+const RootDiv = styled('div')(({ theme }) => {
+  const { palette, breakpoints, shadows } = theme;
   const bubbleBg = palette.shades.main;
+
   return {
-    root: {
-      display: 'flex',
-      flexDirection: 'column',
-      position: 'absolute',
-      top: 48,
-      zIndex: 100,
-      borderRadius: [[0, 0, 25, 25]],
-      backgroundColor: fade(bubbleBg, 0.8),
-      [breakpoints.down('sm')]: {
-        flexDirection: 'row',
-        right: 48,
-        top: 'auto',
-        borderRadius: [[25, 0, 0, 25]],
-        // Truncate right box shadow
-        clipPath: 'inset(-8px 0 -8px -8px)',
-      },
-    },
-    foreground: {
-      height: 40,
-      padding: [[8, 8, 0, 8]],
-      margin: (props) => [[props.showResetButton ? -12 : 0, 0, 0, 0]],
-      [breakpoints.down('sm')]: {
-        height: 48,
-        width: 40,
-        padding: [[8, 0, 8, 8]],
-        marginTop: 0,
-        margin: (props) => [[0, 0, 0, props.showResetButton ? -12 : 0]],
-      },
-    },
-    background: {
-      marginTop: -6,
-      zIndex: -5,
-      height: 40,
-      padding: [[0, 8, 8, 8]],
-      [breakpoints.down('sm')]: {
-        height: 48,
-        width: 40,
-        padding: [[8, 8, 8, 0]],
-        marginTop: 0,
-        marginLeft: -6,
-      },
+    display: 'flex',
+    flexDirection: 'column',
+    position: 'absolute',
+    top: 48,
+    zIndex: 100,
+    boxShadow: shadows[4],
+    borderRadius: '0px 0px 25px 25px',
+    backgroundColor: alpha(bubbleBg, 0.8),
+    [breakpoints.down('sm')]: {
+      flexDirection: 'row',
+      right: 48,
+      top: 'auto',
+      borderRadius: '25px 0px 0px 25px',
+      // Truncate right box shadow
+      clipPath: 'inset(-8px 0px -8px -8px)',
     },
   };
 });
+
+const BackgroundColorInput = styled(ColorInput)(({ theme }) => {
+  const { breakpoints } = theme;
+
+  return {
+    marginTop: -6,
+    zIndex: -5,
+    height: 40,
+    padding: '0px 8px 8px 8px',
+    [breakpoints.down('sm')]: {
+      height: 48,
+      width: 40,
+      padding: '8px 8px 8px 0px',
+      marginTop: 0,
+      marginLeft: -6,
+    },
+  };
+});
+
+const ForegroundColorInput = styled(ColorInput)(({ theme, showResetButton }) => ({
+  height: 40,
+  padding: '8px 8px 0px 8px',
+  margin: showResetButton ? '-12px 0px 0px 0px' : '0px 0px 0px 0px',
+  [theme.breakpoints.down('sm')]: {
+    height: 48,
+    width: 40,
+    padding: '8px 0px 8px 8px',
+    marginTop: 0,
+    margin: `0px 0px 0px ${showResetButton ? '-12px' : '0px'}`,
+  },
+}));
 
 /** Widget to update text and background color */
 const ColorWidget = ({
@@ -68,10 +74,9 @@ const ColorWidget = ({
 }) => {
   const showResetButton =
     !useAutoColors && pageColors && pageColors.some((c) => c && (c.textColor || c.bgColor));
-  const classes = useStyles({ showResetButton });
 
   return (
-    <div className={`MuiPaper-elevation4 ${classes.root}`}>
+    <RootDiv>
       {showResetButton && (
         <MiradorMenuButton
           containerId={containerId}
@@ -87,7 +92,7 @@ const ColorWidget = ({
           <ResetColorsIcon />
         </MiradorMenuButton>
       )}
-      <ColorInput
+      <ForegroundColorInput
         title={t('textColor')}
         autoColors={useAutoColors ? pageColors.map((colors) => colors.textColor) : undefined}
         color={textColor}
@@ -101,9 +106,8 @@ const ColorWidget = ({
           }
           onChange({ textColor: color, bgColor, useAutoColors: false });
         }}
-        className={classes.foreground}
       />
-      <ColorInput
+      <BackgroundColorInput
         title={t('backgroundColor')}
         color={bgColor}
         autoColors={useAutoColors ? pageColors.map((colors) => colors.bgColor) : undefined}
@@ -114,9 +118,8 @@ const ColorWidget = ({
           }
           onChange({ bgColor: color, textColor, useAutoColors: false });
         }}
-        className={classes.background}
       />
-    </div>
+    </RootDiv>
   );
 };
 ColorWidget.propTypes = {
@@ -130,7 +133,7 @@ ColorWidget.propTypes = {
     PropTypes.shape({
       textColor: PropTypes.string,
       bgColor: PropTypes.string,
-    })
+    }),
   ).isRequired,
 };
 

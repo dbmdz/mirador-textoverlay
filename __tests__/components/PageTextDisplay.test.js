@@ -2,7 +2,6 @@ import React from 'react';
 
 import { describe, it, jest, expect } from '@jest/globals';
 import { fireEvent, render, screen } from '@testing-library/react';
-import '@testing-library/jest-dom/extend-expect';
 
 import PageTextDisplay from '../../src/components/PageTextDisplay';
 
@@ -66,11 +65,11 @@ describe('PageTextDisplay', () => {
     renderPage({ visible: false });
     expect(screen.getByText(svgTextMatcher('a firstWord on a line'))).toHaveAttribute(
       'style',
-      'fill: rgba(0, 0, 0, 0);'
+      'fill: rgba(0, 0, 0, 0);',
     );
     expect(screen.getByText(svgTextMatcher('another secondWord on another line'))).toHaveAttribute(
       'style',
-      'fill: rgba(0, 0, 0, 0);'
+      'fill: rgba(0, 0, 0, 0);',
     );
   });
 
@@ -78,12 +77,12 @@ describe('PageTextDisplay', () => {
     const { rerender } = renderPage();
     expect(screen.getByText(svgTextMatcher('a firstWord on a line'))).toHaveAttribute(
       'style',
-      'fill: rgba(0, 0, 0, 0.75);'
+      'fill: rgba(0, 0, 0, 0.75);',
     );
     renderPage({ opacity: 0.25 }, rerender);
     expect(screen.getByText(svgTextMatcher('a firstWord on a line'))).toHaveAttribute(
       'style',
-      'fill: rgba(0, 0, 0, 0.75);'
+      'fill: rgba(0, 0, 0, 0.75);',
     );
   });
 
@@ -92,11 +91,11 @@ describe('PageTextDisplay', () => {
     expect(screen.getByText(svgTextMatcher('a firstWord on a line'))).not.toBeNull();
     renderPage(
       { source: 'http://example.com/pages/2', lines: lineFixtures.withoutSpans, opacity: 0.25 },
-      rerender
+      rerender,
     );
     expect(screen.getByText('a word on a line')).toHaveAttribute(
       'style',
-      'fill: rgba(0, 0, 0, 0.25);'
+      'fill: rgba(0, 0, 0, 0.25);',
     );
   });
 
@@ -156,10 +155,17 @@ describe('PageTextDisplay', () => {
 
   it('should render spans as <text> elements when running under Gecko', () => {
     const prevAgent = global.navigator.userAgent;
-    global.navigator.userAgent =
-      'Mozilla/5.0 (X11; Linux x86_64; rv:10.0) Gecko/20100101 Firefox/10.0';
+
+    Object.defineProperty(global.navigator, 'userAgent', {
+      value: 'Mozilla/5.0 (X11; Linux x86_64; rv:10.0) Gecko/20100101 Firefox/10.0',
+      configurable: true,
+    });
+
     renderPage();
-    global.navigator.userAgent = prevAgent;
+    Object.defineProperty(global.navigator, 'userAgent', {
+      value: prevAgent,
+      configurable: true,
+    });
     const word = screen.getByText('firstWord');
     expect(word).not.toBeNull();
     expect(word.tagName).toEqual('text');

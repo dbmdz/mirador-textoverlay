@@ -1,3 +1,4 @@
+/* eslint-disable default-param-last */
 import { PluginActionTypes } from './actions';
 
 /** Reducer for global text overlay state */
