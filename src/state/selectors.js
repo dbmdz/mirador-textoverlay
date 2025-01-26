@@ -27,7 +27,7 @@ export const getWindowTextOverlayOptions = createSelector(
     fontFamily,
     ...defaultConfig,
     ...(textOverlay ?? {}),
-  })
+  }),
 );
 
 /** Selector to get all loaded texts */
@@ -43,5 +43,5 @@ export const getTextsForVisibleCanvases = createSelector(
       return [];
     }
     return texts;
-  }
+  },
 );

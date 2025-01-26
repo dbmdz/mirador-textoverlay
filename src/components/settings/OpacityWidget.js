@@ -33,7 +33,7 @@ const useStyles = makeStyles(({ palette, breakpoints }) => {
 });
 
 /** Widget to control the opacity of the displayed text */
-const OpacityWidget = ({ opacity, onChange, t }) => {
+function OpacityWidget({ opacity, onChange, t }) {
   const classes = useStyles();
   const theme = useTheme();
   const isSmallDisplay = useMediaQuery(theme.breakpoints.down('sm'));
@@ -54,7 +54,7 @@ const OpacityWidget = ({ opacity, onChange, t }) => {
       />
     </div>
   );
-};
+}
 OpacityWidget.propTypes = {
   opacity: PropTypes.number.isRequired,
   onChange: PropTypes.func.isRequired,

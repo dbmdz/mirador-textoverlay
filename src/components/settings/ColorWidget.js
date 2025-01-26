@@ -57,15 +57,7 @@ const useStyles = makeStyles(({ palette, breakpoints }) => {
 });
 
 /** Widget to update text and background color */
-const ColorWidget = ({
-  textColor,
-  bgColor,
-  onChange,
-  t,
-  pageColors,
-  useAutoColors,
-  containerId,
-}) => {
+const ColorWidget = ({ textColor, bgColor, onChange, t, pageColors, useAutoColors, containerId }) => {
   const showResetButton =
     !useAutoColors && pageColors && pageColors.some((c) => c && (c.textColor || c.bgColor));
   const classes = useStyles({ showResetButton });
@@ -118,7 +110,7 @@ const ColorWidget = ({
       />
     </div>
   );
-};
+}
 ColorWidget.propTypes = {
   containerId: PropTypes.string.isRequired,
   textColor: PropTypes.string.isRequired,
@@ -130,7 +122,7 @@ ColorWidget.propTypes = {
     PropTypes.shape({
       textColor: PropTypes.string,
       bgColor: PropTypes.string,
-    })
+    }),
   ).isRequired,
 };
 
