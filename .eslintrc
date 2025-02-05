@@ -1,36 +1,30 @@
 {
   "env": {
-    "jest/globals": true,
-    "browser": true
+    "jest/globals": true
   },
-  "extends": ["airbnb", "plugin:jest/recommended", "prettier"],
+  "extends": ["airbnb","react-app","prettier"],
   "globals": {
     "page": true,
     "document": true
   },
-  "parser": "@babel/eslint-parser",
-  "plugins": ["babel", "jest", "react", "react-hooks", "prettier"],
+  "parser": "babel-eslint",
+  "plugins": ["jest","prettier"],
   "rules": {
     "import/prefer-default-export": "off",
-    "import/no-extraneous-dependencies": "off",
     "no-console": "off",
+    "prettier/prettier": ["error"],
     "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
     "require-jsdoc": ["error", {
-       "require": {
-         "FunctionDeclaration": true,
-         "MethodDefinition": true,
-         "ClassDeclaration": true,
+      "require": {
+        "FunctionDeclaration": true,
+        "MethodDefinition": true,
+        "ClassDeclaration": true,
         "ArrowFunctionExpression": true,
         "FunctionExpression": true
       }
     }],
-    "no-restricted-syntax": ["off", "ForOfStatement"],
-    "react/no-unstable-nested-components": 1,
-    "react/no-unused-class-component-methods": 1,
-    "react/jsx-fragments": "off",
-    "react/jsx-props-no-spreading": "off",
     "react/prefer-stateless-function": "off",
-    "react/function-component-definition": "off",
-    "no-continue": "off"
+    "sort-keys": "off",
+    "no-continue": "off",
   }
 }
