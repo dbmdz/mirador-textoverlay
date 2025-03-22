@@ -1,10 +1,4 @@
-/* eslint-disable require-jsdoc */
+import '@testing-library/jest-dom';
+import sizeMe from 'react-sizeme';
 
-/** Makes navigator.userAgent writable for testing purposes */
-Object.defineProperty(window.navigator, 'userAgent', ((initialValue) => {
-  let value = initialValue;
-  return {
-    get() { return value; },
-    set(v) { value = v; },
-  };
-})(window.navigator.userAgent));
+sizeMe.noPlaceholders = true;
