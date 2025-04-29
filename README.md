@@ -82,7 +82,7 @@ changed through the UI, except for `enabled` and `fontFamily`) are:
   defaults to `1.0`
 - `useAutoColors`: Try to determine fitting text and background colors from
   the page image itself.<br>
-  Falls back to `textCololor`/`bgColor` if
+  Falls back to `textColor`/`bgColor` if
   auto-detection fails (e.g. due to missing CORS headers).<br>
   Boolean, defaults
   to `true`.
