@@ -1,19 +1,29 @@
 {
   "env": {
+    "browser": true,
+    "es2021": true,
     "jest/globals": true
   },
-  "extends": ["airbnb","react-app","prettier"],
+  "extends": [
+    "plugin:react/recommended",
+    "airbnb",
+    "plugin:prettier/recommended"
+  ],
   "globals": {
     "page": true,
     "document": true
   },
-  "parser": "babel-eslint",
   "plugins": ["jest","prettier"],
   "rules": {
+    "class-methods-use-this": "warn",
+    "default-param-last": "warn",
     "import/prefer-default-export": "off",
     "no-console": "off",
     "prettier/prettier": ["error"],
     "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
+    "react/prop-types": "warn",
+    "react/no-unstable-nested-components": "warn",
+    "react/no-unused-class-component-methods": "warn",
     "require-jsdoc": ["error", {
       "require": {
         "FunctionDeclaration": true,
@@ -25,6 +35,6 @@
     }],
     "react/prefer-stateless-function": "off",
     "sort-keys": "off",
-    "no-continue": "off",
+    "no-continue": "off"
   }
 }

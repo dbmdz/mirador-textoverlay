@@ -76,9 +76,8 @@ export function* discoverExternalOcr({ visibleCanvases: visibleCanvasIds, window
   // seem to do anything :-/
   for (const canvas of visibleCanvases) {
     const { width, height } = canvas.__jsonld;
-    const seeAlso = (Array.isArray(canvas.__jsonld.seeAlso)
-      ? canvas.__jsonld.seeAlso
-      : [canvas.__jsonld.seeAlso]
+    const seeAlso = (
+      Array.isArray(canvas.__jsonld.seeAlso) ? canvas.__jsonld.seeAlso : [canvas.__jsonld.seeAlso]
     ).filter((res) => isAlto(res) || isHocr(res))[0];
     if (seeAlso !== undefined) {
       const ocrSource = seeAlso['@id'];
@@ -129,7 +128,7 @@ export function* fetchExternalAnnotationResources({ targetId, annotationId, anno
     return;
   }
   const resourceUris = uniq(
-    annotationJson.resources.map((anno) => anno.resource['@id'].split('#')[0])
+    annotationJson.resources.map((anno) => anno.resource['@id'].split('#')[0]),
   );
   const contents = yield all(resourceUris.map((uri) => call(fetchAnnotationResource, uri)));
   const contentMap = Object.fromEntries(contents.map((c) => [c.id ?? c['@id'], c]));
@@ -148,7 +147,7 @@ export function* fetchExternalAnnotationResources({ targetId, annotationId, anno
     return { ...anno, resource: { ...anno.resource, value: partialContent } };
   });
   yield put(
-    receiveAnnotation(targetId, annotationId, { ...annotationJson, resources: completedAnnos })
+    receiveAnnotation(targetId, annotationId, { ...annotationJson, resources: completedAnnos }),
   );
 }
 
@@ -160,7 +159,7 @@ export function* processTextsFromAnnotations({ targetId, annotationId, annotatio
     (anno) =>
       anno.motivation === 'supplementing' || // IIIF 3.0
       anno.resource['@type']?.toLowerCase() === 'cnt:contentastext' || // IIIF 2.0
-      ['Line', 'Word'].indexOf(anno.dcType) >= 0 // Europeana IIIF 2.0
+      ['Line', 'Word'].indexOf(anno.dcType) >= 0, // Europeana IIIF 2.0
   );
 
   if (contentAsTextAnnos.length > 0) {
@@ -178,7 +177,7 @@ export function* onConfigChange({ payload, id: windowId }) {
   const texts = yield select(getTextsForVisibleCanvases, { windowId });
   // Check if any of the texts need fetching
   const needFetching = texts.filter(
-    ({ sourceType, text }) => sourceType === 'ocr' && text === undefined
+    ({ sourceType, text }) => sourceType === 'ocr' && text === undefined,
   );
   // Check if we need to discover external OCR
   const needsDiscovery =
@@ -191,7 +190,7 @@ export function* onConfigChange({ payload, id: windowId }) {
     needFetching.map(({ canvasId, source }) => {
       const { width, height } = visibleCanvases.find((c) => c.id === canvasId).__jsonld;
       return put(requestText(canvasId, source, { height, width }));
-    })
+    }),
   );
   if (needsDiscovery) {
     const canvasIds = visibleCanvases.map((c) => c.id);
@@ -204,7 +203,7 @@ export function* injectTranslations() {
   yield put(
     updateConfig({
       translations,
-    })
+    }),
   );
 }
 
@@ -232,7 +231,7 @@ export function* fetchColors({ targetId, infoId }) {
     const { success: infoSuccess, failure: infoFailure } = yield race({
       success: take((a) => a.type === ActionTypes.RECEIVE_INFO_RESPONSE && a.infoId === infoId),
       failure: take(
-        (a) => a.type === ActionTypes.RECEIVE_INFO_RESPONSE_FAILURE && a.infoId === infoId
+        (a) => a.type === ActionTypes.RECEIVE_INFO_RESPONSE_FAILURE && a.infoId === infoId,
       ),
     });
     if (infoFailure) {

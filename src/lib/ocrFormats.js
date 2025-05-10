@@ -80,7 +80,7 @@ export function parseHocr(hocrText, referenceSize) {
     const scaledHeight = Math.round(scaleFactorX * pageSize[3]);
     if (scaledWidth !== referenceSize.width || scaledHeight !== referenceSize.height) {
       console.warn(
-        `Differing scale factors for x and y axis: x=${scaleFactorX}, y=${scaleFactorY}`
+        `Differing scale factors for x and y axis: x=${scaleFactorX}, y=${scaleFactorY}`,
       );
     }
     scaleFactor = scaleFactorX;
@@ -350,7 +350,7 @@ export function parseIiifAnnotations(annos, imgSize) {
   const lineAnnos = annos.filter(
     (anno) =>
       anno.textGranularity === 'line' || // IIIF Text Granularity
-      anno.dcType === 'Line' // Europeana
+      anno.dcType === 'Line', // Europeana
   );
   const targetAnnos = lineAnnos.length > 0 ? lineAnnos : annos;
   const boxes = targetAnnos.map((anno) => {
