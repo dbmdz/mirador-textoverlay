@@ -6,7 +6,7 @@
         ":preserveSemverRanges",
         ":dependencyDashboard",
         ":rebaseStalePrs",
-        ":enableVulnerabilityAlertsWithLabel('security')",
+        ":enableVulnerabilityAlertsWithLabel(security)",
         "group:recommended"
     ],
     "groupName":"all dependencies",
