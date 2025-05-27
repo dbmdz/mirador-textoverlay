@@ -6,7 +6,7 @@
 **A Mirador 3 plugin to display a selectable text overlay based on OCR or transcriptions.**
 
 [![Screenshot][screenshot]][demo]
-**[Demo on https://mirador-textoverlay.netlify.com][demo]** (try selecting some text)
+**[Demo on https://mirador-textoverlay.netlify.app][demo]** (try selecting some text)
 
 ## Requirements for supported IIIF manifests
 
@@ -126,6 +126,6 @@ starting the work, so we can discuss if it's a fit.
 [mirador]: https://github.com/ProjectMirador/mirador/releases/tag/v3.0.0-rc.5
 
 [screenshot]: .docassets/screenshot.jpg
-[demo]: https://mirador-textoverlay.netlify.com
+[demo]: https://mirador-textoverlay.netlify.app
 [demo-cfg]: https://github.com/dbmdz/mirador-textoverlay/blob/main/demo/src/index.js#L4-L24
 [demo-cfg-catalog]: https://github.com/dbmdz/mirador-textoverlay/blob/main/demo/src/index.js#L5-L13
