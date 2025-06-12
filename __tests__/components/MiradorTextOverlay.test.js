@@ -2,7 +2,6 @@
 import React from 'react';
 import { describe, it, jest, expect } from '@jest/globals';
 import { render, queryByText, getByText } from '@testing-library/react';
-import '@testing-library/jest-dom/extend-expect';
 
 import MiradorTextOverlay from '../../src/components/MiradorTextOverlay';
 
@@ -125,7 +124,7 @@ describe('MiradorTextOverlay', () => {
     } = renderOverlay({ pageTexts });
     viewer.handlers['update-viewport']();
     const overlays = Array.of(...viewer.canvas.querySelectorAll('div > svg:first-of-type')).map(
-      (e) => e.parentElement
+      (e) => e.parentElement,
     );
     expect(overlays[0]).toHaveStyle({
       transform: 'translate(52.95000000000001px, 72.9px) scale(1.33)',
