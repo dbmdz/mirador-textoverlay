@@ -2,45 +2,41 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { MiradorMenuButton } from 'mirador/dist/es/src/components/MiradorMenuButton';
-import TextIcon from '@material-ui/icons/TextFields';
-import CloseIcon from '@material-ui/icons/Close';
-import SubjectIcon from '@material-ui/icons/Subject';
-import OpacityIcon from '@material-ui/icons/Opacity';
-import PaletteIcon from '@material-ui/icons/Palette';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import useTheme from '@material-ui/core/styles/useTheme';
-import makeStyles from '@material-ui/core/styles/makeStyles';
-import useMediaQuery from '@material-ui/core/useMediaQuery';
-import { fade } from '@material-ui/core/styles/colorManipulator';
+import TextIcon from '@mui/icons-material/TextFields';
+import CloseIcon from '@mui/icons-material/Close';
+import SubjectIcon from '@mui/icons-material/Subject';
+import OpacityIcon from '@mui/icons-material/Opacity';
+import PaletteIcon from '@mui/icons-material/Palette';
+import CircularProgress from '@mui/material/CircularProgress';
+import { useTheme, alpha, styled } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
 
 import TextSelectIcon from '../TextSelectIcon';
 import ButtonContainer from './ButtonContainer';
 import OpacityWidget from './OpacityWidget';
 import ColorWidget from './ColorWidget';
 
-const useStyles = makeStyles(({ palette, breakpoints }) => {
-  const bubbleBg = palette.shades.main;
+const BubbleContainer = styled('div', {
+  shouldForwardProp: (prop) =>
+    prop !== 'imageToolsEnabled' && prop !== 'open' && prop !== 'showColorPicker',
+})(({ theme, imageToolsEnabled, showColorPicker }) => {
+  const bubbleBg = theme.palette.shades.main;
 
   return {
-    bubbleContainer: {
-      display: 'flex',
-      flexDirection: 'row',
-      backgroundColor: fade(bubbleBg, 0.8),
-      borderRadius: (props) => [[25, 25, 25, 25]],
-      position: 'absolute',
-      right: 8,
-      // The mirador-image-tools plugin renders itself at the same position,
-      // so if it's active, position the menu lower
-      top: (props) => (props.imageToolsEnabled ? 66 : 8),
-      zIndex: 999,
-      [breakpoints.down('sm')]: {
-        flexDirection: 'column',
-        top: (props) => 8, // FIXME: Needs to be a func for some reason
-        right: (props) => (props.imageToolsEnabled ? 66 : 8),
-        borderRadius: (props) => [
-          [25, 25, 25, !props.textsFetching && props.open && props.showColorPicker ? 0 : 25],
-        ],
-      },
+    display: 'flex',
+    flexDirection: 'row',
+    backgroundColor: alpha(bubbleBg, 0.8),
+    borderRadius: showColorPicker ? '25px 25px 25px 0px' : '25px',
+    position: 'absolute',
+    right: 8,
+    top: imageToolsEnabled ? 66 : 8,
+    boxShadow: theme.shadows[4],
+    zIndex: 999,
+    [theme.breakpoints.down('sm')]: {
+      flexDirection: 'column',
+      top: 8,
+      right: imageToolsEnabled ? 66 : 8,
+      borderRadius: showColorPicker ? '25px 25px 25px 0px' : '25px',
     },
   };
 });
@@ -69,24 +65,18 @@ const OverlaySettings = ({
   const [showOpacitySlider, setShowOpacitySlider] = useState(false);
   const [showColorPicker, setShowColorPicker] = useState(false);
   const theme = useTheme();
-  const isSmallDisplay = useMediaQuery(theme.breakpoints.down('sm'));
+  const isSmallDisplay = useMediaQuery(theme.breakpoints.down('md'));
 
   const { palette } = useTheme();
   const bubbleBg = palette.shades.main;
   const bubbleFg = palette.getContrastText(bubbleBg);
-  const toggledBubbleBg = fade(bubbleFg, 0.25);
-  const classes = useStyles({
-    imageToolsEnabled,
-    open,
-    showColorPicker,
-    textsFetching,
-  });
+  const toggledBubbleBg = alpha(bubbleFg, 0.25);
 
   const textColor = useAutoColors
-    ? pageColors.map((cs) => cs.textColor).filter((x) => x)[0] ?? defaultTextColor
+    ? (pageColors.map((cs) => cs.textColor).filter((x) => x)[0] ?? defaultTextColor)
     : defaultTextColor;
   const bgColor = useAutoColors
-    ? pageColors.map((cs) => cs.bgColor).filter((x) => x)[0] ?? defaultBgColor
+    ? (pageColors.map((cs) => cs.bgColor).filter((x) => x)[0] ?? defaultBgColor)
     : defaultBgColor;
 
   const showAllButtons = open && !textsFetching;
@@ -111,7 +101,11 @@ const OverlaySettings = ({
     </ButtonContainer>
   );
   return (
-    <div className={`MuiPaper-elevation4 ${classes.bubbleContainer}`}>
+    <BubbleContainer
+      imageToolsEnabled={imageToolsEnabled}
+      open={open}
+      showColorPicker={showColorPicker}
+    >
       {isSmallDisplay && toggleButton}
       {showAllButtons && (
         <>
@@ -126,7 +120,7 @@ const OverlaySettings = ({
                 })
               }
               aria-pressed={selectable}
-              style={{ backgroundColor: selectable && toggledBubbleBg }}
+              sx={{ backgroundColor: selectable && toggledBubbleBg }}
             >
               <TextSelectIcon />
             </MiradorMenuButton>
@@ -148,7 +142,7 @@ const OverlaySettings = ({
                 }
               }}
               aria-pressed={visible}
-              style={{ backgroundColor: visible && toggledBubbleBg }}
+              sx={{ backgroundColor: visible && toggledBubbleBg }}
             >
               <TextIcon />
             </MiradorMenuButton>
@@ -162,8 +156,8 @@ const OverlaySettings = ({
               aria-controls="text-opacity-slider"
               aria-expanded={showOpacitySlider}
               onClick={() => setShowOpacitySlider(!showOpacitySlider)}
-              style={{
-                backgroundColor: showOpacitySlider && fade(bubbleFg, 0.1),
+              sx={{
+                backgroundColor: showOpacitySlider && alpha(bubbleFg, 0.1),
               }}
             >
               <OpacityIcon />
@@ -190,8 +184,8 @@ const OverlaySettings = ({
               aria-controls="color-picker"
               aria-expanded={showColorPicker}
               onClick={() => setShowColorPicker(!showColorPicker)}
-              style={{
-                backgroundColor: showColorPicker && fade(bubbleFg, 0.1),
+              sx={{
+                backgroundColor: showColorPicker && alpha(bubbleFg, 0.1),
               }}
             >
               <PaletteIcon />
@@ -215,11 +209,9 @@ const OverlaySettings = ({
           </ButtonContainer>
         </>
       )}
-      {textsFetching && (
-        <CircularProgress disableShrink size={50} style={{ position: 'absolute' }} />
-      )}
+      {textsFetching && <CircularProgress disableShrink size={50} sx={{ position: 'absolute' }} />}
       {!isSmallDisplay && toggleButton}
-    </div>
+    </BubbleContainer>
   );
 };
 
@@ -236,7 +228,7 @@ OverlaySettings.propTypes = {
     PropTypes.shape({
       textColor: PropTypes.string,
       bgColor: PropTypes.string,
-    })
+    }),
   ).isRequired,
 };
 
