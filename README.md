@@ -3,7 +3,7 @@
 [![npm package][npm-badge]][npm]
 [![required Mirador version][mirador-badge]][mirador]
 
-**A Mirador 3 plugin to display a selectable text overlay based on OCR or transcriptions.**
+**A Mirador 4 plugin to display a selectable text overlay based on OCR or transcriptions.**
 
 [![Screenshot][screenshot]][demo]
 **[Demo on https://mirador-textoverlay.netlify.com][demo]** (try selecting some text)
@@ -93,7 +93,7 @@ changed through the UI, except for `enabled` and `fontFamily`) are:
 
 The plugin also supports theming for a few things, these can be set under the
 `textOverlay` section for the light and/or dark theme (see
-[Mirador 3 Theming](https://github.com/ProjectMirador/mirador/wiki/M3-Theming-Mirador)
+[Mirador 4 Theming](https://github.com/ProjectMirador/mirador/wiki/M3-Theming-Mirador)
 on how to set these values):
 
 - `overlayFont`: Font(s) to use for rendering text. Any valid `font-family` CSS value

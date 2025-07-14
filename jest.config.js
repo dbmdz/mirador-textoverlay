@@ -4,14 +4,15 @@
 module.exports = {
   // Automatically clear mock calls and instances between every test
   clearMocks: true,
-
+  testEnvironment: 'jsdom',
   collectCoverageFrom: ['src/**/*.js', '!src/locales.js'],
   // The directory where Jest should output its coverage files
   coverageDirectory: 'coverage',
+  moduleNameMapper: {
+    '^uuid$': require.resolve('uuid'),
+  },
   // Ignore Mirador code from jest transforms
-  transformIgnorePatterns: [
-    '<rootDir>/node_modules/(?!(mirador|manifesto.js))',
-  ],
-  setupFiles: ['<rootDir>/jest.setup.js'],
+  transformIgnorePatterns: ['<rootDir>/node_modules/(?!(mirador|manifesto.js))'],
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   testRegex: '/__tests__/.*\\.(test|spec)\\.[jt]sx?$',
 };
