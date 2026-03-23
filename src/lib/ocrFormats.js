@@ -80,14 +80,13 @@ export function parseHocr(hocrText, referenceSize) {
     const scaledHeight = Math.round(scaleFactorX * pageSize[3]);
     if (scaledWidth !== referenceSize.width || scaledHeight !== referenceSize.height) {
       console.warn(
-        `Differing scale factors for x and y axis: x=${scaleFactorX}, y=${scaleFactorY}`
+        `Differing scale factors for x and y axis: x=${scaleFactorX}, y=${scaleFactorY}`,
       );
     }
     scaleFactor = scaleFactorX;
   }
   const lines = [];
   // FIXME: Seems to be an eslint bug: https://github.com/eslint/eslint/issues/12117
-  // eslint-disable-next-line no-unused-vars
   for (const lineNode of pageNode.querySelectorAll('span.ocr_line, span.ocrx_line')) {
     const wordNodes = lineNode.querySelectorAll('span.ocrx_word');
     if (wordNodes.length === 0) {
@@ -95,7 +94,6 @@ export function parseHocr(hocrText, referenceSize) {
     } else {
       const line = parseHocrNode(lineNode, true, scaleFactor)[0];
       const spans = [];
-      // eslint-disable-next-line no-unused-vars
       for (const [i, wordNode] of wordNodes.entries()) {
         const textSpans = parseHocrNode(wordNode, i === wordNodes.length - 1, scaleFactor);
 
@@ -350,7 +348,7 @@ export function parseIiifAnnotations(annos, imgSize) {
   const lineAnnos = annos.filter(
     (anno) =>
       anno.textGranularity === 'line' || // IIIF Text Granularity
-      anno.dcType === 'Line' // Europeana
+      anno.dcType === 'Line', // Europeana
   );
   const targetAnnos = lineAnnos.length > 0 ? lineAnnos : annos;
   const boxes = targetAnnos.map((anno) => {

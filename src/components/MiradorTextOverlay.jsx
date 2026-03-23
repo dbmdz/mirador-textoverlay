@@ -1,6 +1,7 @@
+import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-import PropTypes from 'prop-types';
+
 import PageTextDisplay from './PageTextDisplay';
 
 /** Overlay that renders OCR or transcription text in a SVG.
@@ -29,16 +30,8 @@ class MiradorTextOverlay extends Component {
 
   /** Register OpenSeadragon callback when viewport changes */
   componentDidUpdate(prevProps) {
-    const {
-      enabled,
-      viewer,
-      pageTexts,
-      textColor,
-      bgColor,
-      useAutoColors,
-      visible,
-      selectable,
-    } = this.props;
+    const { enabled, viewer, pageTexts, textColor, bgColor, useAutoColors, visible, selectable } =
+      this.props;
     let { opacity } = this.props;
 
     this.patchAnnotationOverlay();
@@ -64,7 +57,6 @@ class MiradorTextOverlay extends Component {
     }
 
     // Manually update SVG colors for performance reasons
-    // eslint-disable-next-line require-jsdoc
     const hasPageColors = (text = {}) => text.textColor !== undefined;
     if (
       visible !== prevProps.visible ||
@@ -137,7 +129,6 @@ class MiradorTextOverlay extends Component {
     for (let itemNo = 0; itemNo < viewer.world.getItemCount(); itemNo += 1) {
       // Skip update if we don't have a reference to the PageTextDisplay instance
       if (!this.renderRefs[itemNo].current) {
-        // eslint-disable-next-line no-continue
         continue;
       }
       const img = viewer.world.getItemAt(itemNo);
@@ -152,7 +143,7 @@ class MiradorTextOverlay extends Component {
       this.renderRefs[itemNo].current.updateTransforms(
         img.viewportToImageZoom(viewportZoom),
         vpBounds.x * canvasWorldScale - canvasWorldOffset,
-        vpBounds.y * canvasWorldScale
+        vpBounds.y * canvasWorldScale,
       );
     }
   }
@@ -218,17 +209,8 @@ class MiradorTextOverlay extends Component {
 
   /** Render the text overlay SVG */
   render() {
-    const {
-      pageTexts,
-      selectable,
-      visible,
-      viewer,
-      opacity,
-      textColor,
-      bgColor,
-      useAutoColors,
-      fontFamily,
-    } = this.props;
+    const { pageTexts, selectable, visible, viewer, opacity, textColor, bgColor, useAutoColors } =
+      this.props;
     if (!this.shouldRender() || !viewer || !pageTexts) {
       return null;
     }
@@ -264,7 +246,6 @@ class MiradorTextOverlay extends Component {
               width={pageWidth}
               height={pageHeight}
               textColor={textColor}
-              fontFamily={fontFamily}
               bgColor={bgColor}
               useAutoColors={useAutoColors}
               pageColors={pageFg ? { textColor: pageFg, bgColor: pageBg } : undefined}
@@ -272,23 +253,22 @@ class MiradorTextOverlay extends Component {
           );
         })}
       </div>,
-      viewer.canvas
+      viewer.canvas,
     );
   }
 }
 
 MiradorTextOverlay.propTypes = {
-  canvasWorld: PropTypes.object, // eslint-disable-line react/forbid-prop-types
+  canvasWorld: PropTypes.object,
   enabled: PropTypes.bool,
   opacity: PropTypes.number,
-  pageTexts: PropTypes.array, // eslint-disable-line react/forbid-prop-types
+  pageTexts: PropTypes.array,
   selectable: PropTypes.bool,
-  viewer: PropTypes.object, // eslint-disable-line react/forbid-prop-types
-  visible: PropTypes.bool,
-  textColor: PropTypes.string,
-  fontFamily: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
   bgColor: PropTypes.string,
+  textColor: PropTypes.string,
   useAutoColors: PropTypes.bool,
+  viewer: PropTypes.object,
+  visible: PropTypes.bool,
 };
 
 MiradorTextOverlay.defaultProps = {
@@ -297,12 +277,11 @@ MiradorTextOverlay.defaultProps = {
   opacity: 0.75,
   pageTexts: undefined,
   selectable: true,
-  viewer: undefined,
-  visible: false,
   textColor: '#000000',
-  fontFamily: undefined,
   bgColor: '#ffffff',
   useAutoColors: true,
+  viewer: undefined,
+  visible: false,
 };
 
 export default MiradorTextOverlay;

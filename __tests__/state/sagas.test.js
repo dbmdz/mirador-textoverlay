@@ -222,7 +222,7 @@ describe('Fetching external annotation sources', () => {
       .put(
         receiveAnnotation(targetId, annotationId, {
           resources: [{ resource: simpleExternalContent }],
-        })
+        }),
       )
       .run());
 
@@ -245,7 +245,7 @@ describe('Fetching external annotation sources', () => {
               },
             },
           ],
-        })
+        }),
       )
       .run());
 

@@ -3,7 +3,7 @@
 [![npm package][npm-badge]][npm]
 [![required Mirador version][mirador-badge]][mirador]
 
-**A Mirador 3 plugin to display a selectable text overlay based on OCR or transcriptions.**
+**A Mirador 4 plugin to display a selectable text overlay based on OCR or transcriptions.**
 
 [![Screenshot][screenshot]][demo]
 **[Demo on https://mirador-textoverlay.netlify.com][demo]** (try selecting some text)
@@ -28,21 +28,29 @@ entry in the [demo instance configuration][demo-cfg-catalog]. If you need
 support for your particular flavor of attaching text to a IIIF canvas, open
 an issue :-)
 
-
 ## Installation
-Currently the plugin can only be used if you build your own Mirador JavaScript bundle.
-To include the plugin in your Mirador installation, you need to install it
-from npm with `npm install mirador-textoverlay`, import it into your project
-and pass it to Mirador when you instantiate the viewer:
+To include the plugin in your Mirador installation, install it from npm,
+import it into your project and pass it to Mirador when you instantiate the
+viewer:
 
 ```javascript
-import Mirador from 'mirador/dist/es/src/index';
-import textOverlayPlugin from 'mirador-textoverlay/es';
+import Mirador from 'mirador';
+import textOverlayPlugin from 'mirador-textoverlay';
 
 const miradorConfig = {
   // Your Mirador configuration
 }
 Mirador.viewer(config, [...textOverlayPlugin]);
+```
+
+## Development
+This repository now follows the Mirador plugin template layout and build setup
+with `vite`, `src/index.js`, and `src/demo.js`.
+
+```sh
+npm install
+npm start
+npm run build
 ```
 
 ## Configuration
@@ -70,7 +78,7 @@ const miradorConfig = {
 }
 ```
 
-You can view an example configuration in [demo/src/index.js][demo-cfg].
+You can view an example configuration in [src/demo.js][demo-cfg].
 
 The available configuration options (all of which define defaults that can be
 changed through the UI, except for `enabled` and `fontFamily`) are:
@@ -92,9 +100,7 @@ changed through the UI, except for `enabled` and `fontFamily`) are:
   `#ffffff` (white)
 
 The plugin also supports theming for a few things, these can be set under the
-`textOverlay` section for the light and/or dark theme (see
-[Mirador 3 Theming](https://github.com/ProjectMirador/mirador/wiki/M3-Theming-Mirador)
-on how to set these values):
+`textOverlay` section for the light and/or dark theme:
 
 - `overlayFont`: Font(s) to use for rendering text. Any valid `font-family` CSS value
 - `selectionTextColor`: Color to use for rendering text when part of a selection. Any legal CSS color value.
@@ -122,10 +128,10 @@ starting the work, so we can discuss if it's a fit.
 [npm-badge]: https://img.shields.io/npm/v/mirador-textoverlay.png?style=flat-square
 [npm]: https://www.npmjs.org/package/mirador-textoverlay
 
-[mirador-badge]: https://img.shields.io/badge/Mirador-%E2%89%A53.0.0--rc.5-blueviolet 
-[mirador]: https://github.com/ProjectMirador/mirador/releases/tag/v3.0.0-rc.5
+[mirador-badge]: https://img.shields.io/badge/Mirador-4.x-blueviolet
+[mirador]: https://github.com/ProjectMirador/mirador/releases/tag/v4.0.0
 
 [screenshot]: .docassets/screenshot.jpg
 [demo]: https://mirador-textoverlay.netlify.com
-[demo-cfg]: https://github.com/dbmdz/mirador-textoverlay/blob/main/demo/src/index.js#L4-L24
-[demo-cfg-catalog]: https://github.com/dbmdz/mirador-textoverlay/blob/main/demo/src/index.js#L5-L13
+[demo-cfg]: https://github.com/dbmdz/mirador-textoverlay/blob/main/src/demo.js
+[demo-cfg-catalog]: https://github.com/dbmdz/mirador-textoverlay/blob/main/src/demo.js

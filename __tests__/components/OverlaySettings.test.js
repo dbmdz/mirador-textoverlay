@@ -67,7 +67,7 @@ function renderSettings(props = {}, renderFn = render) {
         {...props}
         windowTextOverlayOptions={options}
       />
-    </ThemeProvider>
+    </ThemeProvider>,
   );
   return { rerender, options, updateOptionsMock };
 }
@@ -209,7 +209,7 @@ describe('TextOverlaySettingsBubble', () => {
   it('should be positioned lower if mirador-image-tools is enabled', () => {
     renderSettings({ imageToolsEnabled: true });
     expect(
-      screen.getByLabelText('expandTextOverlayOptions').parentElement.parentElement
+      screen.getByLabelText('expandTextOverlayOptions').parentElement.parentElement,
     ).toHaveStyle('top: 66px');
   });
 
