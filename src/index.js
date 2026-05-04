@@ -4,24 +4,17 @@ import MiradorTextOverlay from './components/MiradorTextOverlay';
 import OverlaySettings from './components/settings/OverlaySettings';
 import { textsReducer } from './state/reducers';
 import textSaga from './state/sagas';
-import { getTextsForVisibleCanvases, getWindowTextOverlayOptions } from './state/selectors';
+import {
+  getPageTexts,
+  getTextsForVisibleCanvases,
+  getWindowTextOverlayOptions,
+} from './state/selectors';
 
 const plugin = [
   {
     component: MiradorTextOverlay,
     mapStateToProps: (state, { windowId }) => ({
-      pageTexts: getTextsForVisibleCanvases(state, { windowId }).map((canvasText) => {
-        if (canvasText === undefined || canvasText.isFetching) {
-          return undefined;
-        }
-
-        return {
-          ...canvasText.text,
-          source: canvasText.source,
-          textColor: canvasText.textColor,
-          bgColor: canvasText.bgColor,
-        };
-      }),
+      pageTexts: getPageTexts(state, { windowId }),
       windowId,
       ...getWindowTextOverlayOptions(state, { windowId }),
     }),

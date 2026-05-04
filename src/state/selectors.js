@@ -39,3 +39,21 @@ export const getTextsForVisibleCanvases = createSelector(
     return texts;
   },
 );
+
+function toPageText(canvasText) {
+  if (canvasText === undefined || canvasText.isFetching) {
+    return undefined;
+  }
+
+  return {
+    ...canvasText.text,
+    source: canvasText.source,
+    textColor: canvasText.textColor,
+    bgColor: canvasText.bgColor,
+  };
+}
+
+/** Selector for overlay-ready text props on all visible canvases */
+export const getPageTexts = createSelector([getTextsForVisibleCanvases], (texts) =>
+  texts.map(toPageText),
+);
