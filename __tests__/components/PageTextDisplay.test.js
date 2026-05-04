@@ -3,6 +3,7 @@ import React from 'react';
 import { describe, it, jest, expect } from '@jest/globals';
 import { fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 import PageTextDisplay from '../../src/components/PageTextDisplay';
 
@@ -74,7 +75,7 @@ describe('PageTextDisplay', () => {
     );
   });
 
-  it('should not re-render by itself when the opacity changes', () => {
+  it('should re-render when the opacity changes', () => {
     const { rerender } = renderPage();
     expect(screen.getByText(svgTextMatcher('a firstWord on a line'))).toHaveAttribute(
       'style',
@@ -83,7 +84,7 @@ describe('PageTextDisplay', () => {
     renderPage({ opacity: 0.25 }, rerender);
     expect(screen.getByText(svgTextMatcher('a firstWord on a line'))).toHaveAttribute(
       'style',
-      'fill: rgba(0, 0, 0, 0.75);',
+      'fill: rgba(0, 0, 0, 0.25);',
     );
   });
 
@@ -182,5 +183,42 @@ describe('PageTextDisplay', () => {
     container
       .querySelectorAll('rect')
       .forEach((rect) => expect(rect).toHaveAttribute('style', 'fill: rgba(255, 255, 255, 0.75);'));
+  });
+
+  it('should preserve the latest visibility across theme rerenders', () => {
+    const pageRef = React.createRef();
+    const renderElement = (theme, props = {}) => (
+      <ThemeProvider theme={theme}>
+        <PageTextDisplay
+          ref={pageRef}
+          selectable
+          visible={false}
+          opacity={0.75}
+          width={2100}
+          height={2970}
+          source="http://example.com/page/1"
+          lines={lineFixtures.withSpans}
+          bgColor="#ffffff"
+          textColor="#000000"
+          useAutoColors={false}
+          {...props}
+        />
+      </ThemeProvider>
+    );
+
+    const firstTheme = createTheme();
+    const secondTheme = createTheme({
+      textOverlay: { overlayFont: 'serif' },
+    });
+    const { rerender } = render(renderElement(firstTheme));
+    const firstLine = screen.getByText(svgTextMatcher('a firstWord on a line'));
+
+    pageRef.current.updateColors('#000000', '#ffffff', 0.75);
+    expect(firstLine).toHaveAttribute('style', 'fill: rgba(0, 0, 0, 0.75);');
+
+    rerender(renderElement(firstTheme, { visible: true }));
+    rerender(renderElement(secondTheme, { visible: true }));
+
+    expect(firstLine).toHaveAttribute('style', 'fill: rgba(0, 0, 0, 0.75);');
   });
 });

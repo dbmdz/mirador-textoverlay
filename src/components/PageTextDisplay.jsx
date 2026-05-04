@@ -220,7 +220,31 @@ PageTextDisplay.defaultProps = {
   pageColors: undefined,
 };
 
-export default memo(
-  PageTextDisplay,
-  (prevProps, nextProps) => nextProps.source === prevProps.source,
-);
+function sameAutoColors(prevPageColors, nextPageColors) {
+  if (prevPageColors === nextPageColors) {
+    return true;
+  }
+
+  return (
+    prevPageColors?.textColor === nextPageColors?.textColor &&
+    prevPageColors?.bgColor === nextPageColors?.bgColor
+  );
+}
+
+function sameProps(prevProps, nextProps) {
+  return (
+    prevProps.source === nextProps.source &&
+    prevProps.lines === nextProps.lines &&
+    prevProps.width === nextProps.width &&
+    prevProps.height === nextProps.height &&
+    prevProps.opacity === nextProps.opacity &&
+    prevProps.selectable === nextProps.selectable &&
+    prevProps.visible === nextProps.visible &&
+    prevProps.textColor === nextProps.textColor &&
+    prevProps.bgColor === nextProps.bgColor &&
+    prevProps.useAutoColors === nextProps.useAutoColors &&
+    sameAutoColors(prevProps.pageColors, nextProps.pageColors)
+  );
+}
+
+export default memo(PageTextDisplay, sameProps);
