@@ -29,6 +29,10 @@ const pluginConfig = {
   server: {
     open: true,
   },
+  test: {
+    environment: 'jsdom',
+    setupFiles: './vitest.setup.js',
+  },
 };
 
 const demoConfig = {
@@ -43,6 +47,10 @@ const demoConfig = {
   plugins: [react()],
   server: {
     open: true,
+  },
+  test: {
+    environment: 'jsdom',
+    setupFiles: './vitest.setup.js',
   },
 };
 

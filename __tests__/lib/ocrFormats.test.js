@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { describe, it, jest, expect } from '@jest/globals';
+import { describe, expect, it, vi } from 'vitest';
 
 import { parseOcr, parseAlto, parseHocr, parseIiifAnnotations } from '../../src/lib/ocrFormats';
 
@@ -107,7 +107,7 @@ describe('parsing hOCR', () => {
 
   it('should warn when the aspect ratio of the reference dimensions does not match that of the page', () => {
     const origWarn = console.warn;
-    const mockWarn = jest.fn();
+    const mockWarn = vi.fn();
     console.warn = mockWarn;
     parseHocr(hocrMarkup, { height: 1792, width: 1000 });
     console.warn = origWarn;

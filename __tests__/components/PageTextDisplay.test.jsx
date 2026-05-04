@@ -1,9 +1,8 @@
 import React from 'react';
 
-import { describe, it, jest, expect } from '@jest/globals';
 import { fireEvent, render, screen } from '@testing-library/react';
-import '@testing-library/jest-dom/extend-expect';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { describe, expect, it, vi } from 'vitest';
 
 import PageTextDisplay from '../../src/components/PageTextDisplay';
 
@@ -102,14 +101,14 @@ describe('PageTextDisplay', () => {
   });
 
   it('should correctly apply transformations to svg container', () => {
-    const { ref } = renderPage();
+    const { container, ref } = renderPage();
     // FIXME: We should be able to use the container provided by RTL for this,
     //        but its transform style remains empty after calling updateTransforms
     //        for some mysterious reason :-/
-    const container = ref.current.containerRef.current;
-    expect(container.style.transform).toEqual('');
+    const overlayContainer = container.firstChild;
+    expect(overlayContainer.style.transform).toEqual('');
     ref.current.updateTransforms(0.5, 200, 600);
-    expect(container.style.transform).toEqual('translate(-625px, -1042.5px) scale(0.5)');
+    expect(overlayContainer.style.transform).toEqual('translate(-625px, -1042.5px) scale(0.5)');
   });
 
   it('should correctly set opacity to all rect and text elements', () => {
@@ -136,7 +135,7 @@ describe('PageTextDisplay', () => {
   });
 
   it('should prevent events from propagating to upper layers if selectability is enabled', () => {
-    const topCallback = jest.fn();
+    const topCallback = vi.fn();
     const { rerender, container } = renderPage({ selectable: false });
     container.addEventListener('pointerdown', topCallback);
     const firstLine = screen.getByText(svgTextMatcher('a firstWord on a line'));
@@ -156,11 +155,13 @@ describe('PageTextDisplay', () => {
   });
 
   it('should render spans as <text> elements when running under Gecko', () => {
-    const prevAgent = global.navigator.userAgent;
-    global.navigator.userAgent =
-      'Mozilla/5.0 (X11; Linux x86_64; rv:10.0) Gecko/20100101 Firefox/10.0';
+    const prevAgent = window.navigator.userAgent;
+    Object.defineProperty(window.navigator, 'userAgent', {
+      configurable: true,
+      value: 'Mozilla/5.0 (X11; Linux x86_64; rv:10.0) Gecko/20100101 Firefox/10.0',
+    });
     renderPage();
-    global.navigator.userAgent = prevAgent;
+    Object.defineProperty(window.navigator, 'userAgent', { configurable: true, value: prevAgent });
     const word = screen.getByText('firstWord');
     expect(word).not.toBeNull();
     expect(word.tagName).toEqual('text');

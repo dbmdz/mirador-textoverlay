@@ -67,7 +67,7 @@ export default function ColorWidget({
           color={textColor}
           title={t('textColor')}
           onChange={(color) => {
-            if (useAutoColors && color === toHexRgb(pageColors?.[0]?.bgColor)) {
+            if (useAutoColors && color === toHexRgb(pageColors?.[0]?.textColor)) {
               return;
             }
 

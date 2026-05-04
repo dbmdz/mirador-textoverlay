@@ -40,7 +40,7 @@ import textOverlayPlugin from 'mirador-textoverlay';
 const miradorConfig = {
   // Your Mirador configuration
 }
-Mirador.viewer(config, [...textOverlayPlugin]);
+Mirador.viewer(miradorConfig, [...textOverlayPlugin]);
 ```
 
 ## Development

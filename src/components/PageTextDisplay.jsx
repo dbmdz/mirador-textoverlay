@@ -209,6 +209,7 @@ PageTextDisplay.propTypes = {
   opacity: PropTypes.number.isRequired,
   pageColors: PropTypes.object,
   selectable: PropTypes.bool.isRequired,
+  slotIndex: PropTypes.number.isRequired,
   source: PropTypes.string.isRequired,
   textColor: PropTypes.string.isRequired,
   useAutoColors: PropTypes.bool.isRequired,
@@ -239,6 +240,7 @@ function sameProps(prevProps, nextProps) {
     prevProps.height === nextProps.height &&
     prevProps.opacity === nextProps.opacity &&
     prevProps.selectable === nextProps.selectable &&
+    prevProps.slotIndex === nextProps.slotIndex &&
     prevProps.visible === nextProps.visible &&
     prevProps.textColor === nextProps.textColor &&
     prevProps.bgColor === nextProps.bgColor &&
