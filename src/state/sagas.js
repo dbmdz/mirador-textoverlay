@@ -197,6 +197,15 @@ export function* onConfigChange({ payload, id: windowId }) {
   }
 }
 
+/** Discover OCR for canvases that become visible through view changes like book mode */
+export function* onVisibleCanvasesChange({ payload, id: windowId }) {
+  if (!payload.visibleCanvases?.length) {
+    return;
+  }
+
+  yield call(discoverExternalOcr, { visibleCanvases: payload.visibleCanvases, windowId });
+}
+
 /** Inject translation keys for this plugin into thte config */
 /** @returns {Generator} */
 export function* injectTranslations() {
@@ -263,6 +272,7 @@ export default function* textSaga() {
     takeEvery(ActionTypes.RECEIVE_ANNOTATION, processTextsFromAnnotations),
     takeEvery(ActionTypes.SET_CANVAS, discoverExternalOcr),
     takeEvery(ActionTypes.UPDATE_WINDOW, onConfigChange),
+    takeEvery(ActionTypes.UPDATE_WINDOW, onVisibleCanvasesChange),
     takeEvery(PluginActionTypes.REQUEST_TEXT, fetchAndProcessOcr),
     takeEvery(PluginActionTypes.REQUEST_COLORS, fetchColors),
   ]);

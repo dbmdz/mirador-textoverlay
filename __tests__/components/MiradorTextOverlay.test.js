@@ -48,6 +48,12 @@ class MockOpenSeadragon {
     this.handlers[evt] = handler;
   };
 
+  removeHandler = jest.fn((evt, handler) => {
+    if (this.handlers[evt] === handler) {
+      delete this.handlers[evt];
+    }
+  });
+
   viewport = {
     getBounds: jest.fn(() => ({ x: -10, y: -20 })),
     getFlip: jest.fn(() => false),
@@ -67,6 +73,7 @@ class MockOpenSeadragon {
 }
 
 const mockCanvasWorld = {
+  canvasIds: ['canvasA', 'canvasB'],
   canvasDimensions: [
     { width: 200, height: 200 },
     { width: 200, height: 200 },
@@ -117,6 +124,16 @@ describe('MiradorTextOverlay', () => {
     // Text should be invisible before the first update
     expect(firstLine).not.toBeVisible();
     expect(firstWord).not.toBeVisible();
+  });
+
+  it('should register viewport updates when enabled after mount', () => {
+    const viewer = new MockOpenSeadragon();
+    const { rerender } = renderOverlay({ enabled: false, pageTexts, viewer });
+    expect(viewer.handlers['update-viewport']).toBeUndefined();
+
+    renderOverlay({ enabled: true, pageTexts, viewer }, rerender);
+
+    expect(viewer.handlers['update-viewport']).toBeDefined();
   });
 
   it('should correctly update the scale and positions of the overlay container when OSD updates', () => {
@@ -199,6 +216,52 @@ describe('MiradorTextOverlay', () => {
     });
     expect(getByText(props.viewer.canvas, 'firstWord').parentElement).toHaveStyle({
       fill: 'rgba(34, 35, 51, 0.75)',
+    });
+  });
+
+  it('should unregister viewport updates when unmounting', () => {
+    const viewer = new MockOpenSeadragon();
+    const { unmount } = renderOverlay({ pageTexts, viewer });
+    const handler = viewer.handlers['update-viewport'];
+
+    expect(handler).toBeDefined();
+
+    unmount();
+
+    expect(viewer.removeHandler).toHaveBeenCalledWith('update-viewport', handler);
+    expect(viewer.handlers['update-viewport']).toBeUndefined();
+  });
+
+  it('should update overlay positions when the canvas world changes but the rendered text count stays the same', () => {
+    const viewer = new MockOpenSeadragon();
+    viewer.world.getItemCount.mockReturnValue(1);
+    const singleCanvasWorld = {
+      canvasIds: ['canvasA'],
+      canvasDimensions: [{ width: 200, height: 200 }],
+    };
+    const singlePageTexts = [pageTexts[0]];
+    const { rerender } = renderOverlay({
+      canvasWorld: singleCanvasWorld,
+      pageTexts: singlePageTexts,
+      viewer,
+    });
+
+    viewer.handlers['update-viewport']();
+    let overlays = Array.of(...viewer.canvas.querySelectorAll('div > svg:first-of-type')).map(
+      (e) => e.parentElement,
+    );
+    expect(overlays[0]).toHaveStyle({
+      transform: 'translate(52.95000000000001px, 72.9px) scale(1.33)',
+    });
+
+    viewer.world.getItemCount.mockReturnValue(2);
+    renderOverlay({ canvasWorld: mockCanvasWorld, pageTexts: [undefined, pageTexts[0]], viewer }, rerender);
+
+    overlays = Array.of(...viewer.canvas.querySelectorAll('div > svg:first-of-type')).map(
+      (e) => e.parentElement,
+    );
+    expect(overlays[0]).toHaveStyle({
+      transform: 'translate(451.95000000000005px, 72.9px) scale(1.33)',
     });
   });
 });

@@ -17,6 +17,7 @@ class MiradorTextOverlay extends Component {
 
     this.renderRefs = [React.createRef(), React.createRef()];
     this.containerRef = React.createRef();
+    this.onUpdateViewportHandler = this.onUpdateViewport.bind(this);
   }
 
   /** Register OpenSeadragon callback on initial mount */
@@ -28,6 +29,11 @@ class MiradorTextOverlay extends Component {
     this.patchAnnotationOverlay();
   }
 
+  /** Remove OpenSeadragon callback when unmounting */
+  componentWillUnmount() {
+    this.unregisterOsdCallback();
+  }
+
   /** Register OpenSeadragon callback when viewport changes */
   componentDidUpdate(prevProps) {
     const { enabled, viewer, pageTexts, textColor, bgColor, useAutoColors, visible, selectable } =
@@ -36,17 +42,23 @@ class MiradorTextOverlay extends Component {
 
     this.patchAnnotationOverlay();
 
-    // OSD instance becomes available, register callback
-    if (enabled && viewer && viewer !== prevProps.viewer) {
-      this.registerOsdCallback();
+    const viewerChanged = viewer !== prevProps.viewer;
+    if (prevProps.enabled && prevProps.viewer && (viewerChanged || !enabled)) {
+      this.unregisterOsdCallback(prevProps.viewer);
     }
+
+    if (enabled && viewer && (viewerChanged || !prevProps.enabled)) {
+      this.registerOsdCallback(viewer);
+    }
+
     // Newly enabled, force initial setting of state from OSD
-    const newlyEnabled =
+    const viewportChanged =
       (this.shouldRender() && !this.shouldRender(prevProps)) ||
+      canvasWorldChanged(prevProps.canvasWorld, this.props.canvasWorld) ||
       pageTexts.filter(this.shouldRenderPage).length !==
         prevProps.pageTexts.filter(this.shouldRenderPage).length;
 
-    if (newlyEnabled) {
+    if (viewportChanged) {
       this.onUpdateViewport();
     }
 
@@ -161,9 +173,13 @@ class MiradorTextOverlay extends Component {
   }
 
   /** Update container dimensions and page scale/offset every time the OSD viewport changes. */
-  registerOsdCallback() {
-    const { viewer } = this.props;
-    viewer.addHandler('update-viewport', this.onUpdateViewport.bind(this));
+  registerOsdCallback(viewer = this.props.viewer) {
+    viewer.addHandler('update-viewport', this.onUpdateViewportHandler);
+  }
+
+  /** Remove OpenSeadragon viewport callback */
+  unregisterOsdCallback(viewer = this.props.viewer) {
+    viewer?.removeHandler?.('update-viewport', this.onUpdateViewportHandler);
   }
 
   /**
@@ -285,3 +301,18 @@ MiradorTextOverlay.defaultProps = {
 };
 
 export default MiradorTextOverlay;
+
+function canvasWorldChanged(prevCanvasWorld, nextCanvasWorld) {
+  if (prevCanvasWorld === nextCanvasWorld) {
+    return false;
+  }
+
+  const prevCanvasIds = prevCanvasWorld?.canvasIds ?? [];
+  const nextCanvasIds = nextCanvasWorld?.canvasIds ?? [];
+
+  if (prevCanvasIds.length !== nextCanvasIds.length) {
+    return true;
+  }
+
+  return prevCanvasIds.some((canvasId, idx) => canvasId !== nextCanvasIds[idx]);
+}

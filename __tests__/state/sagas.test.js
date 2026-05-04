@@ -27,6 +27,7 @@ import {
   fetchAnnotationResource,
   processTextsFromAnnotations,
   onConfigChange,
+  onVisibleCanvasesChange,
   fetchColors,
   loadImageData,
 } from '../../src/state/sagas';
@@ -360,6 +361,28 @@ describe('Reacting to configuration changes', () => {
       .put(requestText('canvasA', 'sourceA', { width: 1000, height: 2000 }))
       .put(requestText('canvasB', 'sourceB', { width: 1500, height: 3000 }))
       .run());
+});
+
+describe('Reacting to visible canvas changes', () => {
+  const windowId = 'window';
+
+  it('should trigger OCR discovery for newly visible canvases', () =>
+    expectSaga(onVisibleCanvasesChange, {
+      id: windowId,
+      payload: { visibleCanvases: ['canvasA', 'canvasB'] },
+    })
+      .provide([
+        [call(discoverExternalOcr, { visibleCanvases: ['canvasA', 'canvasB'], windowId }), {}],
+      ])
+      .call(discoverExternalOcr, { visibleCanvases: ['canvasA', 'canvasB'], windowId })
+      .run());
+
+  it('should do nothing when visible canvases are not part of the update payload', () =>
+    expectSaga(onVisibleCanvasesChange, { id: windowId, payload: {} })
+      .run()
+      .then(({ effects }) => {
+        expect(effects.call).toBeUndefined();
+      }));
 });
 
 describe('Fetching page colors', () => {
