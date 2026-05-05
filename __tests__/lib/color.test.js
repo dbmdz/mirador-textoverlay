@@ -1,3 +1,5 @@
+import { describe, expect, it } from 'vitest';
+
 import { toHexRgb, getPageColors } from '../../src/lib/color';
 
 describe('toHexRgb', () => {
@@ -16,7 +18,7 @@ describe('getPageColors', () => {
   it('should be able to determine foreground and background from 4-pixel mock image', () => {
     const mockData = [255, 255, 255, 255, 0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255];
     const { textColor, bgColor } = getPageColors(mockData);
-    expect(textColor).toEqual('rgb(0,0,0)');
-    expect(bgColor).toEqual('rgb(255,255,255)');
+    expect(textColor).toEqual('rgb(255,255,255)');
+    expect(bgColor).toEqual('rgb(0,0,0)');
   });
 });

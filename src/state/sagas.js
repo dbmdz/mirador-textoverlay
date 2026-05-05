@@ -1,31 +1,30 @@
-/* eslint-disable no-underscore-dangle */
-import uniq from 'lodash/uniq';
-import { all, call, put, select, take, takeEvery, race } from 'redux-saga/effects';
 import fetch from 'isomorphic-unfetch';
-
-import ActionTypes from 'mirador/dist/es/src/state/actions/action-types';
-import { receiveAnnotation, updateConfig } from 'mirador/dist/es/src/state/actions';
+import uniq from 'lodash/uniq';
 import {
+  ActionTypes,
   getCanvases,
-  getWindowConfig,
   getVisibleCanvases,
+  getWindowConfig,
+  MiradorCanvas,
+  receiveAnnotation,
   selectInfoResponse,
-} from 'mirador/dist/es/src/state/selectors';
-import MiradorCanvas from 'mirador/dist/es/src/lib/MiradorCanvas';
+  updateConfig,
+} from 'mirador';
+import { all, call, put, race, select, take, takeEvery } from 'redux-saga/effects';
 
+import { getPageColors } from '../lib/color';
+import { parseIiifAnnotations, parseOcr } from '../lib/ocrFormats';
+import translations from '../locales';
 import {
+  discoveredText,
   PluginActionTypes,
-  requestText,
+  receiveColors,
   receiveText,
   receiveTextFailure,
-  discoveredText,
   requestColors,
-  receiveColors,
+  requestText,
 } from './actions';
 import { getTexts, getTextsForVisibleCanvases } from './selectors';
-import translations from '../locales';
-import { parseIiifAnnotations, parseOcr } from '../lib/ocrFormats';
-import { getPageColors } from '../lib/color';
 
 const charFragmentPattern = /^(.+)#char=(\d+),(\d+)$/;
 
@@ -44,7 +43,7 @@ const isAlto = (resource) =>
   resource &&
   (resource.format === 'application/xml+alto' ||
     resource.format === 'application/alto+xml' ||
-    (resource.profile && resource.profile.startsWith('http://www.loc.gov/standards/alto/')));
+    resource.profile?.startsWith('http://www.loc.gov/standards/alto/'));
 
 /** Checks if a given resource points to an hOCR document */
 const isHocr = (resource) =>
@@ -76,15 +75,13 @@ export function* discoverExternalOcr({ visibleCanvases: visibleCanvasIds, window
   // seem to do anything :-/
   for (const canvas of visibleCanvases) {
     const { width, height } = canvas.__jsonld;
-    const seeAlso = (Array.isArray(canvas.__jsonld.seeAlso)
-      ? canvas.__jsonld.seeAlso
-      : [canvas.__jsonld.seeAlso]
+    const seeAlso = (
+      Array.isArray(canvas.__jsonld.seeAlso) ? canvas.__jsonld.seeAlso : [canvas.__jsonld.seeAlso]
     ).filter((res) => isAlto(res) || isHocr(res))[0];
     if (seeAlso !== undefined) {
       const ocrSource = seeAlso['@id'];
       const alreadyHasText = texts[canvas.id]?.source === ocrSource;
       if (alreadyHasText) {
-        // eslint-disable-next-line no-continue
         continue;
       }
       if (selectable || visible) {
@@ -124,12 +121,13 @@ export async function fetchAnnotationResource(url) {
 }
 
 /** Saga for fetching external annotation resources */
+/** @returns {Generator} */
 export function* fetchExternalAnnotationResources({ targetId, annotationId, annotationJson }) {
   if (!annotationJson.resources.some(hasExternalResource)) {
     return;
   }
   const resourceUris = uniq(
-    annotationJson.resources.map((anno) => anno.resource['@id'].split('#')[0])
+    annotationJson.resources.map((anno) => anno.resource['@id'].split('#')[0]),
   );
   const contents = yield all(resourceUris.map((uri) => call(fetchAnnotationResource, uri)));
   const contentMap = Object.fromEntries(contents.map((c) => [c.id ?? c['@id'], c]));
@@ -148,7 +146,7 @@ export function* fetchExternalAnnotationResources({ targetId, annotationId, anno
     return { ...anno, resource: { ...anno.resource, value: partialContent } };
   });
   yield put(
-    receiveAnnotation(targetId, annotationId, { ...annotationJson, resources: completedAnnos })
+    receiveAnnotation(targetId, annotationId, { ...annotationJson, resources: completedAnnos }),
   );
 }
 
@@ -160,7 +158,7 @@ export function* processTextsFromAnnotations({ targetId, annotationId, annotatio
     (anno) =>
       anno.motivation === 'supplementing' || // IIIF 3.0
       anno.resource['@type']?.toLowerCase() === 'cnt:contentastext' || // IIIF 2.0
-      ['Line', 'Word'].indexOf(anno.dcType) >= 0 // Europeana IIIF 2.0
+      ['Line', 'Word'].indexOf(anno.dcType) >= 0, // Europeana IIIF 2.0
   );
 
   if (contentAsTextAnnos.length > 0) {
@@ -178,7 +176,7 @@ export function* onConfigChange({ payload, id: windowId }) {
   const texts = yield select(getTextsForVisibleCanvases, { windowId });
   // Check if any of the texts need fetching
   const needFetching = texts.filter(
-    ({ sourceType, text }) => sourceType === 'ocr' && text === undefined
+    ({ sourceType, text }) => sourceType === 'ocr' && text === undefined,
   );
   // Check if we need to discover external OCR
   const needsDiscovery =
@@ -191,7 +189,7 @@ export function* onConfigChange({ payload, id: windowId }) {
     needFetching.map(({ canvasId, source }) => {
       const { width, height } = visibleCanvases.find((c) => c.id === canvasId).__jsonld;
       return put(requestText(canvasId, source, { height, width }));
-    })
+    }),
   );
   if (needsDiscovery) {
     const canvasIds = visibleCanvases.map((c) => c.id);
@@ -199,12 +197,22 @@ export function* onConfigChange({ payload, id: windowId }) {
   }
 }
 
+/** Discover OCR for canvases that become visible through view changes like book mode */
+export function* onVisibleCanvasesChange({ payload, id: windowId }) {
+  if (!payload.visibleCanvases?.length) {
+    return;
+  }
+
+  yield call(discoverExternalOcr, { visibleCanvases: payload.visibleCanvases, windowId });
+}
+
 /** Inject translation keys for this plugin into thte config */
+/** @returns {Generator} */
 export function* injectTranslations() {
   yield put(
     updateConfig({
       translations,
-    })
+    }),
   );
 }
 
@@ -215,7 +223,10 @@ export async function loadImageData(imgUrl) {
     img.crossOrigin = 'Anonymous';
     img.onload = () => {
       const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
       const ctx = canvas.getContext('2d');
+      ctx.imageSmoothingEnabled = false;
       ctx.drawImage(img, 0, 0);
       resolve(ctx.getImageData(0, 0, img.width, img.height).data);
     };
@@ -232,7 +243,7 @@ export function* fetchColors({ targetId, infoId }) {
     const { success: infoSuccess, failure: infoFailure } = yield race({
       success: take((a) => a.type === ActionTypes.RECEIVE_INFO_RESPONSE && a.infoId === infoId),
       failure: take(
-        (a) => a.type === ActionTypes.RECEIVE_INFO_RESPONSE_FAILURE && a.infoId === infoId
+        (a) => a.type === ActionTypes.RECEIVE_INFO_RESPONSE_FAILURE && a.infoId === infoId,
       ),
     });
     if (infoFailure) {
@@ -243,7 +254,7 @@ export function* fetchColors({ targetId, infoId }) {
   try {
     // FIXME: This assumes a Level 2 endpoint, we should probably use one of the sizes listed
     //        explicitely in the info response instead.
-    const imgUrl = `${serviceId}/full/200,/0/default.jpg`;
+    const imgUrl = `${serviceId}/full/256,/0/default.jpg`;
     const imgData = yield call(loadImageData, imgUrl);
     const { textColor, bgColor } = yield call(getPageColors, imgData);
     yield put(receiveColors(targetId, textColor, bgColor));
@@ -261,6 +272,7 @@ export default function* textSaga() {
     takeEvery(ActionTypes.RECEIVE_ANNOTATION, processTextsFromAnnotations),
     takeEvery(ActionTypes.SET_CANVAS, discoverExternalOcr),
     takeEvery(ActionTypes.UPDATE_WINDOW, onConfigChange),
+    takeEvery(ActionTypes.UPDATE_WINDOW, onVisibleCanvasesChange),
     takeEvery(PluginActionTypes.REQUEST_TEXT, fetchAndProcessOcr),
     takeEvery(PluginActionTypes.REQUEST_COLORS, fetchColors),
   ]);

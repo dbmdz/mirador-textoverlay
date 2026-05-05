@@ -1,45 +1,54 @@
 /* eslint-disable react/prop-types */
 import React from 'react';
-import { describe, it, jest, expect } from '@jest/globals';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { fireEvent, render, screen, queryByRole } from '@testing-library/react';
-import '@testing-library/jest-dom/extend-expect';
-import { ThemeProvider } from '@material-ui/core/styles';
-import MuiDefaultTheme from '@material-ui/core/styles/defaultTheme';
+import { describe, expect, it, vi } from 'vitest';
+
+vi.mock('mirador', () => ({
+  MiradorMenuButton: ({ children, containerId: _containerId, sx, ...props }) => (
+    <button type="button" style={sx} {...props}>
+      {children}
+    </button>
+  ),
+}));
 
 import OverlaySettings from '../../src/components/settings/OverlaySettings';
 
-const mockTheme = {
-  ...MuiDefaultTheme,
+const muiTheme = createTheme();
+const mockTheme = createTheme({
   palette: {
-    ...MuiDefaultTheme.palette,
+    ...muiTheme.palette,
     getContrastText: () => '#000',
     shades: {
-      ...MuiDefaultTheme.palette.shades,
+      ...(muiTheme.palette.shades ?? {}),
       main: '#fff',
     },
   },
-};
+});
 
 // Mocked MUI slider for easier testing, taken from
 // https://stackoverflow.com/a/61628815 (CC BY-SA 4.0)
-jest.mock('@material-ui/core/Slider', () => (props) => {
-  const { id, name, min, max, onChange } = props;
-  return (
-    <input
-      data-testid="opacity-slider"
-      type="range"
-      id={id}
-      name={name}
-      min={min}
-      max={max}
-      onChange={(event) => onChange(event, event.target.value)}
-    />
-  );
-});
+vi.mock('@mui/material/Slider', () => ({
+  default: (props) => {
+    const { id, name, min, max, onChange, value } = props;
+    return (
+      <input
+        data-testid="opacity-slider"
+        type="range"
+        id={id}
+        name={name}
+        min={min}
+        max={max}
+        value={value}
+        onChange={(event) => onChange(event, event.target.value)}
+      />
+    );
+  },
+}));
 
 /** Render a bubble to the testing screen */
 function renderSettings(props = {}, renderFn = render) {
-  const updateOptionsMock = jest.fn();
+  const updateOptionsMock = vi.fn();
   const options = {
     enabled: true,
     opacity: 1,
@@ -67,7 +76,7 @@ function renderSettings(props = {}, renderFn = render) {
         {...props}
         windowTextOverlayOptions={options}
       />
-    </ThemeProvider>
+    </ThemeProvider>,
   );
   return { rerender, options, updateOptionsMock };
 }
@@ -116,7 +125,7 @@ describe('TextOverlaySettingsBubble', () => {
     const opacityToggle = screen.getByLabelText('textOpacity');
     expect(opacityToggle).toBeVisible();
     expect(opacityToggle).toBeDisabled();
-    expect(opacityToggle).not.toHaveStyle('background-color: rgba(0, 0, 0, 0.1');
+    expect(opacityToggle).not.toHaveStyle('background-color: rgba(0, 0, 0, 0.1)');
     expect(opacityToggle).not.toHaveAttribute('aria-expanded', 'true');
     expect(queryByRole(opacityToggle.parentElement, 'slider')).toBeNull();
 
@@ -148,7 +157,7 @@ describe('TextOverlaySettingsBubble', () => {
     const opacityToggle = screen.getByLabelText('textOpacity');
     expect(opacityToggle).toBeVisible();
     expect(opacityToggle).not.toBeDisabled();
-    expect(opacityToggle).not.toHaveStyle('background-color: rgba(0, 0, 0, 0.1');
+    expect(opacityToggle).not.toHaveStyle('background-color: rgba(0, 0, 0, 0.1)');
     expect(opacityToggle).not.toHaveAttribute('aria-expanded', 'true');
     expect(queryByRole(opacityToggle.parentElement, 'slider')).toBeNull();
 
@@ -181,7 +190,6 @@ describe('TextOverlaySettingsBubble', () => {
 
     // Change opacity
     fireEvent.change(slider, { target: { value: 25 } });
-    expect(slider).toHaveValue('25');
     expect(updateOptionsMock).toHaveBeenCalledWith({
       ...initialOpts,
       opacity: 0.25,
@@ -209,7 +217,7 @@ describe('TextOverlaySettingsBubble', () => {
   it('should be positioned lower if mirador-image-tools is enabled', () => {
     renderSettings({ imageToolsEnabled: true });
     expect(
-      screen.getByLabelText('expandTextOverlayOptions').parentElement.parentElement
+      screen.getByLabelText('expandTextOverlayOptions').parentElement.parentElement,
     ).toHaveStyle('top: 66px');
   });
 

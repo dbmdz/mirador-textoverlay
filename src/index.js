@@ -1,27 +1,20 @@
-import { updateWindow } from 'mirador/dist/es/src/state/actions';
-import { getWindowConfig, getContainerId } from 'mirador/dist/es/src/state/selectors';
+import { getContainerId, getWindowConfig, updateWindow } from 'mirador';
 
-import { textsReducer } from './state/reducers';
-import textSaga from './state/sagas';
-import { getTextsForVisibleCanvases, getWindowTextOverlayOptions } from './state/selectors';
 import MiradorTextOverlay from './components/MiradorTextOverlay';
 import OverlaySettings from './components/settings/OverlaySettings';
+import { textsReducer } from './state/reducers';
+import textSaga from './state/sagas';
+import {
+  getPageTexts,
+  getTextsForVisibleCanvases,
+  getWindowTextOverlayOptions,
+} from './state/selectors';
 
-export default [
+const plugin = [
   {
     component: MiradorTextOverlay,
     mapStateToProps: (state, { windowId }) => ({
-      pageTexts: getTextsForVisibleCanvases(state, { windowId }).map((canvasText) => {
-        if (canvasText === undefined || canvasText.isFetching) {
-          return undefined;
-        }
-        return {
-          ...canvasText.text,
-          source: canvasText.source,
-          textColor: canvasText.textColor,
-          bgColor: canvasText.bgColor,
-        };
-      }),
+      pageTexts: getPageTexts(state, { windowId }),
       windowId,
       ...getWindowTextOverlayOptions(state, { windowId }),
     }),
@@ -40,14 +33,20 @@ export default [
     }),
     mapStateToProps: (state, { windowId }) => {
       const { imageToolsEnabled = false } = getWindowConfig(state, { windowId });
+
       return {
         containerId: getContainerId(state),
         imageToolsEnabled,
-        textsAvailable: getTextsForVisibleCanvases(state, { windowId }).length > 0,
-        textsFetching: getTextsForVisibleCanvases(state, { windowId }).some((t) => t?.isFetching),
         pageColors: getTextsForVisibleCanvases(state, { windowId })
-          .filter((p) => p !== undefined)
-          .map(({ textColor, bgColor }) => ({ textColor, bgColor })),
+          .filter((page) => page !== undefined)
+          .map(({ textColor, bgColor }) => ({
+            textColor,
+            bgColor,
+          })),
+        textsAvailable: getTextsForVisibleCanvases(state, { windowId }).length > 0,
+        textsFetching: getTextsForVisibleCanvases(state, { windowId }).some(
+          (text) => text?.isFetching,
+        ),
         windowTextOverlayOptions: getWindowTextOverlayOptions(state, { windowId }),
       };
     },
@@ -55,3 +54,5 @@ export default [
     target: 'OpenSeadragonViewer',
   },
 ];
+
+export default plugin;

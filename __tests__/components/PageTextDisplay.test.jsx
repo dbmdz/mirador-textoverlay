@@ -1,8 +1,8 @@
 import React from 'react';
 
-import { describe, it, jest, expect } from '@jest/globals';
 import { fireEvent, render, screen } from '@testing-library/react';
-import '@testing-library/jest-dom/extend-expect';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { describe, expect, it, vi } from 'vitest';
 
 import PageTextDisplay from '../../src/components/PageTextDisplay';
 
@@ -66,24 +66,24 @@ describe('PageTextDisplay', () => {
     renderPage({ visible: false });
     expect(screen.getByText(svgTextMatcher('a firstWord on a line'))).toHaveAttribute(
       'style',
-      'fill: rgba(0, 0, 0, 0);'
+      'fill: rgba(0, 0, 0, 0);',
     );
     expect(screen.getByText(svgTextMatcher('another secondWord on another line'))).toHaveAttribute(
       'style',
-      'fill: rgba(0, 0, 0, 0);'
+      'fill: rgba(0, 0, 0, 0);',
     );
   });
 
-  it('should not re-render by itself when the opacity changes', () => {
+  it('should re-render when the opacity changes', () => {
     const { rerender } = renderPage();
     expect(screen.getByText(svgTextMatcher('a firstWord on a line'))).toHaveAttribute(
       'style',
-      'fill: rgba(0, 0, 0, 0.75);'
+      'fill: rgba(0, 0, 0, 0.75);',
     );
     renderPage({ opacity: 0.25 }, rerender);
     expect(screen.getByText(svgTextMatcher('a firstWord on a line'))).toHaveAttribute(
       'style',
-      'fill: rgba(0, 0, 0, 0.75);'
+      'fill: rgba(0, 0, 0, 0.25);',
     );
   });
 
@@ -92,23 +92,23 @@ describe('PageTextDisplay', () => {
     expect(screen.getByText(svgTextMatcher('a firstWord on a line'))).not.toBeNull();
     renderPage(
       { source: 'http://example.com/pages/2', lines: lineFixtures.withoutSpans, opacity: 0.25 },
-      rerender
+      rerender,
     );
     expect(screen.getByText('a word on a line')).toHaveAttribute(
       'style',
-      'fill: rgba(0, 0, 0, 0.25);'
+      'fill: rgba(0, 0, 0, 0.25);',
     );
   });
 
   it('should correctly apply transformations to svg container', () => {
-    const { ref } = renderPage();
+    const { container, ref } = renderPage();
     // FIXME: We should be able to use the container provided by RTL for this,
     //        but its transform style remains empty after calling updateTransforms
     //        for some mysterious reason :-/
-    const container = ref.current.containerRef.current;
-    expect(container.style.transform).toEqual('');
+    const overlayContainer = container.firstChild;
+    expect(overlayContainer.style.transform).toEqual('');
     ref.current.updateTransforms(0.5, 200, 600);
-    expect(container.style.transform).toEqual('translate(-625px, -1042.5px) scale(0.5)');
+    expect(overlayContainer.style.transform).toEqual('translate(-625px, -1042.5px) scale(0.5)');
   });
 
   it('should correctly set opacity to all rect and text elements', () => {
@@ -135,7 +135,7 @@ describe('PageTextDisplay', () => {
   });
 
   it('should prevent events from propagating to upper layers if selectability is enabled', () => {
-    const topCallback = jest.fn();
+    const topCallback = vi.fn();
     const { rerender, container } = renderPage({ selectable: false });
     container.addEventListener('pointerdown', topCallback);
     const firstLine = screen.getByText(svgTextMatcher('a firstWord on a line'));
@@ -155,11 +155,13 @@ describe('PageTextDisplay', () => {
   });
 
   it('should render spans as <text> elements when running under Gecko', () => {
-    const prevAgent = global.navigator.userAgent;
-    global.navigator.userAgent =
-      'Mozilla/5.0 (X11; Linux x86_64; rv:10.0) Gecko/20100101 Firefox/10.0';
+    const prevAgent = window.navigator.userAgent;
+    Object.defineProperty(window.navigator, 'userAgent', {
+      configurable: true,
+      value: 'Mozilla/5.0 (X11; Linux x86_64; rv:10.0) Gecko/20100101 Firefox/10.0',
+    });
     renderPage();
-    global.navigator.userAgent = prevAgent;
+    Object.defineProperty(window.navigator, 'userAgent', { configurable: true, value: prevAgent });
     const word = screen.getByText('firstWord');
     expect(word).not.toBeNull();
     expect(word.tagName).toEqual('text');
@@ -182,5 +184,42 @@ describe('PageTextDisplay', () => {
     container
       .querySelectorAll('rect')
       .forEach((rect) => expect(rect).toHaveAttribute('style', 'fill: rgba(255, 255, 255, 0.75);'));
+  });
+
+  it('should preserve the latest visibility across theme rerenders', () => {
+    const pageRef = React.createRef();
+    const renderElement = (theme, props = {}) => (
+      <ThemeProvider theme={theme}>
+        <PageTextDisplay
+          ref={pageRef}
+          selectable
+          visible={false}
+          opacity={0.75}
+          width={2100}
+          height={2970}
+          source="http://example.com/page/1"
+          lines={lineFixtures.withSpans}
+          bgColor="#ffffff"
+          textColor="#000000"
+          useAutoColors={false}
+          {...props}
+        />
+      </ThemeProvider>
+    );
+
+    const firstTheme = createTheme();
+    const secondTheme = createTheme({
+      textOverlay: { overlayFont: 'serif' },
+    });
+    const { rerender } = render(renderElement(firstTheme));
+    const firstLine = screen.getByText(svgTextMatcher('a firstWord on a line'));
+
+    pageRef.current.updateColors('#000000', '#ffffff', 0.75);
+    expect(firstLine).toHaveAttribute('style', 'fill: rgba(0, 0, 0, 0.75);');
+
+    rerender(renderElement(firstTheme, { visible: true }));
+    rerender(renderElement(secondTheme, { visible: true }));
+
+    expect(firstLine).toHaveAttribute('style', 'fill: rgba(0, 0, 0, 0.75);');
   });
 });

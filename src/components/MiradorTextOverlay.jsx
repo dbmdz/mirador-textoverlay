@@ -1,6 +1,7 @@
+import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-import PropTypes from 'prop-types';
+
 import PageTextDisplay from './PageTextDisplay';
 
 /** Overlay that renders OCR or transcription text in a SVG.
@@ -14,8 +15,10 @@ class MiradorTextOverlay extends Component {
   constructor(props) {
     super(props);
 
-    this.renderRefs = [React.createRef(), React.createRef()];
+    this.renderRefs = [];
+    this.renderRefCallbacks = [];
     this.containerRef = React.createRef();
+    this.onUpdateViewportHandler = this.onUpdateViewport.bind(this);
   }
 
   /** Register OpenSeadragon callback on initial mount */
@@ -27,44 +30,46 @@ class MiradorTextOverlay extends Component {
     this.patchAnnotationOverlay();
   }
 
+  /** Remove OpenSeadragon callback when unmounting */
+  componentWillUnmount() {
+    this.unregisterOsdCallback();
+  }
+
   /** Register OpenSeadragon callback when viewport changes */
   componentDidUpdate(prevProps) {
-    const {
-      enabled,
-      viewer,
-      pageTexts,
-      textColor,
-      bgColor,
-      useAutoColors,
-      visible,
-      selectable,
-    } = this.props;
+    const { enabled, viewer, pageTexts, textColor, bgColor, useAutoColors, visible, selectable } =
+      this.props;
     let { opacity } = this.props;
 
     this.patchAnnotationOverlay();
 
-    // OSD instance becomes available, register callback
-    if (enabled && viewer && viewer !== prevProps.viewer) {
-      this.registerOsdCallback();
+    const viewerChanged = viewer !== prevProps.viewer;
+    if (prevProps.enabled && prevProps.viewer && (viewerChanged || !enabled)) {
+      this.unregisterOsdCallback(prevProps.viewer);
     }
+
+    if (enabled && viewer && (viewerChanged || !prevProps.enabled)) {
+      this.registerOsdCallback(viewer);
+    }
+
     // Newly enabled, force initial setting of state from OSD
-    const newlyEnabled =
+    const viewportChanged =
       (this.shouldRender() && !this.shouldRender(prevProps)) ||
+      canvasWorldChanged(prevProps.canvasWorld, this.props.canvasWorld) ||
       pageTexts.filter(this.shouldRenderPage).length !==
         prevProps.pageTexts.filter(this.shouldRenderPage).length;
 
-    if (newlyEnabled) {
+    if (viewportChanged) {
       this.onUpdateViewport();
     }
 
     if (selectable !== prevProps.selectable) {
       this.renderRefs
-        .filter((ref) => ref.current)
-        .forEach((ref) => ref.current.updateSelectability(selectable));
+        .filter(Boolean)
+        .forEach((instance) => instance.updateSelectability(selectable));
     }
 
     // Manually update SVG colors for performance reasons
-    // eslint-disable-next-line require-jsdoc
     const hasPageColors = (text = {}) => text.textColor !== undefined;
     if (
       visible !== prevProps.visible ||
@@ -78,7 +83,7 @@ class MiradorTextOverlay extends Component {
         opacity = 0;
       }
       this.renderRefs.forEach((ref, idx) => {
-        if (!ref.current) {
+        if (!ref) {
           return;
         }
         let fg = textColor;
@@ -90,7 +95,7 @@ class MiradorTextOverlay extends Component {
             bg = newBg;
           }
         }
-        ref.current.updateColors(fg, bg, opacity);
+        ref.updateColors(fg, bg, opacity);
       });
     }
   }
@@ -98,15 +103,23 @@ class MiradorTextOverlay extends Component {
   /** OpenSeadragon viewport update callback */
   onUpdateViewport() {
     // Do nothing if the overlay is not currently rendered
-    if (!this.shouldRender) {
+    if (!this.shouldRender()) {
       return;
     }
 
     const { viewer, canvasWorld } = this.props;
+    const canvasDimensions = canvasWorld?.canvasDimensions ?? [];
+    const baseItem = viewer.world.getItemAt(0);
+    if (!baseItem) {
+      return;
+    }
 
     // Determine new scale factor and position for each page
     const vpBounds = viewer.viewport.getBounds(true);
     const viewportZoom = viewer.viewport.getZoom(true);
+    const baseCanvasWidth = canvasDimensions[0]?.width || baseItem.source.dimensions.x;
+    const worldToScreenScale =
+      baseItem.viewportToImageZoom(viewportZoom) * (baseItem.source.dimensions.x / baseCanvasWidth);
     if (this.containerRef.current) {
       const { clientWidth: containerWidth, clientHeight: containerHeight } = viewer.container;
       const flip = viewer.viewport.getFlip();
@@ -134,25 +147,27 @@ class MiradorTextOverlay extends Component {
       }
       this.containerRef.current.style.transform = transforms.join(' ');
     }
-    for (let itemNo = 0; itemNo < viewer.world.getItemCount(); itemNo += 1) {
-      // Skip update if we don't have a reference to the PageTextDisplay instance
-      if (!this.renderRefs[itemNo].current) {
-        // eslint-disable-next-line no-continue
+    for (let itemNo = 0; itemNo < canvasDimensions.length; itemNo += 1) {
+      const renderRef = this.renderRefs[itemNo];
+      const page = this.props.pageTexts[itemNo];
+      const canvasDims = canvasDimensions[itemNo];
+      if (!renderRef) {
         continue;
       }
-      const img = viewer.world.getItemAt(itemNo);
-      const canvasDims = canvasWorld.canvasDimensions[itemNo];
-      const canvasWorldOffset =
-        itemNo > 0
-          ? img.source.dimensions.x -
-            canvasDims.width +
-            canvasWorld.canvasDimensions[itemNo - 1].width
-          : 0;
-      const canvasWorldScale = img.source.dimensions.x / canvasDims.width;
-      this.renderRefs[itemNo].current.updateTransforms(
-        img.viewportToImageZoom(viewportZoom),
-        vpBounds.x * canvasWorldScale - canvasWorldOffset,
-        vpBounds.y * canvasWorldScale
+      if (!page || !canvasDims?.width || !canvasDims?.height) {
+        continue;
+      }
+      const item = viewer.world.getItemAt(itemNo);
+      const sourceWidth =
+        canvasDims.canvas?.getWidth?.() ?? item?.source?.dimensions?.x ?? page.width;
+      const sourceHeight =
+        canvasDims.canvas?.getHeight?.() ?? item?.source?.dimensions?.y ?? page.height;
+      const canvasWorldScaleX = sourceWidth / canvasDims.width;
+      const canvasWorldScaleY = sourceHeight / canvasDims.height;
+      renderRef.updateTransforms(
+        worldToScreenScale / canvasWorldScaleX,
+        (vpBounds.x - (canvasDims.x ?? 0)) * canvasWorldScaleX,
+        (vpBounds.y - (canvasDims.y ?? 0)) * canvasWorldScaleY,
       );
     }
   }
@@ -170,9 +185,23 @@ class MiradorTextOverlay extends Component {
   }
 
   /** Update container dimensions and page scale/offset every time the OSD viewport changes. */
-  registerOsdCallback() {
-    const { viewer } = this.props;
-    viewer.addHandler('update-viewport', this.onUpdateViewport.bind(this));
+  registerOsdCallback(viewer = this.props.viewer) {
+    viewer.addHandler('update-viewport', this.onUpdateViewportHandler);
+  }
+
+  /** Remove OpenSeadragon viewport callback */
+  unregisterOsdCallback(viewer = this.props.viewer) {
+    viewer?.removeHandler?.('update-viewport', this.onUpdateViewportHandler);
+  }
+
+  /** Get stable callback ref for a visible canvas slot */
+  getRenderRef(idx) {
+    if (!this.renderRefCallbacks[idx]) {
+      this.renderRefCallbacks[idx] = (instance) => {
+        this.renderRefs[idx] = instance;
+      };
+    }
+    return this.renderRefCallbacks[idx];
   }
 
   /**
@@ -218,20 +247,12 @@ class MiradorTextOverlay extends Component {
 
   /** Render the text overlay SVG */
   render() {
-    const {
-      pageTexts,
-      selectable,
-      visible,
-      viewer,
-      opacity,
-      textColor,
-      bgColor,
-      useAutoColors,
-      fontFamily,
-    } = this.props;
+    const { pageTexts, selectable, visible, viewer, opacity, textColor, bgColor, useAutoColors } =
+      this.props;
     if (!this.shouldRender() || !viewer || !pageTexts) {
       return null;
     }
+    this.renderRefs.length = pageTexts.length;
     return ReactDOM.createPortal(
       <div
         ref={this.containerRef}
@@ -254,17 +275,17 @@ class MiradorTextOverlay extends Component {
           } = page;
           return (
             <PageTextDisplay
-              ref={this.renderRefs[idx]}
+              ref={this.getRenderRef(idx)}
               key={source}
               lines={lines}
               source={source}
               selectable={selectable}
+              slotIndex={idx}
               visible={visible}
               opacity={opacity}
               width={pageWidth}
               height={pageHeight}
               textColor={textColor}
-              fontFamily={fontFamily}
               bgColor={bgColor}
               useAutoColors={useAutoColors}
               pageColors={pageFg ? { textColor: pageFg, bgColor: pageBg } : undefined}
@@ -272,23 +293,22 @@ class MiradorTextOverlay extends Component {
           );
         })}
       </div>,
-      viewer.canvas
+      viewer.canvas,
     );
   }
 }
 
 MiradorTextOverlay.propTypes = {
-  canvasWorld: PropTypes.object, // eslint-disable-line react/forbid-prop-types
+  canvasWorld: PropTypes.object,
   enabled: PropTypes.bool,
   opacity: PropTypes.number,
-  pageTexts: PropTypes.array, // eslint-disable-line react/forbid-prop-types
+  pageTexts: PropTypes.array,
   selectable: PropTypes.bool,
-  viewer: PropTypes.object, // eslint-disable-line react/forbid-prop-types
-  visible: PropTypes.bool,
-  textColor: PropTypes.string,
-  fontFamily: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
   bgColor: PropTypes.string,
+  textColor: PropTypes.string,
   useAutoColors: PropTypes.bool,
+  viewer: PropTypes.object,
+  visible: PropTypes.bool,
 };
 
 MiradorTextOverlay.defaultProps = {
@@ -297,12 +317,26 @@ MiradorTextOverlay.defaultProps = {
   opacity: 0.75,
   pageTexts: undefined,
   selectable: true,
-  viewer: undefined,
-  visible: false,
   textColor: '#000000',
-  fontFamily: undefined,
   bgColor: '#ffffff',
   useAutoColors: true,
+  viewer: undefined,
+  visible: false,
 };
 
 export default MiradorTextOverlay;
+
+function canvasWorldChanged(prevCanvasWorld, nextCanvasWorld) {
+  if (prevCanvasWorld === nextCanvasWorld) {
+    return false;
+  }
+
+  const prevCanvasIds = prevCanvasWorld?.canvasIds ?? [];
+  const nextCanvasIds = nextCanvasWorld?.canvasIds ?? [];
+
+  if (prevCanvasIds.length !== nextCanvasIds.length) {
+    return true;
+  }
+
+  return prevCanvasIds.some((canvasId, idx) => canvasId !== nextCanvasIds[idx]);
+}

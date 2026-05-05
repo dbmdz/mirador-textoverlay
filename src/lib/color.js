@@ -1,11 +1,9 @@
-/* eslint-disable no-param-reassign */
-
 /** Convert a rgb(...) or rgba(...) string to its hexadecimal representation. */
 export function toHexRgb(rgbColor) {
-  if (!rgbColor || !rgbColor.startsWith('rgb')) {
+  if (!rgbColor?.startsWith('rgb')) {
     return rgbColor;
   }
-  // eslint-disable-next-line prefer-template
+
   return `#${rgbColor
     .replace(/rgba?\((.+)\)/, '$1')
     .split(',')
@@ -42,6 +40,8 @@ function luminance([r, g, b]) {
 
 /** Calculate the contrast between two RGB colors.
  *
+ * Returned value is the contrast ratio, which is a number between 1 and 21.
+ *
  * Algorithm and all constants taken from
  * https://www.w3.org/TR/WCAG20-TECHS/G17.html#G17-procedure
  */
@@ -70,19 +70,19 @@ export function getPageColors(imgData) {
     const rgb = `rgb(${r},${g},${b})`;
     colors[rgb] = (colors[rgb] ?? 0) + 1;
   }
-  // Really simple algorithm: The most frequent color is always going to be the text color,
-  // the next most frequent color that has a contrast of at least 7:1 with the text color is
-  // the background. If no background color matches this criterioin, we use black or white,
-  // depending on the text color.
+  // Really simple algorithm: The most frequent color is usually going to be the page background,
+  // the next most frequent color that has a contrast of at least 7:1 with the background is
+  // the text color. If no text color matches this criterion, we use black or white,
+  // depending on the background color.
   // This can and should probably be tweaked with some additional heuristics in the future
   // (converting to HSL seems worthwhile), but it's good enough for now.
   // FIXME: Testing with a cairo-backed canvas reveled that this approach relies a lot on
   //        the implementations in Firefox and Chrome, i.e. we got lucky. Needs more work
   //        to be more reliable and testable!
   const sorted = Object.entries(colors).sort(([, freqA], [, freqB]) => freqB - freqA);
-  const textColor = sorted[0][0];
+  const bgColor = sorted[0][0];
   // Add fallback colors to list of candidate colors
-  sorted.push(['rgba(0, 0, 0)', 0], ['rgb(255, 255, 255)', 0]);
-  const bgColor = sorted.slice(1).find(([color]) => contrast(textColor, color) >= 7)[0];
+  sorted.push(['rgb(0, 0, 0)', 0], ['rgb(255, 255, 255)', 0]);
+  const textColor = sorted.slice(1).find(([color]) => contrast(bgColor, color) >= 7)[0];
   return { textColor, bgColor };
 }

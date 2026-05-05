@@ -11,6 +11,7 @@ export default {
     textColor: 'Farbe für Text',
     backgroundColor: 'Farbe für Zeilenhintergrund',
     resetTextColors: 'Farben zurücksetzen',
+    opacityCurrentValue: 'Aktuelle Text-Transparenz: {{value}} Prozent',
   },
   en: {
     collapseTextOverlayOptions: 'Collapse text overlay options',
@@ -24,6 +25,7 @@ export default {
     textColor: 'Text color',
     backgroundColor: 'Line background color',
     resetTextColors: 'Reset colors',
+    opacityCurrentValue: 'Current text opacity: {{value}} percent',
   },
   sr: {
     collapseTextOverlayOptions: 'Затворите опције приказа текста',
@@ -37,5 +39,6 @@ export default {
     textColor: 'Боја текста',
     backgroundColor: 'Боја позадине реда',
     resetTextColors: 'Ресет боја',
+    opacityCurrentValue: 'Тренутна видљивост текста: {{value}} процената',
   },
 };

@@ -1,4 +1,7 @@
-[build.environment]
-  NODE_VERSION = "16"
+[build]
+  command = "npm run build:demo"
+  publish = "demo/dist"
 
-  NPM_FLAGS = "--legacy-peer-deps"
+[build.environment]
+  NODE_VERSION = "24"
+  NPM_VERSION = "11"

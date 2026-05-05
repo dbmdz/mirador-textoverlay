@@ -1,14 +1,15 @@
 import { select, call } from 'redux-saga/effects';
 import { expectSaga } from 'redux-saga-test-plan';
 import { throwError } from 'redux-saga-test-plan/providers';
+import { describe, expect, it } from 'vitest';
 import {
-  getWindowConfig,
+  ActionTypes,
   getCanvases,
   getVisibleCanvases,
+  getWindowConfig,
+  receiveAnnotation,
   selectInfoResponse,
-} from 'mirador/dist/es/src/state/selectors';
-import { receiveAnnotation } from 'mirador/dist/es/src/state/actions';
-import ActionTypes from 'mirador/dist/es/src/state/actions/action-types';
+} from 'mirador';
 import { Canvas } from 'manifesto.js';
 
 import {
@@ -27,6 +28,7 @@ import {
   fetchAnnotationResource,
   processTextsFromAnnotations,
   onConfigChange,
+  onVisibleCanvasesChange,
   fetchColors,
   loadImageData,
 } from '../../src/state/sagas';
@@ -222,7 +224,7 @@ describe('Fetching external annotation sources', () => {
       .put(
         receiveAnnotation(targetId, annotationId, {
           resources: [{ resource: simpleExternalContent }],
-        })
+        }),
       )
       .run());
 
@@ -245,7 +247,7 @@ describe('Fetching external annotation sources', () => {
               },
             },
           ],
-        })
+        }),
       )
       .run());
 
@@ -362,6 +364,28 @@ describe('Reacting to configuration changes', () => {
       .run());
 });
 
+describe('Reacting to visible canvas changes', () => {
+  const windowId = 'window';
+
+  it('should trigger OCR discovery for newly visible canvases', () =>
+    expectSaga(onVisibleCanvasesChange, {
+      id: windowId,
+      payload: { visibleCanvases: ['canvasA', 'canvasB'] },
+    })
+      .provide([
+        [call(discoverExternalOcr, { visibleCanvases: ['canvasA', 'canvasB'], windowId }), {}],
+      ])
+      .call(discoverExternalOcr, { visibleCanvases: ['canvasA', 'canvasB'], windowId })
+      .run());
+
+  it('should do nothing when visible canvases are not part of the update payload', () =>
+    expectSaga(onVisibleCanvasesChange, { id: windowId, payload: {} })
+      .run()
+      .then(({ effects }) => {
+        expect(effects.call).toBeUndefined();
+      }));
+});
+
 describe('Fetching page colors', () => {
   const targetId = 'canvasA';
   const infoId = 'http://example.com/iiif/image/canvasA';
@@ -370,7 +394,7 @@ describe('Fetching page colors', () => {
     expectSaga(fetchColors, { targetId, infoId })
       .provide([
         [select(selectInfoResponse, { infoId }), { id: infoId }],
-        [call(loadImageData, `${infoId}/full/200,/0/default.jpg`), 'data'],
+        [call(loadImageData, `${infoId}/full/256,/0/default.jpg`), 'data'],
         [call(getPageColors, 'data'), colors],
       ])
       .put(receiveColors(targetId, colors.textColor, colors.bgColor))
@@ -380,7 +404,7 @@ describe('Fetching page colors', () => {
     expectSaga(fetchColors, { targetId, infoId })
       .provide([
         [select(selectInfoResponse, { infoId }), undefined],
-        [call(loadImageData, `${infoId}/full/200,/0/default.jpg`), 'data'],
+        [call(loadImageData, `${infoId}/full/256,/0/default.jpg`), 'data'],
         [call(getPageColors, 'data'), colors],
       ])
       .dispatch({
