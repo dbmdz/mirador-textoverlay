@@ -13,7 +13,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/dbmdz/mirador-textoverlay"
+    "url": "git+https://github.com/dbmdz/mirador-textoverlay.git"
   },
   "license": "MIT",
   "author": "Johannes Baiter <johannes.baiter@bsb-muenchen.de>",
