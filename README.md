@@ -6,7 +6,7 @@
 **A Mirador 4 plugin to display a selectable text overlay based on OCR or transcriptions.**
 
 [![Screenshot][screenshot]][demo]
-**[Demo on https://mirador-textoverlay.netlify.com][demo]** (try selecting some text)
+**[Demo on https://mirador-textoverlay.netlify.app][demo]** (try selecting some text)
 
 ## Requirements for supported IIIF manifests
 
@@ -125,6 +125,8 @@ contributions :-)
 For larger changes/features, it's usually wise to open an issue before
 starting the work, so we can discuss if it's a fit.
 
+**Note**: The package requires Node.js `24` and npm in major version `11`.
+
 [npm-badge]: https://img.shields.io/npm/v/mirador-textoverlay.png?style=flat-square
 [npm]: https://www.npmjs.org/package/mirador-textoverlay
 
@@ -132,6 +134,6 @@ starting the work, so we can discuss if it's a fit.
 [mirador]: https://github.com/ProjectMirador/mirador/releases/tag/v4.0.0
 
 [screenshot]: .docassets/screenshot.jpg
-[demo]: https://mirador-textoverlay.netlify.com
+[demo]: https://mirador-textoverlay.netlify.app
 [demo-cfg]: https://github.com/dbmdz/mirador-textoverlay/blob/main/src/demo.js
 [demo-cfg-catalog]: https://github.com/dbmdz/mirador-textoverlay/blob/main/src/demo.js
