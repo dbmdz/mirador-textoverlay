@@ -17,6 +17,8 @@ const pluginConfig = {
         /^@mui\/(icons-material|material|system)/,
         'mirador',
         'react',
+        "react/jsx-runtime",
+        "react/jsx-dev-runtime",
         'react-dom',
         'react-i18next',
       ],
