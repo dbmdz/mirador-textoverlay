@@ -23,11 +23,11 @@
   ],
   "scripts": {
     "build": "npm run build:demo && npm run build:plugin",
-    "check": "npm run lint && npm run test && npm run build",
     "prebuild:demo": "rimraf demo/dist",
     "build:demo": "BUILD_MODE=demo vite build",
     "prebuild:plugin": "rimraf dist",
     "build:plugin": "vite build",
+    "check": "npm run lint && npm run test && npm run build",
     "format": "eslint . --ext js,jsx --fix --max-warnings 0 --report-unused-disable-directives",
     "lint": "eslint . --ext js,jsx --max-warnings 0 --report-unused-disable-directives",
     "prepublishOnly": "npm run check",
