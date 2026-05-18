@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 
 ## Unreleased
 
+## [1.0.0](https://github.com/dbmdz/mirador-textoverlay/releases/tag/1.0.0) - 2026-05-18
 ### Changed
 
 - Updated plugin to Mirador 4/MUI v7/React 19
