@@ -1,6 +1,6 @@
 {
   "name": "mirador-textoverlay",
-  "version": "0.4.0",
+  "version": "1.0.0",
   "description": "Mirador 4 plugin to render a hidden or visible selectable text overlay",
   "keywords": [
     "iiif",
