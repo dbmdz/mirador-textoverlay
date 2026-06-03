@@ -11,7 +11,6 @@ import ColorInput from './ColorInput';
 
 export default function ColorWidget({
   bgColor,
-  containerId,
   onChange,
   pageColors,
   t,
@@ -42,7 +41,6 @@ export default function ColorWidget({
       {showResetButton && (
         <MiradorMenuButton
           aria-label={t('resetTextColors')}
-          containerId={containerId}
           onClick={() =>
             onChange({
               useAutoColors: true,
@@ -96,7 +94,6 @@ export default function ColorWidget({
 
 ColorWidget.propTypes = {
   bgColor: PropTypes.string.isRequired,
-  containerId: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
   pageColors: PropTypes.arrayOf(
     PropTypes.shape({

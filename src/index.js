@@ -1,4 +1,4 @@
-import { getContainerId, getWindowConfig, updateWindow } from 'mirador';
+import { getWindowConfig, updateWindow } from 'mirador';
 
 import MiradorTextOverlay from './components/MiradorTextOverlay';
 import OverlaySettings from './components/settings/OverlaySettings';
@@ -35,7 +35,6 @@ const plugin = [
       const { imageToolsEnabled = false } = getWindowConfig(state, { windowId });
 
       return {
-        containerId: getContainerId(state),
         imageToolsEnabled,
         pageColors: getTextsForVisibleCanvases(state, { windowId })
           .filter((page) => page !== undefined)
