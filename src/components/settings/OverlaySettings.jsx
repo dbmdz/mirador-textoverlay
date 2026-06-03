@@ -18,7 +18,6 @@ import ColorWidget from './ColorWidget';
 import OpacityWidget from './OpacityWidget';
 
 export default function OverlaySettings({
-  containerId,
   imageToolsEnabled,
   pageColors,
   t,
@@ -63,7 +62,6 @@ export default function OverlaySettings({
         aria-expanded={showAllButtons}
         aria-haspopup
         aria-label={open ? t('collapseTextOverlayOptions') : t('expandTextOverlayOptions')}
-        containerId={containerId}
         disabled={textsFetching}
         onClick={() => setOpen(!open)}
       >
@@ -96,7 +94,6 @@ export default function OverlaySettings({
             <MiradorMenuButton
               aria-label={t('textSelect')}
               aria-pressed={selectable}
-              containerId={containerId}
               sx={{ backgroundColor: selectable ? toggledBubbleBg : 'transparent' }}
               onClick={() =>
                 updateWindowTextOverlayOptions({
@@ -112,7 +109,6 @@ export default function OverlaySettings({
             <MiradorMenuButton
               aria-label={t('textVisible')}
               aria-pressed={visible}
-              containerId={containerId}
               sx={{ backgroundColor: visible ? toggledBubbleBg : 'transparent' }}
               onClick={() => {
                 updateWindowTextOverlayOptions({
@@ -132,7 +128,6 @@ export default function OverlaySettings({
               aria-controls="text-opacity-slider"
               aria-expanded={showOpacitySlider}
               aria-label={t('textOpacity')}
-              containerId={containerId}
               disabled={!visible}
               sx={{ backgroundColor: showOpacitySlider ? alpha(bubbleFg, 0.1) : 'transparent' }}
               onClick={() => setShowOpacitySlider(!showOpacitySlider)}
@@ -158,7 +153,6 @@ export default function OverlaySettings({
               aria-controls="color-picker"
               aria-expanded={showColorPicker}
               aria-label={t('colorPicker')}
-              containerId={containerId}
               disabled={!visible}
               sx={{ backgroundColor: showColorPicker ? alpha(bubbleFg, 0.1) : 'transparent' }}
               onClick={() => setShowColorPicker(!showColorPicker)}
@@ -168,7 +162,6 @@ export default function OverlaySettings({
             {visible && showColorPicker && (
               <ColorWidget
                 bgColor={bgColor}
-                containerId={containerId}
                 pageColors={pageColors}
                 t={t}
                 textColor={textColor}
@@ -199,7 +192,6 @@ export default function OverlaySettings({
 }
 
 OverlaySettings.propTypes = {
-  containerId: PropTypes.string.isRequired,
   imageToolsEnabled: PropTypes.bool.isRequired,
   pageColors: PropTypes.arrayOf(
     PropTypes.shape({

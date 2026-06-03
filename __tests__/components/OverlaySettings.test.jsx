@@ -5,7 +5,7 @@ import { fireEvent, render, screen, queryByRole } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('mirador', () => ({
-  MiradorMenuButton: ({ children, containerId: _containerId, sx, ...props }) => (
+  MiradorMenuButton: ({ children, sx, ...props }) => (
     <button type="button" style={sx} {...props}>
       {children}
     </button>
@@ -66,7 +66,6 @@ function renderSettings(props = {}, renderFn = render) {
   const { rerender } = renderFn(
     <ThemeProvider theme={mockTheme}>
       <OverlaySettings
-        containerId="foobar"
         imageToolsEnabled={false}
         t={(key) => key}
         textsAvailable
