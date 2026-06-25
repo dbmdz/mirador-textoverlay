@@ -81,8 +81,7 @@ export function getPageColors(imgData) {
   //        to be more reliable and testable!
   const sorted = Object.entries(colors).sort(([, freqA], [, freqB]) => freqB - freqA);
   const bgColor = sorted[0][0];
-  // Add fallback colors to list of candidate colors
-  sorted.push(['rgb(0, 0, 0)', 0], ['rgb(255, 255, 255)', 0]);
-  const textColor = sorted.slice(1).find(([color]) => contrast(bgColor, color) >= 7)[0];
+  const textColor =
+    sorted.slice(1).find(([color]) => contrast(bgColor, color) >= 7)?.[0] ?? 'rgb(0, 0, 0)';
   return { textColor, bgColor };
 }
