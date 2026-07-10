@@ -123,7 +123,7 @@ export async function fetchAnnotationResource(url) {
 /** Saga for fetching external annotation resources */
 /** @returns {Generator} */
 export function* fetchExternalAnnotationResources({ targetId, annotationId, annotationJson }) {
-  if (!annotationJson.resources.some(hasExternalResource)) {
+  if (!annotationJson.resources?.some(hasExternalResource)) {
     return;
   }
   const resourceUris = uniq(
@@ -154,7 +154,9 @@ export function* fetchExternalAnnotationResources({ targetId, annotationId, anno
 export function* processTextsFromAnnotations({ targetId, annotationId, annotationJson }) {
   // Check if the annotation contains "content as text" resources that
   // we can extract text with coordinates from
-  const contentAsTextAnnos = annotationJson.resources.filter(
+  // IIIF v3 annotation pages keep their annotations in `items` instead of
+  // `resources`; those are not handled yet, so skip them instead of crashing.
+  const contentAsTextAnnos = (annotationJson.resources ?? []).filter(
     (anno) =>
       anno.motivation === 'supplementing' || // IIIF 3.0
       anno.resource['@type']?.toLowerCase() === 'cnt:contentastext' || // IIIF 2.0

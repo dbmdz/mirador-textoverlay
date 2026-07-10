@@ -263,6 +263,21 @@ describe('Fetching external annotation sources', () => {
         expect(effects.call).toBeUndefined();
         expect(effects.put).toBeUndefined();
       }));
+
+  it('should not do anything for IIIF v3 annotation pages without a resources array', () =>
+    expectSaga(fetchExternalAnnotationResources, {
+      annotationId,
+      annotationJson: {
+        items: [{ body: { value: 'a comment' }, motivation: 'commenting' }],
+        type: 'AnnotationPage',
+      },
+      targetId,
+    })
+      .run()
+      .then(({ effects }) => {
+        expect(effects.call).toBeUndefined();
+        expect(effects.put).toBeUndefined();
+      }));
 });
 
 describe('Processing text from regular annotations', () => {
@@ -284,6 +299,21 @@ describe('Processing text from regular annotations', () => {
       .put(receiveText('canvasA', 'annoList', 'annos', mockParse))
       .run();
   });
+
+  it('should not do anything for IIIF v3 annotation pages without a resources array', () =>
+    expectSaga(processTextsFromAnnotations, {
+      annotationId: 'annoPage',
+      annotationJson: {
+        items: [{ body: { value: 'a comment' }, motivation: 'commenting' }],
+        type: 'AnnotationPage',
+      },
+      targetId: 'canvasA',
+    })
+      .run()
+      .then(({ effects }) => {
+        expect(effects.call).toBeUndefined();
+        expect(effects.put).toBeUndefined();
+      }));
 });
 
 describe('Reacting to configuration changes', () => {
