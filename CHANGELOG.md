@@ -6,13 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 
 ## Unreleased
 
-## [1.0.4](https://github.com/dbmdz/mirador-textoverlay/releases/tag/1.0.4) - 2026-06-25
-
 ### Fixed
 
 - Fixed crashes on IIIF v3 annotation pages without a `resources` array
 
-## [1.0.4](https://github.com/dbmdz/mirador-textoverlay/releases/tag/v1.0.4) - 2026-06-25
+## [1.0.4](https://github.com/dbmdz/mirador-textoverlay/releases/tag/1.0.4) - 2026-06-25
 
 ### Fixed
 
