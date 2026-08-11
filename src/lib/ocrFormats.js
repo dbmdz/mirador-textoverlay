@@ -1,6 +1,8 @@
 /** Functions to parse OCR boxes from various formats and render them as SVG. */
 import max from 'lodash/max';
 
+import { asArray, flattenBodies, getBodyValue } from './iiifAnnotations';
+
 const parser = new DOMParser();
 
 /** Parse hOCR attributes from a node's title attribute */
@@ -341,7 +343,40 @@ export function parseOcr(ocrText, referenceSize) {
  * @returns parsed OCR boxes
  */
 export function parseIiifAnnotations(annos, imgSize) {
-  const fragmentPat = /.+#xywh=(\d+),(\d+),(\d+),(\d+)/g;
+  const fragmentPat = /(?:^|[#&])xywh=(?:pixel:)?([\d.]+),([\d.]+),([\d.]+),([\d.]+)/;
+
+  const textFor = (anno) => {
+    const candidates = flattenBodies(anno.body ?? anno.resource).filter(
+      (body) => getBodyValue(body) !== undefined,
+    );
+    const preferred = candidates.find((body) => {
+      return asArray(body.purpose).includes('supplementing');
+    });
+    return getBodyValue(preferred ?? candidates[0]);
+  };
+
+  const regionFor = (target) => {
+    if (Array.isArray(target)) {
+      return target.map(regionFor).find(Boolean);
+    }
+    if (typeof target === 'string') {
+      return target.match(fragmentPat)?.slice(1, 5).map(Number);
+    }
+    if (!target) {
+      return undefined;
+    }
+
+    const directRegion = regionFor(target.id ?? target['@id']);
+    if (directRegion) {
+      return directRegion;
+    }
+    const selectors = Array.isArray(target.selector) ? target.selector : [target.selector];
+    const fragmentSelector = selectors.find(
+      (selector) =>
+        selector?.type === 'FragmentSelector' || selector?.['@type'] === 'oa:FragmentSelector',
+    );
+    return regionFor(fragmentSelector?.value);
+  };
 
   // TODO: Handle word-level annotations
   // See if we can tell from the annotations themselves if it targets a line
@@ -351,27 +386,18 @@ export function parseIiifAnnotations(annos, imgSize) {
       anno.dcType === 'Line', // Europeana
   );
   const targetAnnos = lineAnnos.length > 0 ? lineAnnos : annos;
-  const boxes = targetAnnos.map((anno) => {
-    let text;
-    if (anno.resource) {
-      text = anno.resource.chars ?? anno.resource.value;
-    } else {
-      text = anno.body.value;
+  const boxes = targetAnnos.flatMap((anno) => {
+    const region = regionFor(anno.target ?? anno.on);
+    const text = textFor(anno);
+    if (!region || text === undefined) {
+      return [];
     }
-    let target = anno.target || anno.on;
-    target = Array.isArray(target) ? target[0] : target;
-    const [x, y, width, height] = target.matchAll(fragmentPat).next().value.slice(1, 5);
-    return {
-      height: parseInt(height, 10),
-      text,
-      width: parseInt(width, 10),
-      x: parseInt(x, 10),
-      y: parseInt(y, 10),
-    };
+    const [x, y, width, height] = region;
+    return [{ height, text, width, x, y }];
   });
 
   return {
-    ...(imgSize ?? getFallbackImageSize(boxes)),
+    ...(imgSize ?? (boxes.length > 0 ? getFallbackImageSize(boxes) : { height: 0, width: 0 })),
     lines: boxes,
   };
 }

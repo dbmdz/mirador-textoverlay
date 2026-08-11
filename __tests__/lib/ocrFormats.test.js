@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { parseOcr, parseAlto, parseHocr, parseIiifAnnotations } from '../../src/lib/ocrFormats';
 
 import contentAsTextAnnos from '../../__fixtures__/anno_iifv2.json';
+import { annotation as v3Annotation, textualBody } from '../../__fixtures__/iiifv3';
 
 /** Helper for comparing floats.
  *
@@ -144,5 +145,75 @@ describe('parsing text from IIIF annotations', () => {
     const parsed = parseIiifAnnotations(contentAsTextAnnos.resources);
     expect(parsed.width).toEqual(2261);
     expect(parsed.height).toEqual(3309);
+  });
+
+  it('should parse IIIF v3 SpecificResource targets with FragmentSelectors', () => {
+    const parsed = parseIiifAnnotations([
+      v3Annotation({
+        body: textualBody('A transcription line'),
+        target: {
+          selector: {
+            type: 'FragmentSelector',
+            value: 'xywh=500,1100,3500,100',
+          },
+          source: 'https://example.org/canvas/1r',
+          type: 'SpecificResource',
+        },
+        textGranularity: 'line',
+      }),
+    ]);
+
+    expect(parsed).toEqual({
+      height: 1200,
+      lines: [
+        {
+          height: 100,
+          text: 'A transcription line',
+          width: 3500,
+          x: 500,
+          y: 1100,
+        },
+      ],
+      width: 4000,
+    });
+  });
+
+  it('should parse object targets, decimal coordinates, and Choice bodies', () => {
+    const parsed = parseIiifAnnotations([
+      v3Annotation({
+        body: {
+          items: [
+            textualBody('Preferred text', { language: 'en' }),
+            textualBody('Alternativer Text', { language: 'de' }),
+          ],
+          type: 'Choice',
+        },
+        target: {
+          id: 'https://example.org/canvas/1r#xywh=pixel:10.5,20.25,100.5,50.75',
+          type: 'Canvas',
+        },
+      }),
+    ]);
+
+    expect(parsed.lines).toEqual([
+      {
+        height: 50.75,
+        text: 'Preferred text',
+        width: 100.5,
+        x: 10.5,
+        y: 20.25,
+      },
+    ]);
+  });
+
+  it('should ignore annotations without a supported spatial target', () => {
+    expect(
+      parseIiifAnnotations([
+        v3Annotation({
+          body: textualBody('Whole canvas transcription'),
+          target: 'https://example.org/canvas/1r',
+        }),
+      ]),
+    ).toEqual({ height: 0, lines: [], width: 0 });
   });
 });

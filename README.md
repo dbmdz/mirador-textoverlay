@@ -11,11 +11,15 @@
 ## Requirements for supported IIIF manifests
 
 - Line-level annotations with either one of:
-  - a `motivation` that is `supplementing` (IIIF v3)
+  - a `motivation` containing `supplementing` and an embedded `TextualBody`
+    or external `Text` body (IIIF v3); body arrays and `Choice` bodies are
+    supported
   - a resource that has a `@type` that is `cnt:contentAsText`  (IIIF v2)
   - a `dcType` that is equal to `Line` (Europeana)
-- A per-canvas `seeAlso` entry pointing to the ALTO or hOCR OCR markup for
-  the page with either:
+- Annotation targets expressed as a pixel `xywh` URI fragment or as a
+  `SpecificResource` with a `FragmentSelector`
+- A per-canvas `seeAlso` or `rendering` entry pointing to the ALTO or hOCR OCR
+  markup for the page with either:
   - A `format` that is `application/xml+alto` or `text/vnd.hocr+html`
   - A `profile` starting with `http://www.loc.gov/standards/alto/`,
   `http://kba.cloud/hocr-spec`, `http://kba.github.io/hocr-spec/` or
