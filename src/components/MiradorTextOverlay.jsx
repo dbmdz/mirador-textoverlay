@@ -109,17 +109,14 @@ class MiradorTextOverlay extends Component {
 
     const { viewer, canvasWorld } = this.props;
     const canvasDimensions = canvasWorld?.canvasDimensions ?? [];
-    const baseItem = viewer.world.getItemAt(0);
-    if (!baseItem) {
+    if (!viewer.world.getItemAt(0)) {
       return;
     }
 
     // Determine new scale factor and position for each page
     const vpBounds = viewer.viewport.getBounds(true);
     const viewportZoom = viewer.viewport.getZoom(true);
-    const baseCanvasWidth = canvasDimensions[0]?.width || baseItem.source.dimensions.x;
-    const worldToScreenScale =
-      baseItem.viewportToImageZoom(viewportZoom) * (baseItem.source.dimensions.x / baseCanvasWidth);
+    const worldToScreenScale = viewer.container.clientWidth * viewportZoom;
     if (this.containerRef.current) {
       const { clientWidth: containerWidth, clientHeight: containerHeight } = viewer.container;
       const flip = viewer.viewport.getFlip();
@@ -157,11 +154,8 @@ class MiradorTextOverlay extends Component {
       if (!page || !canvasDims?.width || !canvasDims?.height) {
         continue;
       }
-      const item = viewer.world.getItemAt(itemNo);
-      const sourceWidth =
-        canvasDims.canvas?.getWidth?.() ?? item?.source?.dimensions?.x ?? page.width;
-      const sourceHeight =
-        canvasDims.canvas?.getHeight?.() ?? item?.source?.dimensions?.y ?? page.height;
+      const sourceWidth = canvasDims.canvas?.getWidth?.() ?? page.width;
+      const sourceHeight = canvasDims.canvas?.getHeight?.() ?? page.height;
       const canvasWorldScaleX = sourceWidth / canvasDims.width;
       const canvasWorldScaleY = sourceHeight / canvasDims.height;
       renderRef.updateTransforms(
