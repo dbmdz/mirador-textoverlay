@@ -48,6 +48,7 @@ function toPageText(canvasText) {
   return {
     ...canvasText.text,
     source: canvasText.source,
+    isFetchingColors: canvasText.isFetchingColors,
     textColor: canvasText.textColor,
     bgColor: canvasText.bgColor,
   };

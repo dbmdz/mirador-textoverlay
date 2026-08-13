@@ -7,7 +7,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 ## Unreleased
 
 ### Added
+
 - Support for IIIFv3 annotations and OCR references in `rendering` and `seeAlso`
+
+### Changed
+
+- Improved automatic page color detection by sampling and clustering colors within OCR text regions
+
+### Fixed
+
+- Fixed automatic colors for IIIF Image API 3 resources and delayed text rendering until color detection completes
 
 ## [1.0.4](https://github.com/dbmdz/mirador-textoverlay/releases/tag/1.0.4) - 2026-06-25
 

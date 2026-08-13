@@ -12,13 +12,47 @@ describe('toHexRgb', () => {
 });
 
 describe('getPageColors', () => {
-  // NOTE: We should really test with actual images here, but unfortunately our current algorithm
-  //       relies on the way Gecko and WebKit render images, which seems to drastically differ from
-  //       the way the Cairo canvas that we have available in the test env renders them ¯\_(ツ)_/¯
   it('should be able to determine foreground and background from 4-pixel mock image', () => {
-    const mockData = [255, 255, 255, 255, 0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255];
-    const { textColor, bgColor } = getPageColors(mockData);
+    const image = {
+      data: [255, 255, 255, 255, 0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255],
+      height: 1,
+      width: 4,
+    };
+    const { textColor, bgColor } = getPageColors(image);
     expect(textColor).toEqual('rgb(255,255,255)');
     expect(bgColor).toEqual('rgb(0,0,0)');
+  });
+
+  it('should group nearby background colors', () => {
+    const image = {
+      data: [
+        192, 160, 128, 255, 193, 161, 129, 255, 194, 162, 130, 255, 0, 0, 0, 255, 0, 0, 0,
+        255,
+      ],
+      height: 1,
+      width: 5,
+    };
+    const { textColor, bgColor } = getPageColors(image);
+    expect(textColor).toEqual('rgb(0,0,0)');
+    expect(bgColor).toEqual('rgb(193,161,129)');
+  });
+
+  it('should only sample colors inside OCR line boxes', () => {
+    const image = {
+      data: [
+        192, 160, 128, 255, 193, 161, 129, 255, 0, 0, 0, 255, 0, 0, 0, 255, 194, 162,
+        130, 255, 16, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255,
+      ],
+      height: 2,
+      width: 4,
+    };
+    const pageText = {
+      height: 2,
+      lines: [{ x: 0, y: 0, width: 2, height: 2 }],
+      width: 4,
+    };
+    const { textColor, bgColor } = getPageColors(image, pageText);
+    expect(textColor).toEqual('rgb(16,0,0)');
+    expect(bgColor).toEqual('rgb(193,161,129)');
   });
 });
