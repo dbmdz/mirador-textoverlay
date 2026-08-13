@@ -11,7 +11,7 @@ import {
   receiveAnnotation,
   selectInfoResponse,
 } from 'mirador';
-import { Canvas } from 'manifesto.js';
+import { Canvas, parseManifest } from 'manifesto.js';
 
 import {
   annotation as v3Annotation,
@@ -27,6 +27,7 @@ import {
   receiveTextFailure,
   requestColors,
   receiveColors,
+  receiveColorsFailure,
 } from '../../src/state/actions';
 import {
   discoverExternalOcr,
@@ -120,8 +121,22 @@ describe('Discovering external OCR resources', () => {
         [select(getCanvases, { windowId }), canvases],
         [select(getTexts), {}],
       ])
-      .put(discoveredText('canvasA', 'http://example.com/ocr/canvasA'))
-      .put(discoveredText('canvasB', 'http://example.com/ocr/canvasB'))
+      .put(
+        discoveredText(
+          'canvasA',
+          'http://example.com/ocr/canvasA',
+          'ocr',
+          'http://example.com/iiif/image/canvasA',
+        ),
+      )
+      .put(
+        discoveredText(
+          'canvasB',
+          'http://example.com/ocr/canvasB',
+          'ocr',
+          'http://example.com/iiif/image/canvasB',
+        ),
+      )
       .run());
 
   ['selectable', 'visible'].forEach((setting) => {
@@ -173,12 +188,15 @@ describe('Discovering external OCR resources', () => {
   it('should request colors for each canvas with an associated resource', () =>
     expectSaga(discoverExternalOcr, { visibleCanvases: ['canvasA', 'canvasB'], windowId })
       .provide([
-        [select(getWindowConfig, { windowId }), windowConfig],
+        [
+          select(getWindowConfig, { windowId }),
+          { textOverlay: { ...windowConfig.textOverlay, visible: true } },
+        ],
         [select(getCanvases, { windowId }), canvases],
         [select(getTexts), {}],
       ])
-      .put(discoveredText('canvasA', 'http://example.com/ocr/canvasA'))
-      .put(discoveredText('canvasB', 'http://example.com/ocr/canvasB'))
+      .put(requestText('canvasA', 'http://example.com/ocr/canvasA', canvasSize))
+      .put(requestText('canvasB', 'http://example.com/ocr/canvasB', canvasSize))
       .put(requestColors('canvasA', 'http://example.com/iiif/image/canvasA'))
       .put(requestColors('canvasB', 'http://example.com/iiif/image/canvasB'))
       .run());
@@ -529,13 +547,25 @@ describe('Discovering external OCR for IIIF v3', () => {
     },
   };
 
-  it('should discover OCR and image services from a genuine v3 Canvas', () => {
-    const v3Canvas = new Canvas(
-      imageCanvas({
-        id: 'canvasV3',
-        imageServiceId: 'http://example.com/iiif/image/v3canvas',
-      }),
-    );
+  it('should discover the image service from a genuine v3 Manifest', () => {
+    const manifest = parseManifest({
+      id: 'manifestV3',
+      items: [
+        imageCanvas({
+          id: 'canvasV3',
+          imageServiceId: 'http://example.com/iiif/image/v3canvas',
+        }),
+      ],
+      services: [
+        {
+          id: 'http://example.com/tracking',
+          profile: 'http://universalviewer.io/tracking-extensions-profile',
+          type: 'Text',
+        },
+      ],
+      type: 'Manifest',
+    });
+    const v3Canvas = manifest.getSequenceByIndex(0).getCanvasByIndex(0);
 
     return expectSaga(discoverExternalOcr, { visibleCanvases: ['canvasV3'], windowId })
       .provide([
@@ -543,8 +573,14 @@ describe('Discovering external OCR for IIIF v3', () => {
         [select(getCanvases, { windowId }), [v3Canvas]],
         [select(getTexts), {}],
       ])
-      .put(discoveredText('canvasV3', 'http://example.com/ocr/v3'))
-      .put(requestColors('canvasV3', 'http://example.com/iiif/image/v3canvas'))
+      .put(
+        discoveredText(
+          'canvasV3',
+          'http://example.com/ocr/v3',
+          'ocr',
+          'http://example.com/iiif/image/v3canvas',
+        ),
+      )
       .run();
   });
 
@@ -575,8 +611,14 @@ describe('Discovering external OCR for IIIF v3', () => {
         [select(getTexts), {}],
       ])
       .put(discoveredText('canvasRendering', 'http://example.com/ocr/rendering'))
-      .put(discoveredText('canvasAfterRendering', 'http://example.com/ocr/v3'))
-      .put(requestColors('canvasAfterRendering', 'http://example.com/iiif/image/v3'))
+      .put(
+        discoveredText(
+          'canvasAfterRendering',
+          'http://example.com/ocr/v3',
+          'ocr',
+          'http://example.com/iiif/image/v3',
+        ),
+      )
       .run();
   });
 });
@@ -642,7 +684,12 @@ describe('Reacting to configuration changes', () => {
         [
           select(getTextsForVisibleCanvases, { windowId }),
           [
-            { sourceType: 'ocr', canvasId: 'canvasA', source: 'sourceA' },
+            {
+              sourceType: 'ocr',
+              canvasId: 'canvasA',
+              source: 'sourceA',
+              infoId: 'imageA',
+            },
             { sourceType: 'ocr', canvasId: 'canvasB', source: 'sourceB' },
           ],
         ],
@@ -654,6 +701,7 @@ describe('Reacting to configuration changes', () => {
           ],
         ],
       ])
+      .put(requestColors('canvasA', 'imageA'))
       .put(requestText('canvasA', 'sourceA', { width: 1000, height: 2000 }))
       .put(requestText('canvasB', 'sourceB', { width: 1500, height: 3000 }))
       .run());
@@ -685,41 +733,73 @@ describe('Fetching page colors', () => {
   const targetId = 'canvasA';
   const infoId = 'http://example.com/iiif/image/canvasA';
   const colors = { textColor: '#abcdef', bgColor: '#fedcba' };
+  const image = { data: 'data', width: 256, height: 300 };
+  const pageText = { lines: [], width: 500, height: 1000 };
+  const texts = { [targetId]: { sourceType: 'ocr', text: pageText } };
   it('should immediately trigger a fetch if info response is available', () =>
     expectSaga(fetchColors, { targetId, infoId })
       .provide([
         [select(selectInfoResponse, { infoId }), { id: infoId }],
-        [call(loadImageData, `${infoId}/full/256,/0/default.jpg`), 'data'],
-        [call(getPageColors, 'data'), colors],
+        [select(getTexts), texts],
+        [call(loadImageData, `${infoId}/full/256,/0/default.jpg`), image],
+        [call(getPageColors, image, pageText), colors],
       ])
       .put(receiveColors(targetId, colors.textColor, colors.bgColor))
       .run());
 
-  it('should wait for info response reception if it is initially unavailable', () =>
+  it.each([{ '@id': infoId }, { id: infoId }])(
+    'should wait for a v2 or v3 info response if it is initially unavailable',
+    (infoJson) =>
+      expectSaga(fetchColors, { targetId, infoId })
+        .provide([
+          [select(selectInfoResponse, { infoId }), undefined],
+          [select(getTexts), texts],
+          [call(loadImageData, `${infoId}/full/256,/0/default.jpg`), image],
+          [call(getPageColors, image, pageText), colors],
+        ])
+        .dispatch({
+          type: ActionTypes.RECEIVE_INFO_RESPONSE,
+          infoId,
+          infoJson,
+        })
+        .put(receiveColors(targetId, colors.textColor, colors.bgColor))
+        .run(),
+  );
+
+  it('should wait for parsed OCR before sampling colors', () =>
     expectSaga(fetchColors, { targetId, infoId })
       .provide([
-        [select(selectInfoResponse, { infoId }), undefined],
-        [call(loadImageData, `${infoId}/full/256,/0/default.jpg`), 'data'],
-        [call(getPageColors, 'data'), colors],
+        [select(selectInfoResponse, { infoId }), { id: infoId }],
+        [select(getTexts), {}],
+        [call(loadImageData, `${infoId}/full/256,/0/default.jpg`), image],
+        [call(getPageColors, image, pageText), colors],
       ])
-      .dispatch({
-        type: ActionTypes.RECEIVE_INFO_RESPONSE,
-        infoId,
-        infoJson: { '@id': infoId },
-      })
+      .dispatch(receiveText(targetId, 'ocr', 'ocr', pageText))
       .put(receiveColors(targetId, colors.textColor, colors.bgColor))
       .run());
 
-  it('should not do anything if the info response reception has failed', () =>
+  it('should finish color detection if fetching OCR fails', () => {
+    const error = new Error('OCR failed');
+    return expectSaga(fetchColors, { targetId, infoId })
+      .provide([
+        [select(selectInfoResponse, { infoId }), { id: infoId }],
+        [select(getTexts), {}],
+      ])
+      .dispatch(receiveTextFailure(targetId, 'ocr', error))
+      .put(receiveColorsFailure(targetId, error))
+      .run();
+  });
+
+  it('should finish color detection if the info response reception has failed', () =>
     expectSaga(fetchColors, { targetId, infoId })
       .provide([[select(selectInfoResponse, { infoId }), undefined]])
       .dispatch({
         type: ActionTypes.RECEIVE_INFO_RESPONSE_FAILURE,
         infoId,
       })
+      .put(receiveColorsFailure(targetId, undefined))
       .run()
       .then(({ effects }) => {
         expect(effects.call).toBeUndefined();
-        expect(effects.put).toBeUndefined();
       }));
 });

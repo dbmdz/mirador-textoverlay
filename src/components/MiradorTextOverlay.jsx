@@ -56,8 +56,9 @@ class MiradorTextOverlay extends Component {
     const viewportChanged =
       (this.shouldRender() && !this.shouldRender(prevProps)) ||
       canvasWorldChanged(prevProps.canvasWorld, this.props.canvasWorld) ||
-      pageTexts.filter(this.shouldRenderPage).length !==
-        prevProps.pageTexts.filter(this.shouldRenderPage).length;
+      pageTexts.filter((page) => this.shouldRenderPage(page, useAutoColors)).length !==
+        prevProps.pageTexts.filter((page) => this.shouldRenderPage(page, prevProps.useAutoColors))
+          .length;
 
     if (viewportChanged) {
       this.onUpdateViewport();
@@ -167,7 +168,8 @@ class MiradorTextOverlay extends Component {
   }
 
   /** If the page should be rendered */
-  shouldRenderPage = ({ lines } = {}) =>
+  shouldRenderPage = ({ lines, isFetchingColors } = {}, useAutoColors = this.props.useAutoColors) =>
+    (!useAutoColors || !isFetchingColors) &&
     lines &&
     lines.length > 0 &&
     lines.some(({ text, spans }) => text || (spans && spans.length > 0));
@@ -256,7 +258,7 @@ class MiradorTextOverlay extends Component {
         }}
       >
         {pageTexts.map((page, idx) => {
-          if (!page || !this.shouldRenderPage(page)) {
+          if (!page || !this.shouldRenderPage(page, useAutoColors)) {
             return null;
           }
           const {

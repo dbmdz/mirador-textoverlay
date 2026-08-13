@@ -9,6 +9,7 @@ export const textsReducer = (state = {}, action) => {
         [action.targetId]: {
           ...state[action.targetId],
           canvasId: action.targetId,
+          infoId: action.infoId,
           source: action.textUri,
           sourceType: action.sourceType,
         },
@@ -58,13 +59,31 @@ export const textsReducer = (state = {}, action) => {
           sourceType: action.sourceType,
         },
       };
+    case PluginActionTypes.REQUEST_COLORS:
+      return {
+        ...state,
+        [action.targetId]: {
+          ...state[action.targetId],
+          infoId: action.infoId,
+          isFetchingColors: true,
+        },
+      };
     case PluginActionTypes.RECEIVE_COLORS:
       return {
         ...state,
         [action.targetId]: {
           ...state[action.targetId],
           bgColor: action.bgColor,
+          isFetchingColors: false,
           textColor: action.textColor,
+        },
+      };
+    case PluginActionTypes.RECEIVE_COLORS_FAILURE:
+      return {
+        ...state,
+        [action.targetId]: {
+          ...state[action.targetId],
+          isFetchingColors: false,
         },
       };
     default:

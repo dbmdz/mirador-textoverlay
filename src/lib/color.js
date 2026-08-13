@@ -60,28 +60,64 @@ function contrast(colorA, colorB) {
 }
 
 /** Determine foreground and background color from text image. */
-export function getPageColors(imgData) {
-  const colors = {};
-  // Data is a flat array containing the image pixels as uint8 RGBA values in the range [0, 255]
-  for (let i = 0; i < imgData.length - 3; i += 4) {
-    const r = imgData[i];
-    const g = imgData[i + 1];
-    const b = imgData[i + 2];
-    const rgb = `rgb(${r},${g},${b})`;
-    colors[rgb] = (colors[rgb] ?? 0) + 1;
+export function getPageColors({ data, width, height }, pageText) {
+  const colors = new Map();
+  const sampleMask = getTextSampleMask(width, height, pageText);
+  // Group nearby colors so textured paper is treated as one dominant color
+  // instead of many infrequent exact RGB values.
+  for (let pixel = 0; pixel < width * height; pixel += 1) {
+    if (sampleMask && sampleMask[pixel] === 0) {
+      continue;
+    }
+    const offset = pixel * 4;
+    const r = data[offset];
+    const g = data[offset + 1];
+    const b = data[offset + 2];
+    const key = `${r >> 4},${g >> 4},${b >> 4}`;
+    const color = colors.get(key) ?? { count: 0, r: 0, g: 0, b: 0 };
+    color.count += 1;
+    color.r += r;
+    color.g += g;
+    color.b += b;
+    colors.set(key, color);
   }
-  // Really simple algorithm: The most frequent color is usually going to be the page background,
-  // the next most frequent color that has a contrast of at least 7:1 with the background is
-  // the text color. If no text color matches this criterion, we use black or white,
-  // depending on the background color.
-  // This can and should probably be tweaked with some additional heuristics in the future
-  // (converting to HSL seems worthwhile), but it's good enough for now.
-  // FIXME: Testing with a cairo-backed canvas reveled that this approach relies a lot on
-  //        the implementations in Firefox and Chrome, i.e. we got lucky. Needs more work
-  //        to be more reliable and testable!
-  const sorted = Object.entries(colors).sort(([, freqA], [, freqB]) => freqB - freqA);
-  const bgColor = sorted[0][0];
+
+  const sorted = Array.from(colors.values()).sort((colorA, colorB) => colorB.count - colorA.count);
+  const asRgb = ({ count, r, g, b }) =>
+    `rgb(${Math.round(r / count)},${Math.round(g / count)},${Math.round(b / count)})`;
+  const bgColor = asRgb(sorted[0]);
   const textColor =
-    sorted.slice(1).find(([color]) => contrast(bgColor, color) >= 7)?.[0] ?? 'rgb(0, 0, 0)';
+    sorted
+      .slice(1)
+      .map(asRgb)
+      .find((color) => contrast(bgColor, color) >= 7) ?? 'rgb(0,0,0)';
   return { textColor, bgColor };
+}
+
+/** Build a thumbnail-sized mask covering the union of all OCR line boxes. */
+function getTextSampleMask(width, height, pageText) {
+  if (!pageText?.width || !pageText?.height || !pageText.lines?.length) {
+    return undefined;
+  }
+
+  const mask = new Uint8Array(width * height);
+  const scaleX = width / pageText.width;
+  const scaleY = height / pageText.height;
+  for (const line of pageText.lines) {
+    if (
+      ![line.x, line.y, line.width, line.height].every(Number.isFinite) ||
+      line.width <= 0 ||
+      line.height <= 0
+    ) {
+      continue;
+    }
+    const left = Math.max(0, Math.floor(line.x * scaleX));
+    const top = Math.max(0, Math.floor(line.y * scaleY));
+    const right = Math.min(width, Math.ceil((line.x + line.width) * scaleX));
+    const bottom = Math.min(height, Math.ceil((line.y + line.height) * scaleY));
+    for (let y = top; y < bottom; y += 1) {
+      mask.fill(1, y * width + left, y * width + right);
+    }
+  }
+  return mask.some(Boolean) ? mask : undefined;
 }

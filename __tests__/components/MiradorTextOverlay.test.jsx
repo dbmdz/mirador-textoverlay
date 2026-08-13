@@ -143,6 +143,32 @@ describe('MiradorTextOverlay', () => {
     expect(firstWord).not.toBeVisible();
   });
 
+  it('should wait for automatic color detection before rendering text', async () => {
+    const viewer = new MockOpenSeadragon();
+    const pendingPage = { ...pageTexts[0], isFetchingColors: true };
+    const { rerender } = renderOverlay({ pageTexts: [pendingPage], viewer });
+
+    expect(queryByText(viewer.canvas, 'a word on a line')).toBeNull();
+
+    renderOverlay(
+      { pageTexts: [{ ...pendingPage, isFetchingColors: false }], viewer },
+      rerender,
+    );
+
+    await waitFor(() => expect(queryByText(viewer.canvas, 'a word on a line')).not.toBeNull());
+  });
+
+  it('should not wait for color detection when automatic colors are disabled', () => {
+    const {
+      props: { viewer },
+    } = renderOverlay({
+      pageTexts: [{ ...pageTexts[0], isFetchingColors: true }],
+      useAutoColors: false,
+    });
+
+    expect(queryByText(viewer.canvas, 'a word on a line')).not.toBeNull();
+  });
+
   it('should register viewport updates when enabled after mount', () => {
     const viewer = new MockOpenSeadragon();
     const { rerender } = renderOverlay({ enabled: false, pageTexts, viewer });

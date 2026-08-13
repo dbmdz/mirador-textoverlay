@@ -28,6 +28,7 @@ import {
   discoveredText,
   PluginActionTypes,
   receiveColors,
+  receiveColorsFailure,
   receiveText,
   receiveTextFailure,
   requestColors,
@@ -106,21 +107,21 @@ export function* discoverExternalOcr({ visibleCanvases: visibleCanvasIds, window
       if (alreadyHasText) {
         continue;
       }
-      if (selectable || visible) {
-        yield put(requestText(canvas.id, ocrSource, { height, width }));
-      } else {
-        yield put(discoveredText(canvas.id, ocrSource));
-      }
       // Get the IIIF Image Service from the canvas to determine text/background colors
       // NOTE: We don't do this in the `fetchColors` saga, since it's kind of a pain to get
       // a canvas object from an id, and we have one already here, so it's just simpler.
       const miradorCanvas = new MiradorCanvas(canvas);
-      const image = miradorCanvas.iiifImageResources[0];
-      const infoId = image?.getServices()[0].id;
-      if (!infoId) {
-        continue;
+      const infoId = miradorCanvas.imageServiceIds[0];
+      if (selectable || visible) {
+        if (infoId) {
+          // Mark color detection as pending before making the text renderable so
+          // fallback colors cannot flash for one render.
+          yield put(requestColors(canvas.id, infoId));
+        }
+        yield put(requestText(canvas.id, ocrSource, { height, width }));
+      } else {
+        yield put(discoveredText(canvas.id, ocrSource, 'ocr', infoId));
       }
-      yield put(requestColors(canvas.id, infoId));
     }
   }
 }
@@ -244,12 +245,13 @@ export function* onConfigChange({ payload, id: windowId }) {
     return;
   }
   const visibleCanvases = yield select(getVisibleCanvases, { windowId });
-  yield all(
-    needFetching.map(({ canvasId, source }) => {
-      const { width, height } = visibleCanvases.find((c) => c.id === canvasId).__jsonld;
-      return put(requestText(canvasId, source, { height, width }));
-    }),
-  );
+  for (const { canvasId, source, infoId, textColor, isFetchingColors } of needFetching) {
+    if (infoId && textColor === undefined && !isFetchingColors) {
+      yield put(requestColors(canvasId, infoId));
+    }
+    const { width, height } = visibleCanvases.find((c) => c.id === canvasId).__jsonld;
+    yield put(requestText(canvasId, source, { height, width }));
+  }
   if (needsDiscovery) {
     const canvasIds = visibleCanvases.map((c) => c.id);
     yield call(discoverExternalOcr, { visibleCanvases: canvasIds, windowId });
@@ -287,7 +289,11 @@ export async function loadImageData(imgUrl) {
       const ctx = canvas.getContext('2d');
       ctx.imageSmoothingEnabled = false;
       ctx.drawImage(img, 0, 0);
-      resolve(ctx.getImageData(0, 0, img.width, img.height).data);
+      resolve({
+        data: ctx.getImageData(0, 0, img.width, img.height).data,
+        height: img.height,
+        width: img.width,
+      });
     };
     img.onerror = reject;
     img.src = imgUrl;
@@ -306,20 +312,45 @@ export function* fetchColors({ targetId, infoId }) {
       ),
     });
     if (infoFailure) {
+      yield put(receiveColorsFailure(targetId, infoFailure.error));
       return;
     }
-    serviceId = infoSuccess.infoJson?.['@id'];
+    serviceId = infoSuccess.infoJson?.id ?? infoSuccess.infoJson?.['@id'];
   }
+
+  const texts = yield select(getTexts);
+  const currentText = texts?.[targetId];
+  let pageText = currentText?.sourceType === 'ocr' ? currentText.text : undefined;
+  if (!pageText) {
+    const { success: textSuccess, failure: textFailure } = yield race({
+      success: take(
+        (action) =>
+          action.type === PluginActionTypes.RECEIVE_TEXT &&
+          action.targetId === targetId &&
+          action.sourceType === 'ocr',
+      ),
+      failure: take(
+        (action) =>
+          action.type === PluginActionTypes.RECEIVE_TEXT_FAILURE && action.targetId === targetId,
+      ),
+    });
+    if (textFailure) {
+      yield put(receiveColorsFailure(targetId, textFailure.error));
+      return;
+    }
+    pageText = textSuccess.parsedText;
+  }
+
   try {
     // FIXME: This assumes a Level 2 endpoint, we should probably use one of the sizes listed
     //        explicitely in the info response instead.
     const imgUrl = `${serviceId}/full/256,/0/default.jpg`;
-    const imgData = yield call(loadImageData, imgUrl);
-    const { textColor, bgColor } = yield call(getPageColors, imgData);
+    const image = yield call(loadImageData, imgUrl);
+    const { textColor, bgColor } = yield call(getPageColors, image, pageText);
     yield put(receiveColors(targetId, textColor, bgColor));
   } catch (error) {
     console.error(error);
-    // NOP
+    yield put(receiveColorsFailure(targetId, error));
   }
 }
 
