@@ -15,7 +15,8 @@ const config = {
       provider: 'Europeana (Annotations, IIIFv2)',
     },
     {
-      manifestId: 'https://iiif.europeana.eu/presentation/9200396/BibliographicResource_3000118435525/manifest?format=3',
+      manifestId:
+        'https://iiif.europeana.eu/presentation/9200396/BibliographicResource_3000118435525/manifest?format=3',
       provider: 'Europeana (Annotations, IIIFv3)',
     },
     {

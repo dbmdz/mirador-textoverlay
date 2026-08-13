@@ -56,7 +56,7 @@ class MockOpenSeadragon {
   viewport = {
     getBounds: vi.fn(() => ({ x: -10, y: -20 })),
     getFlip: vi.fn(() => false),
-    getZoom: vi.fn(() => 1.33),
+    getZoom: vi.fn(() => 1.995 / 444),
     getRotation: vi.fn(() => 0),
   };
 
@@ -74,8 +74,20 @@ class MockOpenSeadragon {
 const mockCanvasWorld = {
   canvasIds: ['canvasA', 'canvasB'],
   canvasDimensions: [
-    { x: 0, y: 0, width: 200, height: 200 },
-    { x: 200, y: 0, width: 200, height: 200 },
+    {
+      x: 0,
+      y: 0,
+      width: 200,
+      height: 200,
+      canvas: { getWidth: () => 300, getHeight: () => 300 },
+    },
+    {
+      x: 200,
+      y: 0,
+      width: 200,
+      height: 200,
+      canvas: { getWidth: () => 300, getHeight: () => 300 },
+    },
   ],
 };
 
@@ -156,6 +168,27 @@ describe('MiradorTextOverlay', () => {
       transform: 'translate(451.95000000000005px, 72.9px) scale(1.33)',
     });
     expect(overlays[0].parentElement.style.transform).toHaveLength(0);
+  });
+
+  it('should not depend on the order of OpenSeadragon world items', () => {
+    const viewer = new MockOpenSeadragon();
+    viewer.world.getItemAt.mockImplementation((idx) =>
+      idx === 0
+        ? { ...viewer.image, source: { dimensions: { x: 600, y: 300 } } }
+        : viewer.image,
+    );
+    renderOverlay({ pageTexts, viewer });
+
+    viewer.handlers['update-viewport']();
+    const overlays = Array.of(...viewer.canvas.querySelectorAll('div > svg:first-of-type')).map(
+      (element) => element.parentElement,
+    );
+    expect(overlays[0]).toHaveStyle({
+      transform: 'translate(52.95000000000001px, 72.9px) scale(1.33)',
+    });
+    expect(overlays[1]).toHaveStyle({
+      transform: 'translate(451.95000000000005px, 72.9px) scale(1.33)',
+    });
   });
 
   it("should correctly patch the annotation overlay's style if present", () => {
@@ -247,7 +280,7 @@ describe('MiradorTextOverlay', () => {
     viewer.world.getItemCount.mockReturnValue(1);
     const singleCanvasWorld = {
       canvasIds: ['canvasA'],
-      canvasDimensions: [{ x: 0, y: 0, width: 200, height: 200 }],
+      canvasDimensions: [mockCanvasWorld.canvasDimensions[0]],
     };
     const singlePageTexts = [pageTexts[0]];
     const { rerender } = renderOverlay({
@@ -281,7 +314,7 @@ describe('MiradorTextOverlay', () => {
     viewer.world.getItemCount.mockReturnValue(1);
     const singleCanvasWorld = {
       canvasIds: ['canvasA'],
-      canvasDimensions: [{ x: 0, y: 0, width: 200, height: 200 }],
+      canvasDimensions: [mockCanvasWorld.canvasDimensions[0]],
     };
     const { rerender } = renderOverlay({
       canvasWorld: singleCanvasWorld,
