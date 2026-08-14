@@ -24,7 +24,7 @@
   "scripts": {
     "build": "npm run build:demo && npm run build:plugin",
     "prebuild:demo": "rimraf demo/dist",
-    "build:demo": "BUILD_MODE=demo vite build",
+    "build:demo": "vite build --config vite.config.demo.mjs",
     "prebuild:plugin": "rimraf dist",
     "build:plugin": "vite build",
     "check": "npm run lint && npm run test && npm run build",
@@ -32,7 +32,7 @@
     "lint": "eslint . --ext js,jsx --max-warnings 0 --report-unused-disable-directives",
     "prepublishOnly": "npm run check",
     "prepreview": "npm run build:demo",
-    "preview": "BUILD_MODE=demo vite preview",
+    "preview": "vite preview --config vite.config.demo.mjs",
     "start": "vite",
     "test": "vitest run",
     "test:watch": "vitest"

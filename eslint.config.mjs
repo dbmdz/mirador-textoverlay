@@ -71,7 +71,7 @@ export default defineConfig([
     '**/package-lock.json',
     '**/pnpm-lock.yaml',
     '**/eslint.config.mjs',
-    '**/vite.config.js',
+    '**/vite.config.*',
     '__tests__/**',
   ]),
 ]);
