@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 ### Changed
 
 - Improved automatic page color detection by sampling and clustering colors within OCR text regions
+- Updated dependencies
 
 ### Fixed
 
