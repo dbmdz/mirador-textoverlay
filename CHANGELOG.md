@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 
 ## Unreleased
 
+### Changed
+
+- Updated dependencies
+
+### Added
+
+- Disable plugin by setting `allowTextOverlay=false` in state
+- Add `watch plugin` script
+
 ## [1.1.1](https://github.com/dbmdz/mirador-textoverlay/releases/tag/1.1.1) - 2026-09-11
 
 ### Changed

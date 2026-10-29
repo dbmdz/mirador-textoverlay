@@ -32,7 +32,9 @@ const plugin = [
         dispatch(updateWindow(windowId, { textOverlay: options })),
     }),
     mapStateToProps: (state, { windowId }) => {
-      const { imageToolsEnabled = false } = getWindowConfig(state, { windowId });
+      const { imageToolsEnabled = false, allowTextOverlay = true } = getWindowConfig(state, {
+        windowId,
+      });
 
       return {
         imageToolsEnabled,
@@ -47,6 +49,7 @@ const plugin = [
           (text) => text?.isFetching,
         ),
         windowTextOverlayOptions: getWindowTextOverlayOptions(state, { windowId }),
+        allowTextOverlay,
       };
     },
     mode: 'add',

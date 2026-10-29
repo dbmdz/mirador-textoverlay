@@ -82,17 +82,22 @@ function renderSettings(props = {}, renderFn = render) {
 
 describe('TextOverlaySettingsBubble', () => {
   it('should not render when the texts are unavailable', () => {
-    renderSettings({ textsAvailable: false });
+    renderSettings({ allowTextOverlay: true, textsAvailable: false });
     expect(screen.queryByLabelText('expandTextOverlayOptions')).toBeNull();
   });
 
   it('should not render when the plugin is disabled', () => {
-    renderSettings({ windowTextOverlayOptions: { enabled: false } });
+    renderSettings({ allowTextOverlay: true, windowTextOverlayOptions: { enabled: false } });
+    expect(screen.queryByLabelText('expandTextOverlayOptions')).toBeNull();
+  });
+
+  it('should not render when the plugin is enabled but not allowed', () => {
+    renderSettings({ allowTextOverlay: false, windowTextOverlayOptions: { enabled: true } });
     expect(screen.queryByLabelText('expandTextOverlayOptions')).toBeNull();
   });
 
   it('should render the bubble collapsed when texts are available, but neither selection nor visibility is enabled', () => {
-    renderSettings();
+    renderSettings({ allowTextOverlay: true });
     expect(screen.getByLabelText('expandTextOverlayOptions')).toBeVisible();
     expect(screen.queryByLabelText('textSelect')).toBeNull();
     expect(screen.queryByLabelText('textVisible')).toBeNull();
@@ -100,7 +105,7 @@ describe('TextOverlaySettingsBubble', () => {
   });
 
   it('should open and close the menu on clicks', () => {
-    renderSettings();
+    renderSettings({ allowTextOverlay: true });
     let bubble = screen.queryByLabelText('expandTextOverlayOptions');
     expect(bubble).not.toBeNull();
     fireEvent.click(bubble);
@@ -114,6 +119,7 @@ describe('TextOverlaySettingsBubble', () => {
   it('should render the selection toggle correctly when enabled', () => {
     const { updateOptionsMock, options: initialOpts } = renderSettings({
       windowTextOverlayOptions: { selectable: true },
+      allowTextOverlay: true,
     });
 
     // Visibility and Selection bubbles should be shown, Opacity toggle should be disabled
@@ -145,6 +151,7 @@ describe('TextOverlaySettingsBubble', () => {
   it('should render the visibility toggle correctly when enabled', () => {
     const { updateOptionsMock, options: initialOpts } = renderSettings({
       windowTextOverlayOptions: { visible: true },
+      allowTextOverlay: true,
     });
 
     // Visibility and Selection bubbles should be shown, Opacity toggle should be enabled
@@ -178,6 +185,7 @@ describe('TextOverlaySettingsBubble', () => {
   it('should handle opacity changes correctly', () => {
     const { updateOptionsMock, options: initialOpts } = renderSettings({
       windowTextOverlayOptions: { opacity: 0.5, visible: true },
+      allowTextOverlay: true,
     });
     const opacityToggle = screen.getByLabelText('textOpacity');
 
@@ -202,6 +210,7 @@ describe('TextOverlaySettingsBubble', () => {
   it('should close the opacity slider when visibility is disabled', () => {
     renderSettings({
       windowTextOverlayOptions: { opacity: 0.5, visible: true },
+      allowTextOverlay: true,
     });
     const visibleToggle = screen.getByLabelText('textVisible');
     const opacityToggle = screen.getByLabelText('textOpacity');
@@ -214,14 +223,14 @@ describe('TextOverlaySettingsBubble', () => {
   });
 
   it('should be positioned lower if mirador-image-tools is enabled', () => {
-    renderSettings({ imageToolsEnabled: true });
+    renderSettings({ imageToolsEnabled: true, allowTextOverlay: true });
     expect(
       screen.getByLabelText('expandTextOverlayOptions').parentElement.parentElement,
     ).toHaveStyle('top: 66px');
   });
 
   it('should be closed, disabled and surrounded by a progress spinner when texts are fetching', () => {
-    renderSettings({ textsFetching: true, visible: true });
+    renderSettings({ textsFetching: true, visible: true, allowTextOverlay: true });
     expect(screen.getByRole('progressbar')).toBeVisible();
     expect(screen.getByLabelText('expandTextOverlayOptions')).toBeVisible();
     expect(screen.getByLabelText('expandTextOverlayOptions')).toBeDisabled();
@@ -233,6 +242,7 @@ describe('TextOverlaySettingsBubble', () => {
   it('should allow manually setting the foreground and background colors', () => {
     const { options, updateOptionsMock } = renderSettings({
       windowTextOverlayOptions: { visible: true, textColor: '#bbbbbb', bgColor: '#444444' },
+      allowTextOverlay: true,
     });
     fireEvent.click(screen.getByLabelText('colorPicker'));
 
@@ -257,13 +267,17 @@ describe('TextOverlaySettingsBubble', () => {
     renderSettings({
       windowTextOverlayOptions: { visible: true },
       pageColors: [undefined, undefined],
+      allowTextOverlay: true,
     });
     fireEvent.click(screen.getByLabelText('colorPicker'));
     expect(screen.queryByLabelText('resetTextColors')).toBeNull();
   });
 
   it('should disable auto-color reset and render gradients in the pickers if auto colors are being used', () => {
-    renderSettings({ windowTextOverlayOptions: { visible: true, useAutoColors: true } });
+    renderSettings({
+      windowTextOverlayOptions: { visible: true, useAutoColors: true },
+      allowTextOverlay: true,
+    });
     fireEvent.click(screen.getByLabelText('colorPicker'));
     expect(screen.queryByLabelText('resetTextColors')).toBeNull();
     const textLabel = screen.getByTitle('textColor');
@@ -282,6 +296,7 @@ describe('TextOverlaySettingsBubble', () => {
   it('should disable auto-colors if colors are manually selected', () => {
     const { updateOptionsMock, options } = renderSettings({
       windowTextOverlayOptions: { visible: true, useAutoColors: true },
+      allowTextOverlay: true,
     });
     fireEvent.click(screen.getByLabelText('colorPicker'));
     const textLabel = screen.getByTitle('backgroundColor');
@@ -298,6 +313,7 @@ describe('TextOverlaySettingsBubble', () => {
   it('should not disable auto-colors if manual color selection is canceled', () => {
     const { updateOptionsMock } = renderSettings({
       windowTextOverlayOptions: { visible: true, useAutoColors: true },
+      allowTextOverlay: true,
     });
     fireEvent.click(screen.getByLabelText('colorPicker'));
     const textLabel = screen.getByTitle('backgroundColor');
@@ -310,6 +326,7 @@ describe('TextOverlaySettingsBubble', () => {
   it('should reset the colors to auto if the colors were manipulated and the reset button is clicked', () => {
     const { updateOptionsMock, options } = renderSettings({
       windowTextOverlayOptions: { visible: true },
+      allowTextOverlay: true,
     });
     fireEvent.click(screen.getByLabelText('colorPicker'));
     fireEvent.click(screen.getByLabelText('resetTextColors'));
