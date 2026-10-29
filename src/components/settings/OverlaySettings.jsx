@@ -25,6 +25,7 @@ export default function OverlaySettings({
   textsFetching,
   updateWindowTextOverlayOptions,
   windowTextOverlayOptions,
+  allowTextOverlay,
 }) {
   const {
     bgColor: defaultBgColor,
@@ -52,7 +53,7 @@ export default function OverlaySettings({
     : defaultBgColor;
   const showAllButtons = open && !textsFetching;
 
-  if (!enabled || !textsAvailable) {
+  if (!enabled || !textsAvailable || !allowTextOverlay) {
     return null;
   }
 
